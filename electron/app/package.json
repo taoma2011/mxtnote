@@ -1,0 +1,18 @@
+{
+  "name": "xtnote",
+  "productName": "XtNote",
+  "version": "0.1.11",
+  "description": "Note taking app",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "Mxtsoft",
+    "email": "taoma2011@gmail.com",
+    "url": "http://mxtsoft.com/xtnote"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
