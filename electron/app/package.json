@@ -1,13 +1,13 @@
 {
-  "name": "xtnote",
-  "productName": "XtNote",
+  "name": "mxtnote",
+  "productName": "MxtNote",
   "version": "0.1.11",
   "description": "Note taking app",
   "main": "./main.prod.js",
   "author": {
     "name": "Mxtsoft",
     "email": "taoma2011@gmail.com",
-    "url": "http://mxtsoft.com/xtnote"
+    "url": "http://note.mxtsoft.com"
   },
   "scripts": {
     "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",

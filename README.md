@@ -1,6 +1,6 @@
 # README
 
-XtNote is an app to manage reading notes and documents and cross reference them
+MxtNote is an app to manage reading notes and documents and cross reference them
 
 ### Compile
 
