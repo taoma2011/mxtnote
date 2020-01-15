@@ -107,25 +107,24 @@ function saveLastPageNumber(state) {
 // if editingNid is null, we are not editing anything
 function setEditingNid(state, editingNid) {
   // first make the current editing note visible
-  let newNotes = state.notes
+  let newNotes = { ...state.notes };
   if (state.editingNid) {
     newNotes = {
       ...newNotes,
-      [state.editingNid]: { ...state.notes[state.editingNid], visible: true };
-    }
+      [state.editingNid]: { ...state.notes[state.editingNid], visible: true }
+    };
   }
   if (editingNid) {
     newNotes = {
       ...newNotes,
-      [editingNid]: { ...state.notes[editingNid], visible: false};
-    }
+      [editingNid]: { ...state.notes[editingNid], visible: false }
+    };
   }
   return {
     ...state,
-    notes: {
-      ...newNotes:
-
-    }
+    editingNid,
+    notes: newNotes,
+    showSelection: !!editingNid
   };
 }
 
