@@ -47,8 +47,8 @@ import {
   IMAGE_FILE_READY,
   CLOSE_NOTE_EDITOR,
   OPEN_NOTE_EDITOR
-} from '../actions/file';
-import type { FileStateType, Action } from './types';
+} from "../actions/file";
+import type { FileStateType, Action } from "./types";
 import {
   AddDocument,
   UpdateDocument,
@@ -62,7 +62,7 @@ import {
   DeleteAllNotes,
   DeleteAllTodos,
   DeleteSettings
-} from '../utils/db';
+} from "../utils/db";
 
 import {
   findFileById,
@@ -78,7 +78,7 @@ import {
   isNewNote,
   generateId,
   getElectron
-} from '../utils/common';
+} from "../utils/common";
 
 function saveLastPageNumber(state) {
   const { files } = state;
@@ -103,19 +103,45 @@ function saveLastPageNumber(state) {
   };
 }
 
+// return new state to indicate whether we are editing a note
+// if editingNid is null, we are not editing anything
+function setEditingNid(state, editingNid) {
+  // first make the current editing note visible
+  let newNotes = state.notes
+  if (state.editingNid) {
+    newNotes = {
+      ...newNotes,
+      [state.editingNid]: { ...state.notes[state.editingNid], visible: true };
+    }
+  }
+  if (editingNid) {
+    newNotes = {
+      ...newNotes,
+      [editingNid]: { ...state.notes[editingNid], visible: false};
+    }
+  }
+  return {
+    ...state,
+    notes: {
+      ...newNotes:
+
+    }
+  };
+}
+
 export default function file(state: FileStateType, action: Action) {
   if (!state) {
     return {
       currentTab: 2,
       files: [],
-      fileName: '',
+      fileName: "",
       pageNum: 1,
       libraryLoaded: false,
       scale: 100,
       settingsLoaded: false
     };
   }
-  console.log('action is ', action);
+  console.log("action is ", action);
   switch (action.type) {
     // user click on a document from library page
     case OPEN_GIVEN_FILE: {
@@ -172,7 +198,7 @@ export default function file(state: FileStateType, action: Action) {
     case SET_PAGE_NUMBER: {
       const page = Number(action.page);
       if (page < 1 || page > state.numPages) {
-        console.log('invalid page ', page, state.pageNum);
+        console.log("invalid page ", page, state.pageNum);
         return state;
       }
       const newState = {
@@ -235,7 +261,7 @@ export default function file(state: FileStateType, action: Action) {
       let newNid = generateId();
       while (state.notes[newNid]) newNid = generateId;
 
-      console.log('adding new note ', newNid);
+      console.log("adding new note ", newNid);
 
       const now = Date.now();
 
@@ -248,7 +274,7 @@ export default function file(state: FileStateType, action: Action) {
         top: (action.y * 100) / state.scale,
         left: (action.x * 100) / state.scale,
         angle: 0,
-        text: 'new note',
+        text: "new note",
         todoDependency: [],
         scale: state.scale,
         image: null,
@@ -298,7 +324,7 @@ export default function file(state: FileStateType, action: Action) {
     case GOTO_NOTE: {
       const n = state.notes[action.nid];
       if (!n) {
-        console.log('cannot find this note ', action.nid);
+        console.log("cannot find this note ", action.nid);
         return state;
       }
       if (n.fileId === state.fileId) {
@@ -319,7 +345,7 @@ export default function file(state: FileStateType, action: Action) {
         }
       });
       if (!fileName) {
-        console.log('cannot find file name for file ', fileId);
+        console.log("cannot find file name for file ", fileId);
         return state;
       }
       return {
@@ -336,14 +362,14 @@ export default function file(state: FileStateType, action: Action) {
     case IMAGE_FILE_READY: {
       const n = state.notes[action.noteId];
       if (!n) {
-        console.log('reducer: image file ready invalid noteId ', action.noteId);
+        console.log("reducer: image file ready invalid noteId ", action.noteId);
         return state;
       }
       const newNote = {
         ...n,
         imageFile: action.file
       };
-      console.log('update image file: ', action.file);
+      console.log("update image file: ", action.file);
       UpdateNote(getNoteId(n), newNote);
       return {
         ...state,
@@ -356,7 +382,7 @@ export default function file(state: FileStateType, action: Action) {
     case IMAGE_DATA_READY: {
       const n = state.notes[action.noteId];
       if (!n) {
-        console.log('reducer: image data ready invalid nodeId ', action.noteId);
+        console.log("reducer: image data ready invalid nodeId ", action.noteId);
         return state;
       }
       const newNote = {
@@ -372,7 +398,7 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case FINALIZE_NOTE: {
-      console.log('finialize ', state.editingNid);
+      console.log("finialize ", state.editingNid);
 
       const n = state.notes[state.editingNid];
       const newNote = {
@@ -396,10 +422,12 @@ export default function file(state: FileStateType, action: Action) {
     }
 
     case SET_TAB: {
-      return {
+      let newState = {
         ...state,
         currentTab: action.tab
       };
+      newState = setEditingNid(newState, null);
+      return newState;
     }
     case ADD_FILE: {
       const newFile = {
@@ -414,7 +442,7 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case ADD_FILE_FROM_DB: {
-      console.log('get add file from db');
+      console.log("get add file from db");
       return {
         ...state,
         files: [...action.files],
@@ -441,7 +469,7 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case ADD_TODO_FROM_DB: {
-      console.log('get add todo from db');
+      console.log("get add todo from db");
 
       return {
         ...state,
@@ -484,8 +512,8 @@ export default function file(state: FileStateType, action: Action) {
       } else {
         newDependency.splice(i, 1);
       }
-      console.log('context is ', action.context);
-      console.log('new dependency ', newDependency);
+      console.log("context is ", action.context);
+      console.log("new dependency ", newDependency);
 
       const newNote = { ...note };
       newNote.todoDependency = newDependency;
@@ -526,7 +554,7 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case SCALE_CHANGED: {
-      console.log('setting scale to ', action.scale);
+      console.log("setting scale to ", action.scale);
       SetScale(action.scale);
 
       return {
@@ -617,12 +645,12 @@ export default function file(state: FileStateType, action: Action) {
     }
     case CANCEL_DELETE_TODO: {
       const deletingTodo = findTodoById(state.todos, action.todoId);
-      console.log('handle cancel delete, ', deletingTodo);
+      console.log("handle cancel delete, ", deletingTodo);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...deletingTodo,
         deleting: false
       });
-      console.log('new todos ', newTodos);
+      console.log("new todos ", newTodos);
       return {
         ...state,
         todos: newTodos
@@ -641,12 +669,12 @@ export default function file(state: FileStateType, action: Action) {
     }
     case CANCEL_DELETE_FILE: {
       const deletingFile = findFileById(state.files, action.fileId);
-      console.log('handle cancel delete file, ', deletingFile);
+      console.log("handle cancel delete file, ", deletingFile);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...deletingFile,
         deleting: false
       });
-      console.log('new files ', newFiles);
+      console.log("new files ", newFiles);
       return {
         ...state,
         files: newFiles
@@ -666,12 +694,12 @@ export default function file(state: FileStateType, action: Action) {
     }
     case CANCEL_DELETE_NOTE: {
       const deletingNote = findNoteById(state.notes, action.noteId);
-      console.log('handle cancel delete file, ', deletingNote);
+      console.log("handle cancel delete file, ", deletingNote);
       const newNotes = replaceNoteById(state.notes, action.noteId, {
         ...deletingNote,
         deleting: false
       });
-      console.log('new notes ', newNotes);
+      console.log("new notes ", newNotes);
       return {
         ...state,
         notes: newNotes
@@ -689,24 +717,24 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case SET_NOTE_TODO_FILTER: {
-      const filterTodoId = action.todoId === 'none' ? null : action.todoId;
+      const filterTodoId = action.todoId === "none" ? null : action.todoId;
       return {
         ...state,
         noteTodoFilter: filterTodoId
       };
     }
     case IMPORT_NOTE: {
-      console.log('export notes');
+      console.log("export notes");
       const remote = getElectron();
       const fileList = remote.dialog.showOpenDialogSync();
 
       if (fileList) {
         const f = fileList[0];
-        console.log('files is ', f);
-        const fs = remote.require('fs');
-        const content = fs.readFileSync(f, 'utf-8');
+        console.log("files is ", f);
+        const fs = remote.require("fs");
+        const content = fs.readFileSync(f, "utf-8");
         if (content) {
-          console.log('content is ', content);
+          console.log("content is ", content);
           try {
             const obj = JSON.parse(content);
             obj.files.forEach(doc => UpdateDocument(getFileId(doc), doc));
@@ -729,14 +757,14 @@ export default function file(state: FileStateType, action: Action) {
       return state;
     }
     case EXPORT_NOTE: {
-      console.log('export notes');
+      console.log("export notes");
       // eslint-disable-next-line global-require
-      const { remote } = require('electron');
+      const { remote } = require("electron");
       const f = remote.dialog.showSaveDialogSync();
-      console.log('files is ', file);
+      console.log("files is ", file);
       if (f) {
-        const fs = remote.require('fs');
-        console.log('before write file');
+        const fs = remote.require("fs");
+        console.log("before write file");
 
         // probaby add an option to save image files too
         const saveNotes = Object.values(state.notes).map(n => ({
@@ -750,9 +778,9 @@ export default function file(state: FileStateType, action: Action) {
           todos: state.todos
         };
         try {
-          fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), 'utf-8');
+          fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), "utf-8");
         } catch (e) {
-          console.log('Failed to save the file: ', e);
+          console.log("Failed to save the file: ", e);
         }
       }
       return state;
