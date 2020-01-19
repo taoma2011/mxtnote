@@ -42,7 +42,8 @@ import {
   SET_PAGE_NUMBER,
   IMPORT_NOTE,
   EXPORT_NOTE,
-  RESET_DB,
+  OPEN_RESET_CONFIRM_DIALOG,
+  CLOSE_RESET_CONFIRM_DIALOG,
   IMAGE_DATA_READY,
   IMAGE_FILE_READY,
   CLOSE_NOTE_EDITOR,
@@ -137,7 +138,8 @@ export default function file(state: FileStateType, action: Action) {
       pageNum: 1,
       libraryLoaded: false,
       scale: 100,
-      settingsLoaded: false
+      settingsLoaded: false,
+      openResetConfirmDialog: false
     };
   }
   console.log("action is ", action);
@@ -784,21 +786,35 @@ export default function file(state: FileStateType, action: Action) {
       }
       return state;
     }
-    case RESET_DB: {
-      DeleteAllDocuments();
-      DeleteAllNotes();
-      DeleteAllTodos();
-      DeleteSettings();
+    case OPEN_RESET_CONFIRM_DIALOG: {
       return {
         ...state,
-        notes: {},
-        files: [],
-        todos: [],
-        scale: 100,
-        noteLoaded: false,
-        todoLoaded: false,
-        libraryLoaded: false
+        openResetConfirmDialog: true
       };
+    }
+    case CLOSE_RESET_CONFIRM_DIALOG: {
+      if (action.confirmed) {
+        DeleteAllDocuments();
+        DeleteAllNotes();
+        DeleteAllTodos();
+        DeleteSettings();
+        return {
+          ...state,
+          notes: {},
+          files: [],
+          todos: [],
+          scale: 100,
+          noteLoaded: false,
+          todoLoaded: false,
+          libraryLoaded: false,
+          openResetConfirmDialog: false
+        };
+      } else {
+        return {
+          ...state,
+          openResetConfirmDialog: false
+        };
+      }
     }
     case CLOSE_NOTE_EDITOR: {
       return {
