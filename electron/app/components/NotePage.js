@@ -7,6 +7,7 @@ import LoadNote from "../containers/LoadNote";
 import NoteControl from "../containers/NoteControl";
 import NoteEditorDialog from "../containers/NoteEditorDialog";
 import ResetConfirmDialog from "../containers/ResetConfirmDialog";
+import BackupDb from "../containers/BackupDb";
 
 import { getNoteId } from "../utils/common";
 
@@ -25,6 +26,7 @@ export default class NotePage extends Component {
     return (
       <div>
         {!noteLoaded && <LoadNote />}
+        <BackupDb />
         <Paper height="100%">
           <NoteControl />
           <div>{items}</div>

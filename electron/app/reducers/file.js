@@ -42,6 +42,7 @@ import {
   SET_PAGE_NUMBER,
   IMPORT_NOTE,
   EXPORT_NOTE,
+  BACKUP_DB,
   OPEN_RESET_CONFIRM_DIALOG,
   CLOSE_RESET_CONFIRM_DIALOG,
   IMAGE_DATA_READY,
@@ -127,6 +128,29 @@ function setEditingNid(state, editingNid) {
     notes: newNotes,
     showSelection: !!editingNid
   };
+}
+
+function exportStateToFile(state, f) {
+  const { remote } = require("electron");
+  const fs = remote.require("fs");
+  console.log("before write file");
+
+  // probaby add an option to save image files too
+  const saveNotes = Object.values(state.notes).map(n => ({
+    ...n,
+    image: null,
+    imageFile: null
+  }));
+  const saveObjects = {
+    files: state.files,
+    notes: saveNotes,
+    todos: state.todos
+  };
+  try {
+    fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), "utf-8");
+  } catch (e) {
+    console.log("Failed to save the file: ", e);
+  }
 }
 
 export default function file(state: FileStateType, action: Action) {
@@ -762,29 +786,15 @@ export default function file(state: FileStateType, action: Action) {
       // eslint-disable-next-line global-require
       const { remote } = require("electron");
       const f = remote.dialog.showSaveDialogSync();
-      console.log("files is ", file);
-      if (f) {
-        const fs = remote.require("fs");
-        console.log("before write file");
 
-        // probaby add an option to save image files too
-        const saveNotes = Object.values(state.notes).map(n => ({
-          ...n,
-          image: null,
-          imageFile: null
-        }));
-        const saveObjects = {
-          files: state.files,
-          notes: saveNotes,
-          todos: state.todos
-        };
-        try {
-          fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), "utf-8");
-        } catch (e) {
-          console.log("Failed to save the file: ", e);
-        }
+      if (f) {
+        exportStateToFile(state, f);
       }
       return state;
+    }
+    case BACKUP_DB: {
+      console.log("backup db");
+      exportStateToFile(state, "db_backup.json");
     }
     case OPEN_RESET_CONFIRM_DIALOG: {
       return {
