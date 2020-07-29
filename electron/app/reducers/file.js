@@ -40,6 +40,7 @@ import {
   CANCEL_DELETE_NOTE,
   SET_NOTE_TODO_FILTER,
   SET_PAGE_NUMBER,
+  IMPORT_NOTE_FROM_REMOTE,
   IMPORT_NOTE,
   EXPORT_NOTE,
   BACKUP_DB,
@@ -81,6 +82,11 @@ import {
   generateId,
   getElectron
 } from "../utils/common";
+
+import {
+  login,
+  callLogin
+} from "../utils/api";
 
 function saveLastPageNumber(state) {
   const { files } = state;
@@ -748,6 +754,12 @@ export default function file(state: FileStateType, action: Action) {
         noteTodoFilter: filterTodoId
       };
     }
+    case IMPORT_NOTE_FROM_REMOTE: {
+      console.log("contact remote");
+      //login("test", "test");
+      callLogin("test", "test");
+      return state;
+    }
     case IMPORT_NOTE: {
       console.log("export notes");
       const remote = getElectron();
@@ -795,6 +807,7 @@ export default function file(state: FileStateType, action: Action) {
     case BACKUP_DB: {
       console.log("backup db");
       exportStateToFile(state, "db_backup.json");
+      return state;
     }
     case OPEN_RESET_CONFIRM_DIALOG: {
       return {

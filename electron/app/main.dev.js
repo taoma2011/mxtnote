@@ -14,6 +14,7 @@ import { app, BrowserWindow, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import {startIpcMain, startIpcRender } from './utils/api';
 
 export default class AppUpdater {
   constructor() {
@@ -46,6 +47,8 @@ const installExtensions = async () => {
     extensions.map(name => installer.default(installer[name], forceDownload))
   ).catch(console.log);
 };
+
+startIpcMain();
 
 /**
  * Add event listeners...
@@ -125,4 +128,6 @@ app.on('ready', async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+
+  //startIpcRender();
 });

@@ -15,6 +15,7 @@ export default class NoteControl extends Component {
       noteTodoFilter,
       todos,
       filterChanged,
+      importNoteFromRemote,
       importNote,
       exportNote,
       resetDb
@@ -52,6 +53,12 @@ export default class NoteControl extends Component {
               {selections}
             </Select>
           </FormControl>
+        </Grid>
+
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={importNoteFromRemote}>
+            ImportRemote
+          </Button>
         </Grid>
 
         <Grid item>

@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import {
   SET_NOTE_TODO_FILTER,
+  IMPORT_NOTE_FROM_REMOTE,
   IMPORT_NOTE,
   EXPORT_NOTE,
   OPEN_RESET_CONFIRM_DIALOG
@@ -19,6 +20,7 @@ function mapDispatchToProps(dispatch) {
   return {
     filterChanged: e =>
       dispatch({ type: SET_NOTE_TODO_FILTER, todoId: e.target.value }),
+      importNoteFromRemote: () => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }),
     importNote: () => dispatch({ type: IMPORT_NOTE }),
     exportNote: () => dispatch({ type: EXPORT_NOTE }),
     resetDb: () => dispatch({ type: OPEN_RESET_CONFIRM_DIALOG })

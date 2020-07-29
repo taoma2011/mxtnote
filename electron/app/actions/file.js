@@ -61,6 +61,7 @@ export const SET_NOTE_TODO_FILTER = "SET_NOTE_TODO_FITLER";
 
 export const SET_PAGE_NUMBER = "SET_PAGE_NUMBER";
 
+export const IMPORT_NOTE_FROM_REMOTE = "IMPORT_NOTE_FROM_REMOTE";
 export const IMPORT_NOTE = "IMPORT_NOTE";
 export const EXPORT_NOTE = "EXPORT_NOTE";
 export const BACKUP_DB = "BACKUP_DB";
