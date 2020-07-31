@@ -49,7 +49,7 @@ import {
   IMAGE_DATA_READY,
   IMAGE_FILE_READY,
   CLOSE_NOTE_EDITOR,
-  OPEN_NOTE_EDITOR
+  OPEN_NOTE_EDITOR,
 } from "../actions/file";
 import type { FileStateType, Action } from "./types";
 import {
@@ -64,7 +64,7 @@ import {
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,
-  DeleteSettings
+  DeleteSettings,
 } from "../utils/db";
 
 import {
@@ -80,13 +80,10 @@ import {
   scaleRect,
   isNewNote,
   generateId,
-  getElectron
+  getElectron,
 } from "../utils/common";
 
-import {
-  login,
-  callLogin
-} from "../utils/api";
+import { login, callLogin, callImportRemoteDb } from "../utils/api";
 
 function saveLastPageNumber(state) {
   const { files } = state;
@@ -99,7 +96,7 @@ function saveLastPageNumber(state) {
   }
   const updatedFile = {
     ...f,
-    lastPageNumber: state.pageNum
+    lastPageNumber: state.pageNum,
   };
   UpdateDocument(state.fileId, updatedFile);
 
@@ -107,7 +104,7 @@ function saveLastPageNumber(state) {
   replaceFileById(updatedFiles, state.fileId, updatedFile);
   return {
     ...state,
-    files: updatedFiles
+    files: updatedFiles,
   };
 }
 
@@ -119,20 +116,20 @@ function setEditingNid(state, editingNid) {
   if (state.editingNid) {
     newNotes = {
       ...newNotes,
-      [state.editingNid]: { ...state.notes[state.editingNid], visible: true }
+      [state.editingNid]: { ...state.notes[state.editingNid], visible: true },
     };
   }
   if (editingNid) {
     newNotes = {
       ...newNotes,
-      [editingNid]: { ...state.notes[editingNid], visible: false }
+      [editingNid]: { ...state.notes[editingNid], visible: false },
     };
   }
   return {
     ...state,
     editingNid,
     notes: newNotes,
-    showSelection: !!editingNid
+    showSelection: !!editingNid,
   };
 }
 
@@ -142,15 +139,15 @@ function exportStateToFile(state, f) {
   console.log("before write file");
 
   // probaby add an option to save image files too
-  const saveNotes = Object.values(state.notes).map(n => ({
+  const saveNotes = Object.values(state.notes).map((n) => ({
     ...n,
     image: null,
-    imageFile: null
+    imageFile: null,
   }));
   const saveObjects = {
     files: state.files,
     notes: saveNotes,
-    todos: state.todos
+    todos: state.todos,
   };
   try {
     fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), "utf-8");
@@ -169,7 +166,7 @@ export default function file(state: FileStateType, action: Action) {
       libraryLoaded: false,
       scale: 100,
       settingsLoaded: false,
-      openResetConfirmDialog: false
+      openResetConfirmDialog: false,
     };
   }
   console.log("action is ", action);
@@ -179,7 +176,7 @@ export default function file(state: FileStateType, action: Action) {
       if (action.file === state.fileName) {
         return {
           ...state,
-          currentTab: 0
+          currentTab: 0,
         };
       }
       // see if there is a saved page number
@@ -195,7 +192,7 @@ export default function file(state: FileStateType, action: Action) {
         fileName: action.file,
         fileId: action.fileId,
         pageNum,
-        currentTab: 0
+        currentTab: 0,
       };
     }
     case FILE_LOADED: {
@@ -203,7 +200,7 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         docLoading: false,
         doc: action.doc,
-        numPages: action.doc.numPages
+        numPages: action.doc.numPages,
       };
     }
     case NEXT_PAGE: {
@@ -212,7 +209,7 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newState = {
         ...state,
-        pageNum: state.pageNum + 1
+        pageNum: state.pageNum + 1,
       };
       return saveLastPageNumber(newState);
     }
@@ -222,7 +219,7 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newState = {
         ...state,
-        pageNum: state.pageNum - 1
+        pageNum: state.pageNum - 1,
       };
       return saveLastPageNumber(newState);
     }
@@ -234,14 +231,14 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newState = {
         ...state,
-        pageNum: page
+        pageNum: page,
       };
       return saveLastPageNumber(newState);
     }
     case PAGE_LOADED: {
       return {
         ...state,
-        page: action.page
+        page: action.page,
       };
     }
     case SET_RECT_STATE: {
@@ -251,7 +248,7 @@ export default function file(state: FileStateType, action: Action) {
           top: action.top,
           left: action.left,
           width: action.width,
-          height: action.height
+          height: action.height,
         },
         100 / state.scale
       );
@@ -262,9 +259,9 @@ export default function file(state: FileStateType, action: Action) {
           ...state.notes,
           [state.editingNid]: {
             ...note,
-            ...newRect
-          }
-        }
+            ...newRect,
+          },
+        },
       };
     }
 
@@ -273,20 +270,20 @@ export default function file(state: FileStateType, action: Action) {
       if (!action.notes) {
         return state;
       }
-      action.notes.forEach(n => {
+      action.notes.forEach((n) => {
         noteMap[getNoteId(n)] = n;
       });
       return {
         ...state,
         notes: noteMap,
-        noteLoaded: true
+        noteLoaded: true,
       };
     }
 
     case START_ADD_NOTE:
       return {
         ...state,
-        addingNote: true
+        addingNote: true,
       };
     case ADD_NOTE: {
       let newNid = generateId();
@@ -311,7 +308,7 @@ export default function file(state: FileStateType, action: Action) {
         image: null,
         imageFile: null,
         created: now,
-        lastModified: now
+        lastModified: now,
       };
 
       UpdateNote(newNid, defaultNote);
@@ -319,10 +316,10 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         notes: {
           ...state.notes,
-          [newNid]: defaultNote
+          [newNid]: defaultNote,
         },
         editingNid: newNid,
-        showSelection: true
+        showSelection: true,
       };
     }
     case EDIT_NOTE: {
@@ -332,11 +329,11 @@ export default function file(state: FileStateType, action: Action) {
         return state;
       }
       const newNotes = {
-        ...state.notes
+        ...state.notes,
       };
       newNotes[action.nid] = {
         ...n,
-        visible: false
+        visible: false,
       };
       return {
         ...state,
@@ -345,11 +342,11 @@ export default function file(state: FileStateType, action: Action) {
           top: n.top,
           width: n.width,
           height: n.height,
-          text: n.text
+          text: n.text,
         },
         showSelection: true,
         editingNid: action.nid,
-        notes: newNotes
+        notes: newNotes,
       };
     }
     case GOTO_NOTE: {
@@ -364,13 +361,13 @@ export default function file(state: FileStateType, action: Action) {
           ...state,
           pageNum: n.page,
           // goto file tab
-          currentTab: 0
+          currentTab: 0,
         };
       }
       // find the file name
       const { fileId } = n;
       let fileName = null;
-      state.files.forEach(f => {
+      state.files.forEach((f) => {
         if (getFileId(f) === fileId) {
           fileName = f.file;
         }
@@ -386,7 +383,7 @@ export default function file(state: FileStateType, action: Action) {
         docLoading: true,
         pageNum: n.page,
         // goto file tab
-        currentTab: 0
+        currentTab: 0,
       };
     }
 
@@ -398,7 +395,7 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newNote = {
         ...n,
-        imageFile: action.file
+        imageFile: action.file,
       };
       console.log("update image file: ", action.file);
       UpdateNote(getNoteId(n), newNote);
@@ -406,8 +403,8 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         notes: {
           ...state.notes,
-          [getNoteId(n)]: newNote
-        }
+          [getNoteId(n)]: newNote,
+        },
       };
     }
     case IMAGE_DATA_READY: {
@@ -418,14 +415,14 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newNote = {
         ...n,
-        image: action.buffer
+        image: action.buffer,
       };
       return {
         ...state,
         notes: {
           ...state.notes,
-          [getNoteId(n)]: newNote
-        }
+          [getNoteId(n)]: newNote,
+        },
       };
     }
     case FINALIZE_NOTE: {
@@ -436,7 +433,7 @@ export default function file(state: FileStateType, action: Action) {
         ...n,
         visible: true,
         image: null,
-        imageFile: null
+        imageFile: null,
       };
       // update db now so that previous imagefile is invalidated
       UpdateNote(getNoteId(newNote), newNote);
@@ -445,17 +442,17 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         notes: {
           ...state.notes,
-          [getNoteId(n)]: newNote
+          [getNoteId(n)]: newNote,
         },
         editingNid: null,
-        showSelection: false
+        showSelection: false,
       };
     }
 
     case SET_TAB: {
       let newState = {
         ...state,
-        currentTab: action.tab
+        currentTab: action.tab,
       };
       newState = setEditingNid(newState, null);
       return newState;
@@ -463,13 +460,13 @@ export default function file(state: FileStateType, action: Action) {
     case ADD_FILE: {
       const newFile = {
         file: action.file,
-        description: action.description
+        description: action.description,
       };
       AddDocument(newFile);
       return {
         ...state,
         files: [],
-        libraryLoaded: false
+        libraryLoaded: false,
       };
     }
     case ADD_FILE_FROM_DB: {
@@ -477,7 +474,7 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         files: [...action.files],
-        libraryLoaded: true
+        libraryLoaded: true,
       };
     }
     case DELETE_FILE: {
@@ -485,18 +482,18 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         files: [],
-        libraryLoaded: false
+        libraryLoaded: false,
       };
     }
     case ADD_TODO: {
       const newTodo = {
-        description: action.description
+        description: action.description,
       };
       UpdateTodo(null, newTodo);
       return {
         ...state,
         todos: [],
-        todoLoaded: false
+        todoLoaded: false,
       };
     }
     case ADD_TODO_FROM_DB: {
@@ -506,7 +503,7 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         todos: [...action.todos],
         todoDependency: [],
-        todoLoaded: true
+        todoLoaded: true,
       };
     }
     case DELETE_TODO: {
@@ -514,7 +511,7 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         todos: [],
-        todoLoaded: false
+        todoLoaded: false,
       };
     }
     case TOGGLE_TODO_DONE: {
@@ -524,13 +521,13 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newTodo = {
         ...todo,
-        done: !todo.done
+        done: !todo.done,
       };
       UpdateTodo(action.todoId, newTodo);
       const newTodoList = replaceTodoById(state.todos, action.todoId, newTodo);
       return {
         ...state,
-        todos: newTodoList
+        todos: newTodoList,
       };
     }
     case TODO_DEPENDENCY_CHANGE: {
@@ -553,8 +550,8 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         notes: {
           ...state.notes,
-          [getNoteId(note)]: newNote
-        }
+          [getNoteId(note)]: newNote,
+        },
       };
     }
 
@@ -564,8 +561,8 @@ export default function file(state: FileStateType, action: Action) {
           ...state,
           rect: {
             ...state.rect,
-            text: action.text
-          }
+            text: action.text,
+          },
         };
       }
       const note = state.notes[state.editingNid];
@@ -573,15 +570,15 @@ export default function file(state: FileStateType, action: Action) {
       const newNote = {
         ...note,
         text: action.text,
-        lastModified: Date.now()
+        lastModified: Date.now(),
       };
       UpdateNote(state.editingNid, newNote);
       return {
         ...state,
         notes: {
           ...state.notes,
-          [state.editingNid]: newNote
-        }
+          [state.editingNid]: newNote,
+        },
       };
     }
     case SCALE_CHANGED: {
@@ -591,7 +588,7 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         scale: action.scale,
-        settingsLoaded: true
+        settingsLoaded: true,
       };
     }
 
@@ -599,33 +596,33 @@ export default function file(state: FileStateType, action: Action) {
       const editingFile = findFileById(state.files, action.fileId);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...editingFile,
-        editing: true
+        editing: true,
       });
       return {
         ...state,
-        files: newFiles
+        files: newFiles,
       };
     }
     case END_EDIT_LIBRARY: {
       const editingFile = findFileById(state.files, action.fileId);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...editingFile,
-        editing: false
+        editing: false,
       });
       return {
         ...state,
-        files: newFiles
+        files: newFiles,
       };
     }
     case DOCUMENT_DESCRIPTION_CHANGED: {
       const editingFile = findFileById(state.files, action.fileId);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...editingFile,
-        description: action.description
+        description: action.description,
       });
       return {
         ...state,
-        files: newFiles
+        files: newFiles,
       };
     }
 
@@ -633,33 +630,33 @@ export default function file(state: FileStateType, action: Action) {
       const editingTodo = findTodoById(state.todos, action.todoId);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...editingTodo,
-        editing: true
+        editing: true,
       });
       return {
         ...state,
-        todos: newTodos
+        todos: newTodos,
       };
     }
     case END_EDIT_TODO: {
       const editingTodo = findTodoById(state.todos, action.todoId);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...editingTodo,
-        editing: false
+        editing: false,
       });
       return {
         ...state,
-        todos: newTodos
+        todos: newTodos,
       };
     }
     case TODO_DESCRIPTION_CHANGED: {
       const editingTodo = findTodoById(state.todos, action.todoId);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...editingTodo,
-        description: action.description
+        description: action.description,
       });
       return {
         ...state,
-        todos: newTodos
+        todos: newTodos,
       };
     }
 
@@ -667,11 +664,11 @@ export default function file(state: FileStateType, action: Action) {
       const deletingTodo = findTodoById(state.todos, action.todoId);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...deletingTodo,
-        deleting: true
+        deleting: true,
       });
       return {
         ...state,
-        todos: newTodos
+        todos: newTodos,
       };
     }
     case CANCEL_DELETE_TODO: {
@@ -679,23 +676,23 @@ export default function file(state: FileStateType, action: Action) {
       console.log("handle cancel delete, ", deletingTodo);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...deletingTodo,
-        deleting: false
+        deleting: false,
       });
       console.log("new todos ", newTodos);
       return {
         ...state,
-        todos: newTodos
+        todos: newTodos,
       };
     }
     case START_DELETE_FILE: {
       const deletingFile = findFileById(state.files, action.fileId);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...deletingFile,
-        deleting: true
+        deleting: true,
       });
       return {
         ...state,
-        files: newFiles
+        files: newFiles,
       };
     }
     case CANCEL_DELETE_FILE: {
@@ -703,24 +700,24 @@ export default function file(state: FileStateType, action: Action) {
       console.log("handle cancel delete file, ", deletingFile);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...deletingFile,
-        deleting: false
+        deleting: false,
       });
       console.log("new files ", newFiles);
       return {
         ...state,
-        files: newFiles
+        files: newFiles,
       };
     }
     case START_DELETE_NOTE: {
       const deletingNote = findNoteById(state.notes, action.noteId);
       const newNotes = replaceNoteById(state.notes, action.noteId, {
         ...deletingNote,
-        deleting: true
+        deleting: true,
       });
       return {
         ...state,
         deletingNid: action.noteId,
-        notes: newNotes
+        notes: newNotes,
       };
     }
     case CANCEL_DELETE_NOTE: {
@@ -728,12 +725,12 @@ export default function file(state: FileStateType, action: Action) {
       console.log("handle cancel delete file, ", deletingNote);
       const newNotes = replaceNoteById(state.notes, action.noteId, {
         ...deletingNote,
-        deleting: false
+        deleting: false,
       });
       console.log("new notes ", newNotes);
       return {
         ...state,
-        notes: newNotes
+        notes: newNotes,
       };
     }
     case DELETE_NOTE: {
@@ -744,20 +741,21 @@ export default function file(state: FileStateType, action: Action) {
         deletingNid: null,
         noteLoaded: false,
         notes: {},
-        showSelection: false
+        showSelection: false,
       };
     }
     case SET_NOTE_TODO_FILTER: {
       const filterTodoId = action.todoId === "none" ? null : action.todoId;
       return {
         ...state,
-        noteTodoFilter: filterTodoId
+        noteTodoFilter: filterTodoId,
       };
     }
     case IMPORT_NOTE_FROM_REMOTE: {
       console.log("contact remote");
       //login("test", "test");
-      callLogin("test", "test");
+      //callLogin("test", "test");
+      callImportRemoteDb();
       return state;
     }
     case IMPORT_NOTE: {
@@ -774,9 +772,9 @@ export default function file(state: FileStateType, action: Action) {
           console.log("content is ", content);
           try {
             const obj = JSON.parse(content);
-            obj.files.forEach(doc => UpdateDocument(getFileId(doc), doc));
-            obj.notes.forEach(note => UpdateNote(getNoteId(note), note));
-            obj.todos.forEach(todo => UpdateTodo(getTodoId(todo), todo));
+            obj.files.forEach((doc) => UpdateDocument(getFileId(doc), doc));
+            obj.notes.forEach((note) => UpdateNote(getNoteId(note), note));
+            obj.todos.forEach((todo) => UpdateTodo(getTodoId(todo), todo));
             return {
               ...state,
               files: [],
@@ -784,7 +782,7 @@ export default function file(state: FileStateType, action: Action) {
               notes: {},
               noteLoaded: false,
               todos: [],
-              todoLoaded: false
+              todoLoaded: false,
             };
           } catch (err) {
             console.log(err);
@@ -812,7 +810,7 @@ export default function file(state: FileStateType, action: Action) {
     case OPEN_RESET_CONFIRM_DIALOG: {
       return {
         ...state,
-        openResetConfirmDialog: true
+        openResetConfirmDialog: true,
       };
     }
     case CLOSE_RESET_CONFIRM_DIALOG: {
@@ -830,26 +828,26 @@ export default function file(state: FileStateType, action: Action) {
           noteLoaded: false,
           todoLoaded: false,
           libraryLoaded: false,
-          openResetConfirmDialog: false
+          openResetConfirmDialog: false,
         };
       } else {
         return {
           ...state,
-          openResetConfirmDialog: false
+          openResetConfirmDialog: false,
         };
       }
     }
     case CLOSE_NOTE_EDITOR: {
       return {
         ...state,
-        showNoteEditor: false
+        showNoteEditor: false,
       };
     }
     case OPEN_NOTE_EDITOR: {
       return {
         ...state,
         editingNid: action.noteId,
-        showNoteEditor: true
+        showNoteEditor: true,
       };
     }
     default:
