@@ -4,9 +4,10 @@ import {
   IMPORT_NOTE_FROM_REMOTE,
   IMPORT_NOTE,
   EXPORT_NOTE,
-  OPEN_RESET_CONFIRM_DIALOG
+  OPEN_RESET_CONFIRM_DIALOG,
 } from "../actions/file";
 import NoteControl from "../components/NoteControl";
+import { doImport } from "../reducers/file";
 
 function mapStateToProps(state) {
   const { file } = state;
@@ -16,14 +17,20 @@ function mapStateToProps(state) {
   return { noteTodoFilter: noteTodoFilter || "none", todos };
 }
 
+function importRemoteThunk() {
+  return function(dispatch) {
+    return doImport().then(() => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }));
+    //return doImport();
+  };
+}
 function mapDispatchToProps(dispatch) {
   return {
-    filterChanged: e =>
+    filterChanged: (e) =>
       dispatch({ type: SET_NOTE_TODO_FILTER, todoId: e.target.value }),
-      importNoteFromRemote: () => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }),
+    importNoteFromRemote: () => dispatch(importRemoteThunk()),
     importNote: () => dispatch({ type: IMPORT_NOTE }),
     exportNote: () => dispatch({ type: EXPORT_NOTE }),
-    resetDb: () => dispatch({ type: OPEN_RESET_CONFIRM_DIALOG })
+    resetDb: () => dispatch({ type: OPEN_RESET_CONFIRM_DIALOG }),
   };
 }
 

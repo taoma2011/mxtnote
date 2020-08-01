@@ -85,11 +85,16 @@ import {
 
 import { login, callLogin, callImportRemoteDb } from "../utils/api";
 
-async function doImport() {
+async function tt() {
+  return {};
+}
+export async function doImport() {
+  //const remoteDb = await tt();
   const remoteDb = await callImportRemoteDb();
-  print("remote db: ", remoteDb);
+  console.log("remote db: ", remoteDb);
 
   // XXX need to handle conflict
+
   remoteDb.files.forEach((f) => {
     f._id = f.id;
     UpdateDocument(f.id, f);
@@ -102,7 +107,10 @@ async function doImport() {
     t._id = t.id;
     UpdateTodo(t.id, t);
   });
+
+  return true;
 }
+
 function saveLastPageNumber(state) {
   const { files } = state;
   if (!files) {
@@ -771,10 +779,8 @@ export default function file(state: FileStateType, action: Action) {
     }
     case IMPORT_NOTE_FROM_REMOTE: {
       console.log("contact remote");
-      //login("test", "test");
-      //callLogin("test", "test");
-      //callImportRemoteDb();
-      doImport();
+
+      //doImport();
       return {
         ...state,
         files: [],

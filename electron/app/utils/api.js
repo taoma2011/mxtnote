@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
+const { ipcRenderer } = require("electron");
 
 let token = null;
 
@@ -196,17 +197,17 @@ export const startIpcMain = () => {
 };
 
 export const callImportRemoteDb = async () => {
-  const { ipcRenderer } = require("electron");
   try {
     const result = await ipcRenderer.invoke("import-db-api", {});
     return result;
   } catch (e) {
+    console.log("exception ", e);
     return null;
   }
 };
 
 export const callLogin = async (username, password) => {
-  const { ipcRenderer } = require("electron");
+  //const { ipcRenderer } = require("electron");
   try {
     const result = await ipcRenderer.invoke("login-api", {
       username: username,
