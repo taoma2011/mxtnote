@@ -75,15 +75,59 @@ export const secureDownloadFile = (url, file) =>
     request.end();
   });
 
+function centerWHToRect(x, y, w, h, pageW, pageH) {
+  return {
+    left: (x - w / 2) * pageW,
+    right: (x + w / 2) * pageW,
+    top: (y - h / 2) * pageH,
+    bottom: (y + h / 2) * pageH,
+  };
+}
+
 export const importRemoteDb = async () => {
   const result = await secureGet(BASE_URL + "/db");
   //console.log("remote db: ", result);
-  const newFiles = result.files.map(
-    async (file) => await remoteFileToLocalFile(file)
-  );
+  const newFiles = [];
+  const fileMap = {};
+  for (var i = 0; i < result.files.length; i++) {
+    const newFile = await remoteFileToLocalFile(result.files[i]);
+    newFiles.push(newFile);
+    fileMap[newFile.id] = newFile;
+  }
+  const newNotes = [];
+  for (var i = 0; i < result.notes.length; i++) {
+    const oldNote = result.notes[i];
+    const noteFile = fileMap[oldNote.fileId];
+    if (!noteFile || !noteFile.width || !noteFile.height) {
+      console.log("ignore note without file width");
+      continue;
+    }
+    if (!oldNote.pageX || !oldNote.pageY || !oldNote.width || !oldNote.height) {
+      console.log("ignore without pageX,Y");
+      continue;
+    }
+    const newRect = centerWHToRect(
+      oldNote.pageX,
+      oldNote.pageY,
+      oldNote.width,
+      oldNote.height,
+      noteFile.width,
+      noteFile.height
+    );
+    const newNote = {
+      ...oldNote,
+      ...newRect,
+      text: oldNote.detail,
+      created: oldNote.createdDate
+        ? Number(Date.parse(oldNote.createdDate))
+        : null,
+    };
+    newNotes.push(newNote);
+  }
   return {
     ...result,
     files: newFiles,
+    notes: newNotes,
   };
 };
 
