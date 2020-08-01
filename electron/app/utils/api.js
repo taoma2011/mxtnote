@@ -1,9 +1,16 @@
+import {
+  GetAllDocumentsPromise,
+  GetAllNotesPromise,
+  GetAllTodosPromise,
+} from "./db";
 const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
 const { ipcRenderer } = require("electron");
 
 let token = null;
+let remoteUserName = null;
+let remoteUserId = null;
 
 export const login = (args) =>
   new Promise((resolve, reject) => {
@@ -24,6 +31,8 @@ export const login = (args) =>
         console.log(`BODY: ${chunk}`);
         const res = JSON.parse(new TextDecoder("utf-8").decode(chunk));
         token = res.token;
+        remoteUserName = res.username;
+        remoteUserId = res.id;
         console.log("set token to ", token);
         resolve(true);
       });
@@ -54,6 +63,78 @@ export const secureGet = (url) =>
     });
     request.end();
   });
+
+export const securePost = (url, body) =>
+  new Promise((resolve, reject) => {
+    const { net } = require("electron");
+    const postData = JSON.stringify(body);
+    const request = net.request({
+      url: url,
+    });
+    request.setHeader("Content-Type", "application/json");
+    request.setHeader("Authorization", "Bearer " + token);
+    request.on("response", (response) => {
+      //console.log("response is ", response);
+      if (response.statusCode != 200) {
+        reject("error");
+      }
+      response.on("data", (chunk) => {
+        //console.log(`BODY: ${chunk}`);
+        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+      });
+    });
+    request.write(postData);
+    request.end();
+  });
+
+export const secureUploadFile = (url, id, description, fileData) =>
+  new Promise((resolve, reject) => {
+    const { net } = require("electron");
+
+    const request = net.request({
+      url: url,
+    });
+
+    var FormData = require("form-data");
+
+    var form = new FormData({ maxDataSize: 20971520 });
+    form.append("id", id);
+    form.append("uploadFile", description, fileData);
+
+    request.setHeader("Authorization", "Bearer " + token);
+    form.getHeaders().forEach((key, item) => {
+      request.setHeader(key, item);
+    });
+    request.writable = true;
+    form.pipe(request);
+
+    request.on("response", (response) => {
+      //console.log("response is ", response);
+      if (response.statusCode != 200) {
+        reject("error");
+      }
+      response.on("data", (chunk) => {
+        //console.log(`BODY: ${chunk}`);
+        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+      });
+    });
+
+    request.end();
+  });
+
+var net = require("electron").net; // or .remote.net if use from renderer;
+var request = net.request({
+  method: "post",
+  url: "https://example.org/upload",
+  headers: form.getHeaders(),
+});
+debugger;
+request.writable = true; // set properties
+form.pipe(request);
+
+request.on("response", function(res) {
+  console.log(res.statusCode);
+});
 
 export const secureDownloadFile = (url, file) =>
   new Promise((resolve, reject) => {
@@ -96,10 +177,118 @@ export const importRemoteDb = async () => {
 
   for (var i = 0; i < result.files.length; i++) {
     const newFile = await remoteFileToLocalFile(result.files[i]);
+    newFile.synced = true;
     newFiles.push(newFile);
     fileMap[newFile.id] = newFile;
     //UpdateDocument(newFile.id, newFile);
   }
+
+  for (var i = 0; i < result.tags.length; i++) {
+    const oldTag = result.tags[i];
+    const newTag = {
+      ...oldTag,
+      description: oldTag.name,
+    };
+    //UpdateTodo(newTag.id, newTag);
+    newTags.push(newTag);
+    tagMap[newTag.description] = newTag;
+  }
+
+  const newNotes = [];
+  for (var i = 0; i < result.notes.length; i++) {
+    const oldNote = result.notes[i];
+    const noteFile = fileMap[oldNote.fileId];
+    if (!noteFile || !noteFile.width || !noteFile.height) {
+      console.log("ignore note without file width");
+      continue;
+    }
+    if (!oldNote.pageX || !oldNote.pageY || !oldNote.width || !oldNote.height) {
+      console.log("ignore without pageX,Y");
+      continue;
+    }
+    const newRect = centerWHToRect(
+      oldNote.pageX,
+      oldNote.pageY,
+      oldNote.width,
+      oldNote.height,
+      noteFile.width,
+      noteFile.height
+    );
+    const newWH = {
+      width: oldNote.width * noteFile.width,
+      height: oldNote.height * noteFile.height,
+    };
+    const oldTags = oldNote.tags;
+    const noteTags = [];
+    if (oldTags) {
+      for (var k = 0; k < oldTags.length; k++) {
+        const t = oldTags[k];
+        const existingTag = tagMap[t];
+        if (existingTag) {
+          noteTags.push(existingTag.id);
+        } else {
+          const newTag = {
+            description: t,
+          };
+          const newId = uuid.v4();
+          newTag.id = newId;
+          noteTags.push(newId);
+          newTags.push(newTag);
+          tagMap[t] = newTag;
+        }
+      }
+    }
+    const newNote = {
+      ...oldNote,
+      ...newRect,
+      ...newWH,
+      scale: 100,
+      text: oldNote.detail,
+      todoDependency: noteTags,
+      created: oldNote.createdDate
+        ? Number(Date.parse(oldNote.createdDate))
+        : null,
+      visible: true,
+    };
+    newNotes.push(newNote);
+    //UpdateNote(newNote.id, newNote);
+  }
+  // mobile version has tags which is not separate record
+
+  return {
+    ...result,
+    files: newFiles,
+    notes: newNotes,
+    todos: newTags,
+  };
+};
+
+// this convert from local format to remote format
+export const exportRemoteDb = async () => {
+  const localFiles = await GetAllDocumentsPromise();
+  const localNotes = await GetAllNotesPromise();
+  const localTodos = await GetAllTodosPromise();
+
+  const newRemoteFiles = [];
+  const fileMap = {};
+  const tagMap = {};
+  const newTags = [];
+
+  for (var i = 0; i < localFiles.length; i++) {
+    const localFile = localFiles[i];
+    if (localFile.synced) {
+      continue;
+    }
+    const newRemoteFileId = await localFileToRemoteFile(localFiles);
+    const newRemoteFile = {};
+    newRemoteFiles.push(newRemoteFile);
+    fileMap[newRemoteFiled] = newRemoteFile;
+
+    // update the synced flag
+    localFile.synced = true;
+    UpdateDocument(localFile.id, localFile);
+  }
+  //---
 
   for (var i = 0; i < result.tags.length; i++) {
     const oldTag = result.tags[i];
@@ -259,4 +448,27 @@ export async function remoteFileToLocalFile(remoteFile) {
     file: getLocalFileNameForRemoteFile(remoteFile),
     description: remoteFile.filename,
   };
+}
+
+export async function localFileToRemoteFile(localFile) {
+  try {
+    const res = await securePost(BASE_URL + "/files/create", {
+      username: remoteUserName,
+      filename: localFile.description,
+      fileUuid: localFile._id,
+    });
+    console.log("remote create file return ", res);
+    // now upload the file
+    const fileData = fs.readFileSync(getLocalFileName(localFile.file));
+    const uploadRes = await secureUploadFile(
+      BASE_URL + "files/upload",
+      res.id,
+      localFile.description,
+      fileData
+    );
+    console.log("upload file return ", uploadRes);
+    return res.id;
+  } catch (e) {
+    return null;
+  }
 }
