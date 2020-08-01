@@ -128,6 +128,17 @@ export const UpdateTodo = (id, todo) => {
   }
 };
 
+export const NewTodo = (todo) =>
+  new Promise((resolve, reject) => {
+    todoDb.insert(todo, function(err, doc) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(doc._id);
+      }
+    });
+  });
+
 export const DeleteTodo = (todoId) => {
   todoDb.remove({ _id: todoId }, { multi: true });
 };

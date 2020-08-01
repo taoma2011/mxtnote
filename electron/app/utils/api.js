@@ -1,3 +1,4 @@
+const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
 
@@ -89,11 +90,27 @@ export const importRemoteDb = async () => {
   //console.log("remote db: ", result);
   const newFiles = [];
   const fileMap = {};
+  const tagMap = {};
+  const newTags = [];
+
   for (var i = 0; i < result.files.length; i++) {
     const newFile = await remoteFileToLocalFile(result.files[i]);
     newFiles.push(newFile);
     fileMap[newFile.id] = newFile;
+    //UpdateDocument(newFile.id, newFile);
   }
+
+  for (var i = 0; i < result.tags.length; i++) {
+    const oldTag = result.tags[i];
+    const newTag = {
+      ...oldTag,
+      description: oldTag.name,
+    };
+    //UpdateTodo(newTag.id, newTag);
+    newTags.push(newTag);
+    tagMap[newTag.description] = newTag;
+  }
+
   const newNotes = [];
   for (var i = 0; i < result.notes.length; i++) {
     const oldNote = result.notes[i];
@@ -114,20 +131,52 @@ export const importRemoteDb = async () => {
       noteFile.width,
       noteFile.height
     );
+    const newWH = {
+      width: oldNote.width * noteFile.width,
+      height: oldNote.height * noteFile.height,
+    };
+    const oldTags = oldNote.tags;
+    const noteTags = [];
+    if (oldTags) {
+      for (var k = 0; k < oldTags.length; k++) {
+        const t = oldTags[k];
+        const existingTag = tagMap[t];
+        if (existingTag) {
+          noteTags.push(existingTag.id);
+        } else {
+          const newTag = {
+            description: t,
+          };
+          const newId = uuid.v4();
+          newTag.id = newId;
+          noteTags.push(newId);
+          newTags.push(newTag);
+          tagMap[t] = newTag;
+        }
+      }
+    }
     const newNote = {
       ...oldNote,
       ...newRect,
+      ...newWH,
+      scale: 100,
       text: oldNote.detail,
+      todoDependency: noteTags,
       created: oldNote.createdDate
         ? Number(Date.parse(oldNote.createdDate))
         : null,
+      visible: true,
     };
     newNotes.push(newNote);
+    //UpdateNote(newNote.id, newNote);
   }
+  // mobile version has tags which is not separate record
+
   return {
     ...result,
     files: newFiles,
     notes: newNotes,
+    todos: newTags,
   };
 };
 
@@ -169,14 +218,19 @@ export const callLogin = async (username, password) => {
   }
 };
 
-const remoteFileDirectory = "remote_files/";
+const remoteFileDirectory = () => {
+  const app = require("electron").app;
+  const retPath = app.getAppPath() + "/remote_files/";
+  console.log("remote file path = ", retPath);
+  return retPath;
+};
 export function getLocalFileNameForRemoteFile(remoteFile) {
-  return remoteFileDirectory + remoteFile.id;
+  return remoteFileDirectory() + remoteFile.id;
 }
 
 const ensureRemoteFileDirectory = () => {
   var fs = require("fs");
-  var dir = remoteFileDirectory;
+  var dir = remoteFileDirectory();
 
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
