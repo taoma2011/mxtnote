@@ -14,7 +14,7 @@ export const login = (args) =>
     });
     request.setHeader("Content-Type", "application/json");
     request.on("response", (response) => {
-      console.log("response is ", response);
+      //console.log("response is ", response);
       if (response.statusCode != 200) {
         reject("error");
       }
@@ -41,13 +41,35 @@ export const secureGet = (url) =>
     request.setHeader("Content-Type", "application/json");
     request.setHeader("Authorization", "Bearer " + token);
     request.on("response", (response) => {
-      console.log("response is ", response);
+      //console.log("response is ", response);
       if (response.statusCode != 200) {
         reject("error");
       }
       response.on("data", (chunk) => {
-        console.log(`BODY: ${chunk}`);
-        resolve(new TextDecoder("utf-8").decode(chunk));
+        //console.log(`BODY: ${chunk}`);
+        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+      });
+    });
+    request.end();
+  });
+
+export const secureDownloadFile = (url, file) =>
+  new Promise((resolve, reject) => {
+    const { net } = require("electron");
+
+    const request = net.request({
+      url: url,
+    });
+    request.setHeader("Content-Type", "application/json");
+    request.setHeader("Authorization", "Bearer " + token);
+    request.on("response", (response) => {
+      //console.log("response is ", response);
+      if (response.statusCode != 200) {
+        reject("error");
+      }
+      response.pipe(file);
+      response.on("end", () => {
+        resolve(true);
       });
     });
     request.end();
@@ -55,7 +77,14 @@ export const secureGet = (url) =>
 
 export const importRemoteDb = async () => {
   const result = await secureGet(BASE_URL + "/db");
-  console.log("remote db: ", result);
+  //console.log("remote db: ", result);
+  const newFiles = result.files.map(
+    async (file) => await remoteFileToLocalFile(file)
+  );
+  return {
+    ...result,
+    files: newFiles,
+  };
 };
 
 export const startIpcMain = () => {
@@ -68,21 +97,25 @@ export const startIpcMain = () => {
   ipcMain.handle("import-db-api", async (event, args) => {
     console.log(args);
     const response = await importRemoteDb(args);
+    console.log("get remote db ", response);
     return response;
   });
 };
 
-export const callImportRemoteDb = () => {
+export const callImportRemoteDb = async () => {
   const { ipcRenderer } = require("electron");
-  ipcRenderer.invoke("import-db-api", {}).then((result) => {
-    console.log("result: ", result);
-  });
+  try {
+    const result = await ipcRenderer.invoke("import-db-api", {});
+    return result;
+  } catch (e) {
+    return null;
+  }
 };
 
 export const callLogin = async (username, password) => {
   const { ipcRenderer } = require("electron");
   try {
-    const result = ipcRenderer.invoke("login-api", {
+    const result = await ipcRenderer.invoke("login-api", {
       username: username,
       password: password,
     });
@@ -91,3 +124,40 @@ export const callLogin = async (username, password) => {
     return false;
   }
 };
+
+const remoteFileDirectory = "remote_files/";
+export function getLocalFileNameForRemoteFile(remoteFile) {
+  return remoteFileDirectory + remoteFile.id;
+}
+
+const ensureRemoteFileDirectory = () => {
+  var fs = require("fs");
+  var dir = remoteFileDirectory;
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+};
+
+export async function downloadRemoteFile(remoteFile) {
+  const http = require("http");
+  const fs = require("fs");
+  ensureRemoteFileDirectory();
+  const localFile = fs.createWriteStream(
+    getLocalFileNameForRemoteFile(remoteFile)
+  );
+  await secureDownloadFile(
+    BASE_URL + "/files/download/" + remoteFile.id,
+    localFile
+  );
+  localFile.close();
+}
+
+export async function remoteFileToLocalFile(remoteFile) {
+  await downloadRemoteFile(remoteFile);
+  return {
+    ...remoteFile,
+    file: getLocalFileNameForRemoteFile(remoteFile),
+    description: remoteFile.filename,
+  };
+}

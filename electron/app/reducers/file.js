@@ -85,6 +85,10 @@ import {
 
 import { login, callLogin, callImportRemoteDb } from "../utils/api";
 
+async function doImport() {
+  const remoteDb = await callImportRemoteDb();
+  print("remote db: ", remoteDb);
+}
 function saveLastPageNumber(state) {
   const { files } = state;
   if (!files) {
@@ -755,7 +759,8 @@ export default function file(state: FileStateType, action: Action) {
       console.log("contact remote");
       //login("test", "test");
       //callLogin("test", "test");
-      callImportRemoteDb();
+      //callImportRemoteDb();
+      doImport();
       return state;
     }
     case IMPORT_NOTE: {
