@@ -163,6 +163,9 @@ function centerWHToRect(x, y, w, h, pageW, pageH) {
 }
 
 function rectToCenter(left, top, right, bottom, pageW, pageH) {
+  console.log(
+    `rect to center ${left}, ${top}, ${right}, ${bottom}, ${pageW}, ${pageH}`
+  );
   const x = (left + right) / 2;
   const y = (top + bottom) / 2;
 
@@ -313,11 +316,12 @@ export const exportRemoteDb = async (db) => {
     const localNote = localNotes[i];
     const noteFile = fileMap[localNote.fileId];
 
+    console.log("local note is ", JSON.stringify(localNote));
     const center = rectToCenter(
       localNote.left,
       localNote.top,
-      localNote.right,
-      localNote.bottom,
+      localNote.left + localNote.width,
+      localNote.top + localNote.height,
 
       noteFile.width,
       noteFile.height
@@ -344,7 +348,7 @@ export const exportRemoteDb = async (db) => {
 
       ...newWH,
 
-      detail: localNote.detail,
+      detail: localNote.text,
       tags: noteTags,
       createdDate: localNote.created ? Date.parse(localNote.created) : null,
     };
