@@ -98,8 +98,9 @@ async function tt() {
 }
 export async function doSync() {
   /* first export to remote db */
-  db = {
-    files: await GetAllDocumentsPromise(),
+  const localFiles = await GetAllDocumentsPromise();
+  const db = {
+    files: localFiles,
     notes: await GetAllNotesPromise(),
     todos: await GetAllTodosPromise(),
   };

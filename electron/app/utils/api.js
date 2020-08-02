@@ -2,6 +2,7 @@ const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
 const { ipcRenderer } = require("electron");
+var fs = require("fs");
 
 let token = null;
 let remoteUserName = null;
@@ -64,6 +65,7 @@ export const securePost = (url, body) =>
     const { net } = require("electron");
     const postData = JSON.stringify(body);
     const request = net.request({
+      method: "POST",
       url: url,
     });
     request.setHeader("Content-Type", "application/json");
@@ -71,11 +73,18 @@ export const securePost = (url, body) =>
     request.on("response", (response) => {
       //console.log("response is ", response);
       if (response.statusCode != 200) {
-        reject("error");
+        console.log(`got error for ${url}: ${response.statusCode}`);
+        //console.log("error response ", response);
+        //reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
       }
       response.on("data", (chunk) => {
         //console.log(`BODY: ${chunk}`);
-        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        if (response.statusCode == 200) {
+          resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        } else {
+          //console.log(`Error BODY: ${chunk}`);
+          reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        }
       });
     });
     request.write(postData);
@@ -87,33 +96,38 @@ export const secureUploadFile = (url, id, description, fileData) =>
     const { net } = require("electron");
 
     const request = net.request({
+      method: "POST",
       url: url,
     });
 
     var FormData = require("form-data");
 
-    var form = new FormData({ maxDataSize: 20971520 });
+    //var form = new FormData({ maxDataSize: 20971520 });
+    var form = new FormData();
     form.append("id", id);
-    form.append("uploadFile", description, fileData);
+    form.append("uploadFile", fileData, description);
 
     request.setHeader("Authorization", "Bearer " + token);
-    form.getHeaders().forEach((key, item) => {
-      request.setHeader(key, item);
+    //console.log("form headers: ", form.getHeaders());
+    const fh = form.getHeaders();
+    Object.keys(fh).forEach((k) => {
+      request.setHeader(k, fh[k]);
     });
+
     request.writable = true;
-    form.pipe(request);
 
     request.on("response", (response) => {
-      //console.log("response is ", response);
+      console.log("upload response is ", response);
       if (response.statusCode != 200) {
         reject("error");
       }
       response.on("data", (chunk) => {
-        //console.log(`BODY: ${chunk}`);
+        console.log(`upload response BODY: ${chunk}`);
         resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
       });
     });
-
+    form.pipe(request);
+    console.log("sent form");
     request.end();
   });
 
@@ -275,13 +289,14 @@ export const exportRemoteDb = async (db) => {
     if (localFile.synced) {
       continue;
     }
-    const newRemoteFile = await localFileToRemoteFile(localFiles);
+    console.log("calling create remote file ", i);
+    const newRemoteFile = await localFileToRemoteFile(localFile);
 
     fileMap[localFile._id] = newRemoteFile;
 
     // update the synced flag
-    localFile.synced = true;
-    UpdateDocument(localFile.id, localFile);
+    //localFile.synced = true;
+    //UpdateDocument(localFile.id, localFile);
   }
 
   for (var i = 0; i < localTodos.length; i++) {
@@ -343,7 +358,12 @@ const createRemoteTag = async (tag) => {
 
 const createRemoteNote = async (note) => {
   try {
-    const res = await securePost(BASE_URL + "/notes/create", note);
+    const n = {
+      ...note,
+      userId: remoteUserId,
+    };
+    delete n._id;
+    const res = await securePost(BASE_URL + "/notes/create", n);
     return res;
   } catch (e) {
     console.log("create note error ", e);
@@ -416,7 +436,6 @@ export function getLocalFileNameForRemoteFile(remoteFile) {
 }
 
 const ensureRemoteFileDirectory = () => {
-  var fs = require("fs");
   var dir = remoteFileDirectory();
 
   if (!fs.existsSync(dir)) {
@@ -449,27 +468,40 @@ export async function remoteFileToLocalFile(remoteFile) {
 
 export async function localFileToRemoteFile(localFile) {
   try {
-    const res = await securePost(BASE_URL + "/files/create", {
-      username: remoteUserName,
-      filename: localFile.description,
-      fileUuid: localFile._id,
-    });
-    console.log("remote create file return ", res);
+    let id = null;
+    try {
+      const res = await securePost(BASE_URL + "/files/create", {
+        username: remoteUserName,
+        filename: localFile.description,
+        fileUuid: localFile._id,
+      });
+      id = res.id;
+    } catch (e) {
+      if (e.id != null) {
+        // this could be the file already exist in remote
+        // for now we still upload the file again
+        id = e.id;
+      } else {
+        throw e;
+      }
+    }
+
     // now upload the file
-    const fileData = fs.readFileSync(getLocalFileName(localFile.file));
+    const fileData = fs.readFileSync(localFile.file);
     const uploadRes = await secureUploadFile(
-      BASE_URL + "files/upload",
-      res.id,
+      BASE_URL + "/files/upload",
+      id,
       localFile.description,
       fileData
     );
     console.log("upload file return ", uploadRes);
     return {
-      id: res.id,
+      id: id,
       width: uploadRes.width,
       height: uploadRes.height,
     };
   } catch (e) {
+    console.log("create remote file error ", e);
     return null;
   }
 }
