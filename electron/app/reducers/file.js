@@ -106,7 +106,6 @@ export async function doSync() {
   };
   await callExportRemoteDb(db);
 
-  /*
   const remoteDb = await callImportRemoteDb();
   console.log("remote db: ", remoteDb);
 
@@ -124,7 +123,7 @@ export async function doSync() {
     t._id = t.id;
     UpdateTodo(t.id, t);
   });
-  */
+
   return true;
 }
 

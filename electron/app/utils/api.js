@@ -1,3 +1,5 @@
+const { machineIdSync } = require("node-machine-id");
+
 const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
@@ -250,6 +252,7 @@ export const importRemoteDb = async () => {
       ...oldNote,
       ...newRect,
       ...newWH,
+
       scale: 100,
       text: oldNote.detail,
       todoDependency: noteTags,
@@ -287,9 +290,15 @@ export const exportRemoteDb = async (db) => {
   const tagMap = {};
   const newTags = [];
 
+  const myId = machineIdSync();
   for (var i = 0; i < localFiles.length; i++) {
     const localFile = localFiles[i];
-    if (localFile.synced) {
+
+    if (!localFile.originalDevice) {
+      localFile.originalDevice = myId;
+    }
+    if (localFile.originalDevice != myId) {
+      // originally non-local file, don't need to send again
       continue;
     }
     console.log("calling create remote file ", i);
@@ -314,6 +323,16 @@ export const exportRemoteDb = async (db) => {
 
   for (var i = 0; i < localNotes.length; i++) {
     const localNote = localNotes[i];
+
+    if (!localFile.originalDevice) {
+      localFile.originalDevice = myId;
+    }
+
+    if (localFile.originalDevice != myId) {
+      console.log("skip non-local note");
+      continue;
+    }
+
     const noteFile = fileMap[localNote.fileId];
 
     console.log("local note is ", JSON.stringify(localNote));
@@ -347,7 +366,7 @@ export const exportRemoteDb = async (db) => {
       pageY: center.y,
 
       ...newWH,
-
+      fileId: noteFile.id,
       detail: localNote.text,
       tags: noteTags,
       createdDate: localNote.created ? Date.parse(localNote.created) : null,
@@ -367,7 +386,7 @@ const createRemoteNote = async (note) => {
       userId: remoteUserId,
     };
     delete n._id;
-    const res = await securePost(BASE_URL + "/notes/create", n);
+    const res = await securePost(BASE_URL + "/notes/sync", n);
     return res;
   } catch (e) {
     console.log("create note error ", e);
