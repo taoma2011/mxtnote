@@ -1,8 +1,3 @@
-import {
-  GetAllDocumentsPromise,
-  GetAllNotesPromise,
-  GetAllTodosPromise,
-} from "./db";
 const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
@@ -122,20 +117,6 @@ export const secureUploadFile = (url, id, description, fileData) =>
     request.end();
   });
 
-var net = require("electron").net; // or .remote.net if use from renderer;
-var request = net.request({
-  method: "post",
-  url: "https://example.org/upload",
-  headers: form.getHeaders(),
-});
-debugger;
-request.writable = true; // set properties
-form.pipe(request);
-
-request.on("response", function(res) {
-  console.log(res.statusCode);
-});
-
 export const secureDownloadFile = (url, file) =>
   new Promise((resolve, reject) => {
     const { net } = require("electron");
@@ -164,6 +145,16 @@ function centerWHToRect(x, y, w, h, pageW, pageH) {
     right: (x + w / 2) * pageW,
     top: (y - h / 2) * pageH,
     bottom: (y + h / 2) * pageH,
+  };
+}
+
+function rectToCenter(left, top, right, bottom, pageW, pageH) {
+  const x = (left + right) / 2;
+  const y = (top + bottom) / 2;
+
+  return {
+    x: x / pageW,
+    y: y / pageH,
   };
 }
 
@@ -264,10 +255,15 @@ export const importRemoteDb = async () => {
 };
 
 // this convert from local format to remote format
-export const exportRemoteDb = async () => {
+export const exportRemoteDb = async (db) => {
+  /*
   const localFiles = await GetAllDocumentsPromise();
   const localNotes = await GetAllNotesPromise();
   const localTodos = await GetAllTodosPromise();
+  */
+  const localFiles = db.files;
+  const localNotes = db.notes;
+  const localTodos = db.todos;
 
   const newRemoteFiles = [];
   const fileMap = {};
@@ -279,95 +275,80 @@ export const exportRemoteDb = async () => {
     if (localFile.synced) {
       continue;
     }
-    const newRemoteFileId = await localFileToRemoteFile(localFiles);
-    const newRemoteFile = {};
-    newRemoteFiles.push(newRemoteFile);
-    fileMap[newRemoteFiled] = newRemoteFile;
+    const newRemoteFile = await localFileToRemoteFile(localFiles);
+
+    fileMap[localFile._id] = newRemoteFile;
 
     // update the synced flag
     localFile.synced = true;
     UpdateDocument(localFile.id, localFile);
   }
-  //---
 
-  for (var i = 0; i < result.tags.length; i++) {
-    const oldTag = result.tags[i];
+  for (var i = 0; i < localTodos.length; i++) {
+    const localTodo = localTodos[i];
+
     const newTag = {
-      ...oldTag,
-      description: oldTag.name,
+      name: localTodo.description,
     };
-    //UpdateTodo(newTag.id, newTag);
-    newTags.push(newTag);
-    tagMap[newTag.description] = newTag;
+    await createRemoteTag(newTag);
+    tagMap[localTodo._id] = newTag;
   }
 
-  const newNotes = [];
-  for (var i = 0; i < result.notes.length; i++) {
-    const oldNote = result.notes[i];
-    const noteFile = fileMap[oldNote.fileId];
-    if (!noteFile || !noteFile.width || !noteFile.height) {
-      console.log("ignore note without file width");
-      continue;
-    }
-    if (!oldNote.pageX || !oldNote.pageY || !oldNote.width || !oldNote.height) {
-      console.log("ignore without pageX,Y");
-      continue;
-    }
-    const newRect = centerWHToRect(
-      oldNote.pageX,
-      oldNote.pageY,
-      oldNote.width,
-      oldNote.height,
+  for (var i = 0; i < localNotes.length; i++) {
+    const localNote = localNotes[i];
+    const noteFile = fileMap[localNote.fileId];
+
+    const center = rectToCenter(
+      localNote.left,
+      localNote.top,
+      localNote.right,
+      localNote.bottom,
+
       noteFile.width,
       noteFile.height
     );
     const newWH = {
-      width: oldNote.width * noteFile.width,
-      height: oldNote.height * noteFile.height,
+      width: localNote.width / noteFile.width,
+      height: localNote.height / noteFile.height,
     };
-    const oldTags = oldNote.tags;
+    const localNoteTags = localNote.todoDependency;
     const noteTags = [];
-    if (oldTags) {
-      for (var k = 0; k < oldTags.length; k++) {
-        const t = oldTags[k];
+    if (localNoteTags) {
+      for (var k = 0; k < localNoteTags.length; k++) {
+        const t = localNoteTags[k];
         const existingTag = tagMap[t];
         if (existingTag) {
-          noteTags.push(existingTag.id);
-        } else {
-          const newTag = {
-            description: t,
-          };
-          const newId = uuid.v4();
-          newTag.id = newId;
-          noteTags.push(newId);
-          newTags.push(newTag);
-          tagMap[t] = newTag;
+          noteTags.push(existingTag.name);
         }
       }
     }
     const newNote = {
-      ...oldNote,
-      ...newRect,
-      ...newWH,
-      scale: 100,
-      text: oldNote.detail,
-      todoDependency: noteTags,
-      created: oldNote.createdDate
-        ? Number(Date.parse(oldNote.createdDate))
-        : null,
-      visible: true,
-    };
-    newNotes.push(newNote);
-    //UpdateNote(newNote.id, newNote);
-  }
-  // mobile version has tags which is not separate record
+      ...localNote,
+      pageX: center.x,
+      pageY: center.y,
 
-  return {
-    ...result,
-    files: newFiles,
-    notes: newNotes,
-    todos: newTags,
-  };
+      ...newWH,
+
+      detail: localNote.detail,
+      tags: noteTags,
+      createdDate: localNote.created ? Date.parse(localNote.created) : null,
+    };
+    createRemoteNote(newNote);
+  }
+};
+
+const createRemoteTag = async (tag) => {
+  // implement
+};
+
+const createRemoteNote = async (note) => {
+  try {
+    const res = await securePost(BASE_URL + "/notes/create", note);
+    return res;
+  } catch (e) {
+    console.log("create note error ", e);
+    return null;
+  }
 };
 
 export const startIpcMain = () => {
@@ -383,11 +364,27 @@ export const startIpcMain = () => {
     console.log("get remote db ", response);
     return response;
   });
+  ipcMain.handle("export-db-api", async (event, args) => {
+    console.log(args);
+    const response = await exportRemoteDb(args);
+    console.log("export remote db ", response);
+    return response;
+  });
 };
 
 export const callImportRemoteDb = async () => {
   try {
     const result = await ipcRenderer.invoke("import-db-api", {});
+    return result;
+  } catch (e) {
+    console.log("exception ", e);
+    return null;
+  }
+};
+
+export const callExportRemoteDb = async (db) => {
+  try {
+    const result = await ipcRenderer.invoke("export-db-api", db);
     return result;
   } catch (e) {
     console.log("exception ", e);
@@ -467,7 +464,11 @@ export async function localFileToRemoteFile(localFile) {
       fileData
     );
     console.log("upload file return ", uploadRes);
-    return res.id;
+    return {
+      id: res.id,
+      width: uploadRes.width,
+      height: uploadRes.height,
+    };
   } catch (e) {
     return null;
   }

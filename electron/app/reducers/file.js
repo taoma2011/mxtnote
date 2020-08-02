@@ -65,6 +65,9 @@ import {
   DeleteAllNotes,
   DeleteAllTodos,
   DeleteSettings,
+  GetAllDocumentsPromise,
+  GetAllNotesPromise,
+  GetAllTodosPromise,
 } from "../utils/db";
 
 import {
@@ -83,13 +86,26 @@ import {
   getElectron,
 } from "../utils/common";
 
-import { login, callLogin, callImportRemoteDb } from "../utils/api";
+import {
+  login,
+  callLogin,
+  callImportRemoteDb,
+  callExportRemoteDb,
+} from "../utils/api";
 
 async function tt() {
   return {};
 }
-export async function doImport() {
-  //const remoteDb = await tt();
+export async function doSync() {
+  /* first export to remote db */
+  db = {
+    files: await GetAllDocumentsPromise(),
+    notes: await GetAllNotesPromise(),
+    todos: await GetAllTodosPromise(),
+  };
+  await callExportRemoteDb(db);
+
+  /*
   const remoteDb = await callImportRemoteDb();
   console.log("remote db: ", remoteDb);
 
@@ -107,7 +123,7 @@ export async function doImport() {
     t._id = t.id;
     UpdateTodo(t.id, t);
   });
-
+  */
   return true;
 }
 

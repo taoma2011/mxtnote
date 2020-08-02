@@ -81,10 +81,17 @@
       ]
     },
     "win": {
-      "target": ["nsis", "msi"]
+      "target": [
+        "nsis",
+        "msi"
+      ]
     },
     "linux": {
-      "target": ["deb", "rpm", "AppImage"],
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
       "category": "Development"
     },
     "directories": {
@@ -141,12 +148,21 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
-    "moduleFileExtensions": ["js", "jsx", "json"],
-    "moduleDirectories": ["node_modules", "app/node_modules"],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "app/node_modules"
+    ],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
-    "setupFiles": ["./internals/scripts/CheckBuildsExist.js"]
+    "setupFiles": [
+      "./internals/scripts/CheckBuildsExist.js"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
@@ -254,6 +270,7 @@
     "electron-debug": "^3.0.1",
     "electron-log": "^4.0.0",
     "electron-updater": "^4.2.0",
+    "form-data": "^3.0.0",
     "history": "^4.10.1",
     "nedb": "^1.8.0",
     "pdfjs-dist": "^2.2.228",

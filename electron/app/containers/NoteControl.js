@@ -7,7 +7,8 @@ import {
   OPEN_RESET_CONFIRM_DIALOG,
 } from "../actions/file";
 import NoteControl from "../components/NoteControl";
-import { doImport } from "../reducers/file";
+import { doSync } from "../reducers/file";
+import { exportRemoteDb } from "../utils/api";
 
 function mapStateToProps(state) {
   const { file } = state;
@@ -17,18 +18,19 @@ function mapStateToProps(state) {
   return { noteTodoFilter: noteTodoFilter || "none", todos };
 }
 
-function importRemoteThunk() {
+function syncRemoteThunk() {
   return function(dispatch) {
-    return doImport().then(() => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }));
-    //return doImport();
+    return doSync().then(() => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }));
   };
 }
+
 function mapDispatchToProps(dispatch) {
   return {
     filterChanged: (e) =>
       dispatch({ type: SET_NOTE_TODO_FILTER, todoId: e.target.value }),
-    importNoteFromRemote: () => dispatch(importRemoteThunk()),
+    importNoteFromRemote: () => dispatch(syncRemoteThunk()),
     importNote: () => dispatch({ type: IMPORT_NOTE }),
+
     exportNote: () => dispatch({ type: EXPORT_NOTE }),
     resetDb: () => dispatch({ type: OPEN_RESET_CONFIRM_DIALOG }),
   };

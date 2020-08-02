@@ -189,7 +189,7 @@ export default class NoteControl extends Component {
             color="primary"
             onClick={doImportNoteFromRemote}
           >
-            ImportRemote
+            Sync With Remote
           </Button>
         </Grid>
 

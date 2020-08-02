@@ -77,8 +77,7 @@ export const GetAllDocuments = (handleDoc) => {
   });
 };
 
-
-export const GetAllDocumentsPromise = new Promise((resolve,reject) => {
+export const GetAllDocumentsPromise = new Promise((resolve, reject) => {
   docDb.find({}, (err, doc) => {
     if (!err) {
       resolve(doc);
@@ -86,8 +85,7 @@ export const GetAllDocumentsPromise = new Promise((resolve,reject) => {
       reject(err);
     }
   });
-};
-
+});
 
 export const DeleteAllNotes = () => {
   noteDb.remove({}, { multi: true });
@@ -126,16 +124,15 @@ export const GetAllNotes = (handleNote) => {
   });
 };
 
-
-export const GetAllNotesPromise = new Promise((resolve, reject)  => {
+export const GetAllNotesPromise = new Promise((resolve, reject) => {
   noteDb.find({}, (err, note) => {
     if (!err) {
       resolve(note);
-    }else {
+    } else {
       reject(err);
     }
   });
-};
+});
 
 export const DeleteAllTodos = () => {
   todoDb.remove({}, { multi: true });
@@ -174,7 +171,7 @@ export const GetAllTodos = (handleTodo) => {
   });
 };
 
-export const GetAllTodosPromise = new Promise((resolve,reject) => {
+export const GetAllTodosPromise = new Promise((resolve, reject) => {
   todoDb.find({}, (err, todo) => {
     if (!err) {
       resolve(todo);
@@ -182,4 +179,4 @@ export const GetAllTodosPromise = new Promise((resolve,reject) => {
       reject(err);
     }
   });
-};
+});
