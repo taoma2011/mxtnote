@@ -255,6 +255,7 @@
     "electron-debug": "^3.0.1",
     "electron-log": "^4.0.0",
     "electron-updater": "^4.2.0",
+    "flat-to-nested": "^1.1.0",
     "form-data": "^3.0.0",
     "history": "^4.10.1",
     "nedb": "^1.8.0",
