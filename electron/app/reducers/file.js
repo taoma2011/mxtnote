@@ -92,37 +92,84 @@ import {
   callImportRemoteDb,
   callExportRemoteDb,
 } from "../utils/api";
+import { mergeVersions } from "../../version/version";
 
 async function tt() {
   return {};
 }
 export async function doSync() {
-  /* first export to remote db */
-  const localFiles = await GetAllDocumentsPromise();
-  const db = {
-    files: localFiles,
-    notes: await GetAllNotesPromise(),
-    todos: await GetAllTodosPromise(),
-  };
-  await callExportRemoteDb(db);
+ 
 
   const remoteDb = await callImportRemoteDb();
   console.log("remote db: ", remoteDb);
-
-  // XXX need to handle conflict
 
   remoteDb.files.forEach((f) => {
     f._id = f.id;
     UpdateDocument(f.id, f);
   });
+
+
+  const syncTime = new Date();
   remoteDb.notes.forEach((n) => {
+
+    if (n.noteUuid) {
+      const existingNote = await GetNoteByUuid(n.noteUuid);
+      if (existingNote) {
+        const localVersion = {
+          lastModified: existingNote.lastModified,
+          lastSynced: existingNote.lastSynced,
+          tree: exisitingNote.syncRecord
+            ? JSON.parse(existingNote.syncRecord)
+            : null,
+        };
+        const remoteVersion = {
+          lastModified: n.lastModifiedTime,
+          lastSynced: n.lastSynced,
+          tree: n.syncRecord ? JSON.parse(n.syncRecord) : null,
+        };
+        console.log("merging ", n.noteUuid);
+        res = mergeVersions(localVersion, remoteVersion);
+        if (res.status === "conflict") {
+          console.log("cannot merge");
+          existingNote.conflict = true;
+          await UpdateNotePromise(existingNote._id, existingNote);
+        } else {
+          if (res.status === "local") {
+            // keep local version, create 
+            existingNote.lastSync = syncTime;
+            existingNote.syncRecord = JSON.stringify(res.tree); 
+            await UpdateNotePromise(existingNote._id, existingNote);
+          }
+          if (res.status === "remote") {
+            Object.assign(existingNote, n);
+            existingNote.lastSync = syncTime;
+            existingNote.lastModified = syncTime;
+            existingNote.syncRecord = JSON.stringify(res.tree); 
+            await UpdateNotePromise(existingNote._id, existingNote);
+          }
+        }
+        return;
+      }
+    }
+
     n._id = n.id;
-    UpdateNote(n.id, n);
+    await UpdateNotePromise(n.id, n);
   });
   remoteDb.todos.forEach((t) => {
     t._id = t.id;
     UpdateTodo(t.id, t);
   });
+
+
+   /* export to remote db */
+   const localFiles = await GetAllDocumentsPromise();
+   const db = {
+     files: localFiles,
+     notes: await GetAllNotesPromise(),
+     todos: await GetAllTodosPromise(),
+   };
+   await callExportRemoteDb(db);
+
 
   return true;
 }

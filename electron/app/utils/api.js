@@ -1,3 +1,5 @@
+import { GetNoteByUuid } from "./db";
+
 const { machineIdSync } = require("node-machine-id");
 
 const uuid = require("uuid");
@@ -333,6 +335,11 @@ export const exportRemoteDb = async (db) => {
       continue;
     }
 
+    if (localNote.conflict) {
+      console.log("skip conflict note");
+      continue;
+    }
+
     const noteFile = fileMap[localNote.fileId];
 
     console.log("local note is ", JSON.stringify(localNote));
@@ -384,6 +391,7 @@ const createRemoteNote = async (note) => {
     const n = {
       ...note,
       userId: remoteUserId,
+      lastModifiedTime: note.lastModified,
     };
     delete n._id;
     const res = await securePost(BASE_URL + "/notes/sync", n);

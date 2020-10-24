@@ -14,6 +14,18 @@ export const InitDb = () => {
   settingsDb = new Datastore({ filename: "settings.db", autoload: true });
 };
 
+export const GetNoteByUuid = (uuid) => {
+  return new Promise(function(resolve, reject) {
+    noteDb.find({ noteUuid: uuid }, function(err, doc) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(doc[0]);
+      }
+    });
+  });
+};
+
 export const GetSettings = () => {
   return new Promise(function(resolve, reject) {
     settingsDb.find({ scope: "global" }, function(err, doc) {
@@ -91,6 +103,22 @@ export const GetAllDocumentsPromise = () =>
 export const DeleteAllNotes = () => {
   noteDb.remove({}, { multi: true });
 };
+
+export const UpdateNotePromise = (id, note) =>
+  new Promise((resolve, reject) => {
+    // eslint-disable-next-line no-underscore-dangle
+    const dbNote = {
+      ...note,
+      image: null,
+    };
+    noteDb.update({ _id: id }, dbNote, { upsert: true }, function(err, doc) {
+      if (!err) {
+        resolve(doc);
+      } else {
+        reject(err);
+      }
+    });
+  });
 
 export const UpdateNote = (id, note, cb) => {
   // eslint-disable-next-line no-underscore-dangle
