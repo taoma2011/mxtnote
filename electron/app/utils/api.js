@@ -104,12 +104,18 @@ export const secureUploadFile = (url, id, description, fileData) =>
       url: url,
     });
 
-    var FormData = require("form-data");
+    const FormData = require("form-data");
 
     //var form = new FormData({ maxDataSize: 20971520 });
-    var form = new FormData();
+    const form = new FormData();
     form.append("id", id);
-    form.append("uploadFile", fileData, description);
+    //form.append("uploadFile", fileData, description);
+    form.append("uploadFile", fileData, {
+      contentType: "application/pdf",
+      filename: description,
+    });
+    //const blob = new Blob([fileData], { type: "application/pdf" });
+    //form.append("uploadFile", blob);
 
     request.setHeader("Authorization", "Bearer " + token);
     //console.log("form headers: ", form.getHeaders());
@@ -254,7 +260,9 @@ export const importRemoteDb = async () => {
       ...oldNote,
       ...newRect,
       ...newWH,
-
+      // mobile version page number start with 0
+      // desktop version start with 1
+      page: oldNote.page + 1,
       scale: 100,
       text: oldNote.detail,
       todoDependency: noteTags,
@@ -292,7 +300,7 @@ export const exportRemoteDb = async (db) => {
   const tagMap = {};
   const newTags = [];
 
-  const myId = machineIdSync();
+  const myId = machineIdSync() + ":mxtnote-electron";
   for (var i = 0; i < localFiles.length; i++) {
     const localFile = localFiles[i];
 
@@ -301,8 +309,11 @@ export const exportRemoteDb = async (db) => {
     }
     if (localFile.originalDevice != myId) {
       // originally non-local file, don't need to send again
+      fileMap[localFile._id] = localFile;
       continue;
     }
+    console.log("originalDeviceId is ", localFile.originalDevice);
+    console.log("myid is ", myId);
     console.log("calling create remote file ", i);
     const newRemoteFile = await localFileToRemoteFile(localFile);
 
@@ -326,14 +337,16 @@ export const exportRemoteDb = async (db) => {
   for (var i = 0; i < localNotes.length; i++) {
     const localNote = localNotes[i];
 
-    if (!localFile.originalDevice) {
-      localFile.originalDevice = myId;
+    if (!localNote.originalDevice) {
+      localNote.originalDevice = myId;
     }
 
-    if (localFile.originalDevice != myId) {
+    /*
+    if (localNote.originalDevice != myId) {
       console.log("skip non-local note");
       continue;
     }
+    */
 
     if (localNote.conflict) {
       console.log("skip conflict note");
@@ -372,8 +385,10 @@ export const exportRemoteDb = async (db) => {
       pageX: center.x,
       pageY: center.y,
 
+      // mobile versin page start with 1
+      page: localNote.page - 1,
       ...newWH,
-      fileId: noteFile.id,
+      //fileId: noteFile.id,
       detail: localNote.text,
       tags: noteTags,
       createdDate: localNote.created ? Date.parse(localNote.created) : null,

@@ -68,6 +68,8 @@ import {
   GetAllDocumentsPromise,
   GetAllNotesPromise,
   GetAllTodosPromise,
+  GetNoteByUuid,
+  UpdateNotePromise,
 } from "../utils/db";
 
 import {
@@ -98,8 +100,6 @@ async function tt() {
   return {};
 }
 export async function doSync() {
- 
-
   const remoteDb = await callImportRemoteDb();
   console.log("remote db: ", remoteDb);
 
@@ -108,13 +108,12 @@ export async function doSync() {
     UpdateDocument(f.id, f);
   });
 
-
   const syncTime = new Date();
-  remoteDb.notes.forEach((n) => {
-
+  remoteDb.notes.forEach(async (n) => {
     if (n.noteUuid) {
       const existingNote = await GetNoteByUuid(n.noteUuid);
       if (existingNote) {
+        console.log("found existing node with uuid ", n.noteUuid);
         const localVersion = {
           lastModified: existingNote.lastModified,
           lastSynced: existingNote.lastSynced,
@@ -135,23 +134,23 @@ export async function doSync() {
           await UpdateNotePromise(existingNote._id, existingNote);
         } else {
           if (res.status === "local") {
-            // keep local version, create 
+            // keep local version, create
             existingNote.lastSync = syncTime;
-            existingNote.syncRecord = JSON.stringify(res.tree); 
+            existingNote.syncRecord = JSON.stringify(res.tree);
             await UpdateNotePromise(existingNote._id, existingNote);
           }
           if (res.status === "remote") {
             Object.assign(existingNote, n);
             existingNote.lastSync = syncTime;
             existingNote.lastModified = syncTime;
-            existingNote.syncRecord = JSON.stringify(res.tree); 
+            existingNote.syncRecord = JSON.stringify(res.tree);
             await UpdateNotePromise(existingNote._id, existingNote);
           }
         }
         return;
       }
     }
-
+    console.log("create new note ", n.id);
     n._id = n.id;
     await UpdateNotePromise(n.id, n);
   });
@@ -160,16 +159,14 @@ export async function doSync() {
     UpdateTodo(t.id, t);
   });
 
-
-   /* export to remote db */
-   const localFiles = await GetAllDocumentsPromise();
-   const db = {
-     files: localFiles,
-     notes: await GetAllNotesPromise(),
-     todos: await GetAllTodosPromise(),
-   };
-   await callExportRemoteDb(db);
-
+  /* export to remote db */
+  const localFiles = await GetAllDocumentsPromise();
+  const db = {
+    files: localFiles,
+    notes: await GetAllNotesPromise(),
+    todos: await GetAllTodosPromise(),
+  };
+  await callExportRemoteDb(db);
 
   return true;
 }
