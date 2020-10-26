@@ -1,7 +1,7 @@
-import { GetNoteByUuid } from "./db";
+import { GetNoteByUuid, UpdateNotePromise } from "./db";
 
 const { machineIdSync } = require("node-machine-id");
-
+const version = require("../../version/version");
 const uuid = require("uuid");
 //const BASE_URL = "http://note.mxtsoft.com:4000";
 const BASE_URL = "http://localhost:4001";
@@ -271,6 +271,13 @@ export const importRemoteDb = async () => {
         : null,
       visible: true,
     };
+
+    // if the remote note doesn't have sync record, create one,
+    // later it will be pushed back to remote
+    if (!newNote.syncRecord) {
+      newNote.syncRecord = JSON.stringify(version.newNode());
+    }
+
     newNotes.push(newNote);
     //UpdateNote(newNote.id, newNote);
   }
@@ -393,6 +400,7 @@ export const exportRemoteDb = async (db) => {
       tags: noteTags,
       createdDate: localNote.created ? Date.parse(localNote.created) : null,
     };
+
     createRemoteNote(newNote);
   }
 };
@@ -409,6 +417,7 @@ const createRemoteNote = async (note) => {
       lastModifiedTime: note.lastModified,
     };
     delete n._id;
+
     const res = await securePost(BASE_URL + "/notes/sync", n);
     return res;
   } catch (e) {
@@ -440,7 +449,9 @@ export const startIpcMain = () => {
 
 export const callImportRemoteDb = async () => {
   try {
+    console.log("before calling import remote db");
     const result = await ipcRenderer.invoke("import-db-api", {});
+    console.log("call import got result: ", result);
     return result;
   } catch (e) {
     console.log("exception ", e);

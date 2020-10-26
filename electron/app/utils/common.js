@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 /* eslint-disable promise/catch-or-return */
-import pdfjs from 'pdfjs-dist';
+import pdfjs from "pdfjs-dist";
 
 export function findFileById(files, id) {
   for (let i = 0; i < files.length; i += 1) {
@@ -18,7 +18,7 @@ export function getFileId(file) {
 }
 
 export function replaceFileById(files, id, newFile) {
-  return files.map(file => {
+  return files.map((file) => {
     if (getFileId(file) === id) {
       return newFile;
     }
@@ -42,7 +42,7 @@ export function findTodoById(todos, id) {
 }
 
 export function replaceTodoById(todos, id, newTodo) {
-  return todos.map(todo => {
+  return todos.map((todo) => {
     if (getTodoId(todo) === id) {
       return newTodo;
     }
@@ -52,33 +52,33 @@ export function replaceTodoById(todos, id, newTodo) {
 
 export function loadImageFromPdf(pdfFile, note, cb) {
   // eslint-disable-next-line promise/catch-or-return
-  console.log('load pdf ', pdfFile);
-  pdfjs.getDocument(pdfFile).promise.then(pdfDoc => {
+  console.log("load pdf ", pdfFile);
+  pdfjs.getDocument(pdfFile).promise.then((pdfDoc) => {
     if (pdfDoc) {
-      pdfDoc.getPage(note.page).then(page => {
+      pdfDoc.getPage(note.page).then((page) => {
         const scaledRect = scaleRect(note, note.scale / 100);
-        console.log('scaled rect is ', scaledRect);
+        console.log("scaled rect is ", scaledRect);
 
         const viewport = page.getViewport({
           // offsetX: scaledRect.left,
           // offsetY: scaledRect.top,
 
-          scale: note.scale / 100
+          scale: note.scale / 100,
         });
-        console.log('viewport is ', viewport);
+        console.log("viewport is ", viewport);
         // eslint-disable-next-line compat/compat
         const canvas = new OffscreenCanvas(viewport.width, viewport.height);
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         const renderContext = {
           canvasContext: ctx,
-          viewport
+          viewport,
         };
 
         page.render(renderContext).promise.then(() => {
-          console.log('offline render complete');
+          console.log("offline render complete");
           if (cb) {
-            console.log('extract image with ', scaledRect);
+            console.log("extract image with ", scaledRect);
             const image = ctx.getImageData(
               scaledRect.left,
               scaledRect.top,
@@ -96,7 +96,7 @@ export function loadImageFromPdf(pdfFile, note, cb) {
   });
 }
 
-export const newNoteId = 'new';
+export const newNoteId = "new";
 export function isNewNote(id) {
   return id === newNoteId;
 }
@@ -113,21 +113,23 @@ export function findNoteById(notes, id) {
 export function replaceNoteById(notes, id, newNote) {
   return {
     ...notes,
-    [id]: newNote
+    [id]: newNote,
   };
 }
 
-export function scaleRect(rect, decimalScale) {
+export function scaleRect(rect, decimalScale0) {
+  //const decimalScale = decimalScale0 * 2.0;
+  const decimalScale = decimalScale0;
   return {
     top: rect.top * decimalScale,
     left: rect.left * decimalScale,
     width: rect.width * decimalScale,
-    height: rect.height * decimalScale
+    height: rect.height * decimalScale,
   };
 }
 
 export function getElectron() {
-  const { remote } = require('electron');
+  const { remote } = require("electron");
   return remote;
 }
 

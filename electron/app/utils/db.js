@@ -142,11 +142,12 @@ export const UpdateNote = (id, note, cb) => {
 };
 
 export const DeleteNote = (noteId) => {
-  noteDb.remove({ _id: noteId }, { multi: true });
+  //noteDb.remove({ _id: noteId }, { multi: true });
+  noteDb.update({ _id: noteId }, { deleted: true });
 };
 
-export const GetAllNotes = (handleNote) => {
-  noteDb.find({}, (err, note) => {
+export const GetAllActiveNotes = (handleNote) => {
+  noteDb.find({ deleted: { $ne: true } }, (err, note) => {
     if (!err) {
       handleNote(note);
     }

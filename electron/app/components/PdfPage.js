@@ -34,9 +34,20 @@ export default class PdfPage extends Component {
     console.log("canvas is ", canvas);
     // var viewport = page.getViewport({scale: scale});
     // $FlowFixMe
-    const viewport = page.getViewport({ scale: this.scale });
+
+    //const moreScale = 2.0;
+    const moreScale = 2.0;
+
+    const viewport = page.getViewport({ scale: this.scale * moreScale });
+
     canvas.height = viewport.height;
     canvas.width = viewport.width;
+
+    canvas.style.height = Math.floor(viewport.height / moreScale) + "px";
+    canvas.style.width = Math.floor(viewport.width / moreScale) + "px";
+
+    //canvas.style.height = Math.floor(viewport.height / moreScale);
+    //canvas.style.width = Math.floor(viewport.width / moreScale);
 
     const ctx = canvas.getContext("2d");
     // Render PDF page into canvas context

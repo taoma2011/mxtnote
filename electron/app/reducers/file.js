@@ -50,6 +50,8 @@ import {
   IMAGE_FILE_READY,
   CLOSE_NOTE_EDITOR,
   OPEN_NOTE_EDITOR,
+  RESOLVE_CONFLICT,
+  RESOLVE_DONE,
 } from "../actions/file";
 import type { FileStateType, Action } from "./types";
 import {
@@ -94,12 +96,9 @@ import {
   callImportRemoteDb,
   callExportRemoteDb,
 } from "../utils/api";
-import { mergeVersions } from "../../version/version";
+import { mergeVersions, newNode } from "../../version/version";
 
-async function tt() {
-  return {};
-}
-export async function doSync() {
+export async function doSync(dispatch) {
   const remoteDb = await callImportRemoteDb();
   console.log("remote db: ", remoteDb);
 
@@ -108,52 +107,97 @@ export async function doSync() {
     UpdateDocument(f.id, f);
   });
 
+  return await mergeAndExport(remoteDb, 0, null);
+}
+
+//
+// this function will be called after conflict is resolved manually
+export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
   const syncTime = new Date();
-  remoteDb.notes.forEach(async (n) => {
+  console.log("merging notes");
+
+  let currentResolveResult = resolveResult;
+  for (let i = currentIndex; i < remoteDb.notes.length; i++) {
+    const n = remoteDb.notes[i];
     if (n.noteUuid) {
+      console.log("checking note uuid ", n.noteUuid);
       const existingNote = await GetNoteByUuid(n.noteUuid);
       if (existingNote) {
         console.log("found existing node with uuid ", n.noteUuid);
+        console.log("local sync record is ", existingNote.syncRecord);
         const localVersion = {
           lastModified: existingNote.lastModified,
           lastSynced: existingNote.lastSynced,
-          tree: exisitingNote.syncRecord
+          tree: existingNote.syncRecord
             ? JSON.parse(existingNote.syncRecord)
             : null,
         };
+        console.log("remote sync record is ", n.syncRecord);
         const remoteVersion = {
           lastModified: n.lastModifiedTime,
           lastSynced: n.lastSynced,
           tree: n.syncRecord ? JSON.parse(n.syncRecord) : null,
         };
         console.log("merging ", n.noteUuid);
-        res = mergeVersions(localVersion, remoteVersion);
+        const res = mergeVersions(localVersion, remoteVersion);
+        console.log("merge result ", res);
         if (res.status === "conflict") {
           console.log("cannot merge");
-          existingNote.conflict = true;
-          await UpdateNotePromise(existingNote._id, existingNote);
-        } else {
-          if (res.status === "local") {
-            // keep local version, create
-            existingNote.lastSync = syncTime;
+          // ask user to resolve conflict
+          if (!currentResolveResult)
+            return {
+              type: RESOLVE_CONFLICT,
+              localNote: existingNote,
+              remoteNote: n,
+              remoteDb: remoteDb,
+              currentIndex: i,
+            };
+          const result = currentResolveResult;
+          currentResolveResult = null;
+          console.log("result is ", result);
+          if (result === "local") {
+            existingNote.lastSynced = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
             await UpdateNotePromise(existingNote._id, existingNote);
-          }
-          if (res.status === "remote") {
+            continue;
+          } else if (result === "remote") {
             Object.assign(existingNote, n);
-            existingNote.lastSync = syncTime;
+            console.log("after merging with remote: ", existingNote);
+            existingNote.lastSynced = syncTime;
             existingNote.lastModified = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
             await UpdateNotePromise(existingNote._id, existingNote);
+            continue;
+          } else {
+            existingNote.conflict = true;
+            await UpdateNotePromise(existingNote._id, existingNote);
+            continue;
+          }
+        } else {
+          if (res.status === "local") {
+            // keep local version, create
+            existingNote.lastSynced = syncTime;
+            existingNote.syncRecord = JSON.stringify(res.tree);
+            await UpdateNotePromise(existingNote._id, existingNote);
+            continue;
+          }
+          if (res.status === "remote") {
+            Object.assign(existingNote, n);
+            console.log("after merging with remote: ", existingNote);
+            existingNote.lastSynced = syncTime;
+            existingNote.lastModified = syncTime;
+            existingNote.syncRecord = JSON.stringify(res.tree);
+            await UpdateNotePromise(existingNote._id, existingNote);
+            continue;
           }
         }
-        return;
       }
     }
     console.log("create new note ", n.id);
     n._id = n.id;
+    n.lastSynced = syncTime;
     await UpdateNotePromise(n.id, n);
-  });
+  }
   remoteDb.todos.forEach((t) => {
     t._id = t.id;
     UpdateTodo(t.id, t);
@@ -161,9 +205,21 @@ export async function doSync() {
 
   /* export to remote db */
   const localFiles = await GetAllDocumentsPromise();
+
+  // if there is no sync record, create one
+  const localNotes = await GetAllNotesPromise();
+
+  localNotes.forEach(async (n) => {
+    if (!n.syncRecord) {
+      n.lastSynced = syncTime;
+      n.syncRecord = JSON.stringify(newNode());
+      await UpdateNotePromise(n._id, n);
+    }
+  });
+
   const db = {
     files: localFiles,
-    notes: await GetAllNotesPromise(),
+    notes: localNotes,
     todos: await GetAllTodosPromise(),
   };
   await callExportRemoteDb(db);
@@ -656,7 +712,8 @@ export default function file(state: FileStateType, action: Action) {
       const newNote = {
         ...note,
         text: action.text,
-        lastModified: Date.now(),
+        //lastModified: Date.now(),
+        lastModified: new Date(),
       };
       UpdateNote(state.editingNid, newNote);
       return {
@@ -941,6 +998,22 @@ export default function file(state: FileStateType, action: Action) {
         ...state,
         editingNid: action.noteId,
         showNoteEditor: true,
+      };
+    }
+    case RESOLVE_CONFLICT: {
+      return {
+        ...state,
+        showResolveConflictDialog: true,
+        resolveConflictLocal: action.localNote,
+        resolveConflictRemote: action.remoteNote,
+        remoteDb: action.remoteDb,
+        currentIndex: action.currentIndex,
+      };
+    }
+    case RESOLVE_DONE: {
+      return {
+        ...state,
+        showResolveConflictDialog: false,
       };
     }
     default:

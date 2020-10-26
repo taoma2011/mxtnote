@@ -7,7 +7,7 @@ import {
   OPEN_RESET_CONFIRM_DIALOG,
 } from "../actions/file";
 import NoteControl from "../components/NoteControl";
-import { doSync } from "../reducers/file";
+import { doSync, mergeAndExport } from "../reducers/file";
 import { exportRemoteDb } from "../utils/api";
 
 function mapStateToProps(state) {
@@ -20,7 +20,12 @@ function mapStateToProps(state) {
 
 function syncRemoteThunk() {
   return function(dispatch) {
-    return doSync().then(() => dispatch({ type: IMPORT_NOTE_FROM_REMOTE }));
+    return doSync().then((result) => {
+      if (typeof result === "object") {
+        // there is conflict, need manual resulve
+        dispatch(result);
+      } else dispatch({ type: IMPORT_NOTE_FROM_REMOTE });
+    });
   };
 }
 
