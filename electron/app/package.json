@@ -1,7 +1,7 @@
 {
   "name": "mxtnote",
   "productName": "MxtNote",
-  "version": "0.1.12",
+  "version": "0.1.14",
   "description": "Note taking app",
   "main": "./main.prod.js",
   "author": {

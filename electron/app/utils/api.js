@@ -3,8 +3,8 @@ import { GetNoteByUuid, UpdateNotePromise } from "./db";
 const { machineIdSync } = require("node-machine-id");
 const version = require("../../version/version");
 const uuid = require("uuid");
-//const BASE_URL = "http://note.mxtsoft.com:4000";
-const BASE_URL = "http://localhost:4001";
+const BASE_URL = "https://note.mxtsoft.com:4001";
+//const BASE_URL = "http://localhost:4001";
 const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
@@ -45,12 +45,13 @@ export const login = (args) =>
 export const secureGet = (url) =>
   new Promise((resolve, reject) => {
     const { net } = require("electron");
-
+    let responseStr = "";
     const request = net.request({
       url: url,
     });
     request.setHeader("Content-Type", "application/json");
     request.setHeader("Authorization", "Bearer " + token);
+
     request.on("response", (response) => {
       //console.log("response is ", response);
       if (response.statusCode != 200) {
@@ -58,9 +59,14 @@ export const secureGet = (url) =>
       }
       response.on("data", (chunk) => {
         //console.log(`BODY: ${chunk}`);
-        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
+      });
+      response.on("end", () => {
+        console.log("response end");
+        resolve(JSON.parse(responseStr));
       });
     });
+
     request.end();
   });
 
@@ -72,6 +78,7 @@ export const securePost = (url, body) =>
       method: "POST",
       url: url,
     });
+    let responseStr = "";
     request.setHeader("Content-Type", "application/json");
     request.setHeader("Authorization", "Bearer " + token);
     request.on("response", (response) => {
@@ -84,11 +91,16 @@ export const securePost = (url, body) =>
       response.on("data", (chunk) => {
         //console.log(`BODY: ${chunk}`);
         if (response.statusCode == 200) {
-          resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+          //resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+          responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
         } else {
           //console.log(`Error BODY: ${chunk}`);
           reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
         }
+      });
+      response.on("end", () => {
+        console.log("response end");
+        resolve(JSON.parse(responseStr));
       });
     });
     request.write(postData);
