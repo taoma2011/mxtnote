@@ -66,7 +66,7 @@ export const secureGet = (url) =>
         responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
       });
       response.on("end", () => {
-        console.log("response end");
+        //console.log("response end");
         resolve(JSON.parse(responseStr));
       });
     });
@@ -93,18 +93,13 @@ export const securePost = (url, body) =>
         //reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
       }
       response.on("data", (chunk) => {
-        //console.log(`BODY: ${chunk}`);
-        if (response.statusCode == 200) {
-          //resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
-          responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
-        } else {
-          //console.log(`Error BODY: ${chunk}`);
-          reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
-        }
+        responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
       });
       response.on("end", () => {
-        console.log("response end");
-        resolve(JSON.parse(responseStr));
+        //console.log("response end");
+        const parsedResult = JSON.parse(responseStr);
+        if (response.statusCode == 200) resolve(parsedResult);
+        else reject(parsedResult);
       });
     });
     request.write(postData);
@@ -210,7 +205,7 @@ const hasLocalDoc = (f, localDocs) => {
   }
   return null;
 };
-export const importRemoteDb = async (localDocs) => {
+export const importRemoteDb = async (event, localDocs) => {
   const result = await secureGet(BASE_URL + "/db");
   //console.log("remote db: ", result);
   const newFiles = [];
@@ -218,12 +213,19 @@ export const importRemoteDb = async (localDocs) => {
   const tagMap = {};
   const newTags = [];
 
+  event.sender.send("sync-progress", "Download remote files");
   for (var i = 0; i < result.files.length; i++) {
     const f = result.files[i];
     const localFile = hasLocalDoc(f, localDocs);
     if (localFile) {
       fileMap[f.id] = localFile;
     } else {
+      event.sender.send(
+        "sync-progress",
+        `Download file ${result.files[i].filename} ${i + 1}/${
+          result.files.length
+        }`
+      );
       const newFile = await remoteFileToLocalFile(result.files[i]);
       newFiles.push(newFile);
       fileMap[f.id] = newFile;
@@ -244,6 +246,11 @@ export const importRemoteDb = async (localDocs) => {
 
   const newNotes = [];
   for (var i = 0; i < result.notes.length; i++) {
+    event.sender.send(
+      "sync-progress",
+      `Download note ${i + 1}/${result.notes.length}`
+    );
+
     const oldNote = result.notes[i];
     const noteFile = fileMap[oldNote.fileId];
     if (!noteFile || !noteFile.width || !noteFile.height) {
@@ -322,7 +329,7 @@ export const importRemoteDb = async (localDocs) => {
 };
 
 // this convert from local format to remote format
-export const exportRemoteDb = async (db) => {
+export const exportRemoteDb = async (event, db) => {
   /*
   const localFiles = await GetAllDocumentsPromise();
   const localNotes = await GetAllNotesPromise();
@@ -340,6 +347,10 @@ export const exportRemoteDb = async (db) => {
   const myId = machineIdSync() + ":mxtnote-electron";
   for (var i = 0; i < localFiles.length; i++) {
     const localFile = localFiles[i];
+    event.sender.send(
+      "sync-progress",
+      `Upload file ${localFile.description} ${i + 1}/${localFiles.length}`
+    );
 
     if (!localFile.originalDevice) {
       localFile.originalDevice = myId;
@@ -373,7 +384,10 @@ export const exportRemoteDb = async (db) => {
 
   for (var i = 0; i < localNotes.length; i++) {
     const localNote = localNotes[i];
-
+    event.sender.send(
+      "sync-progress",
+      `Upload note ${i + 1}/${localNotes.length}`
+    );
     if (!localNote.originalDevice) {
       localNote.originalDevice = myId;
     }
@@ -392,7 +406,7 @@ export const exportRemoteDb = async (db) => {
 
     const noteFile = fileMap[localNote.fileId];
 
-    console.log("local note is ", JSON.stringify(localNote));
+    //console.log("local note is ", JSON.stringify(localNote));
     const center = rectToCenter(
       localNote.left,
       localNote.top,
@@ -433,6 +447,7 @@ export const exportRemoteDb = async (db) => {
 
     createRemoteNote(newNote);
   }
+  event.sender.send("sync-progress", `done`);
 };
 
 const createRemoteTag = async (tag) => {
@@ -464,24 +479,30 @@ export const startIpcMain = () => {
     return response;
   });
   ipcMain.handle("import-db-api", async (event, args) => {
-    console.log(args);
-    const response = await importRemoteDb(args);
-    console.log("get remote db ", response);
+    //console.log(args);
+    const response = await importRemoteDb(event, args);
+    //console.log("get remote db ", response);
     return response;
   });
   ipcMain.handle("export-db-api", async (event, args) => {
-    console.log(args);
-    const response = await exportRemoteDb(args);
-    console.log("export remote db ", response);
+    //console.log(args);
+    const response = await exportRemoteDb(event, args);
+    //console.log("export remote db ", response);
     return response;
+  });
+};
+
+export const startIpcRender = () => {
+  ipcRenderer.on("sync-progress", (event, arg) => {
+    console.log(arg);
   });
 };
 
 export const callImportRemoteDb = async (arg) => {
   try {
-    console.log("before calling import remote db");
+    //console.log("before calling import remote db");
     const result = await ipcRenderer.invoke("import-db-api", arg);
-    console.log("call import got result: ", result);
+    //console.log("call import got result: ", result);
     return result;
   } catch (e) {
     console.log("exception ", e);
@@ -515,7 +536,7 @@ export const callLogin = async (username, password) => {
 const remoteFileDirectory = () => {
   const app = require("electron").app;
   const retPath = app.getAppPath() + "/remote_files/";
-  console.log("remote file path = ", retPath);
+  //console.log("remote file path = ", retPath);
   return retPath;
 };
 export function getLocalFileNameForRemoteFile(remoteFile) {

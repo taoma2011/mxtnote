@@ -77,3 +77,7 @@ export const CLOSE_NOTE_EDITOR = "CLOSE_NOTE_EDITOR";
 
 export const RESOLVE_CONFLICT = "RESOLVE_CONFLICT";
 export const RESOLVE_DONE = "RESOLVE_DONE";
+
+export const SYNC_PROGRESS = "SYNC_PROGRESS";
+
+export const SYNC_DONE = "SYNC_DONE";

@@ -23,11 +23,11 @@ export default class File extends Component {
       docLoading,
       noteLoaded,
       notes,
-      settingsLoaded
+      settingsLoaded,
     } = this.props;
-    console.log("all notes ", notes);
+    //console.log("all notes ", notes);
     if (notes) {
-      Object.keys(notes).forEach(key => {
+      Object.keys(notes).forEach((key) => {
         const n = notes[key];
         // eslint-disable-next-line react/prop-types
         if (n.page === pageNum && n.fileId === fileId) {
@@ -36,7 +36,7 @@ export default class File extends Component {
       });
     }
     const pageDivStyle = {
-      position: "relative"
+      position: "relative",
     };
     return (
       <div>
@@ -46,7 +46,7 @@ export default class File extends Component {
             position: "fixed",
             zIndex: 1,
             width: "100%",
-            maxHeight: 30
+            maxHeight: 30,
           }}
         >
           <FileControl />

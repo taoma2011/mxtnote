@@ -5,7 +5,7 @@ export default function LoadNote(props) {
   // eslint-disable-next-line react/prop-types
   const { addNotes } = props;
   const handleNote = (notes) => {
-    console.log("getting notes", notes);
+    //console.log("getting notes", notes);
     addNotes(notes);
   };
   useEffect(() => {

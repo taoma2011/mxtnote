@@ -1,22 +1,22 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
+import React, { useEffect } from "react";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
 // import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
 // import Typography from '@material-ui/core/Typography';
-import MathJax from 'react-mathjax2';
-import Divider from '@material-ui/core/Divider';
-import Box from '@material-ui/core/Box';
-import Popover from '@material-ui/core/Popover';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
+import MathJax from "react-mathjax2";
+import Divider from "@material-ui/core/Divider";
+import Box from "@material-ui/core/Box";
+import Popover from "@material-ui/core/Popover";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 
-import LoadImage from '../containers/LoadImage';
-import DeleteNoteDialog from '../containers/DeleteNoteDialog';
-import DependencyChips from '../containers/DependencyChips';
+import LoadImage from "../containers/LoadImage";
+import DeleteNoteDialog from "../containers/DeleteNoteDialog";
+import DependencyChips from "../containers/DependencyChips";
 
 export default function NotePanel(props) {
   // eslint-disable-next-line react/prop-types
@@ -31,7 +31,7 @@ export default function NotePanel(props) {
     startDeleteNote,
     gotoNote,
     openNoteEditor,
-    closeNoteEditor
+    closeNoteEditor,
   } = props;
   const scaledWidth = (width || 0) * (scale / 100);
   const scaledHeight = (height || 0) * (scale / 100);
@@ -39,10 +39,10 @@ export default function NotePanel(props) {
 
   useEffect(() => {
     if (canvasRef.current && image && scaledWidth && scaledHeight) {
-      console.log('notepanel repaint for ', text);
+      //console.log('notepanel repaint for ', text);
       canvasRef.current.width = scaledWidth;
       canvasRef.current.height = scaledHeight;
-      const ctx = canvasRef.current.getContext('2d');
+      const ctx = canvasRef.current.getContext("2d");
       const imageBuffer = image;
       const array = new Uint8ClampedArray(imageBuffer);
       try {
@@ -56,7 +56,7 @@ export default function NotePanel(props) {
   }, [image]);
 
   const style = {
-    padding: 10
+    padding: 10,
   };
 
   const lines = text ? text.split(/\r?\n/) : [];
@@ -73,7 +73,7 @@ export default function NotePanel(props) {
         </CardActionArea>
         <Divider />
         <CardContent>
-          <div style={{ width: '100%' }}>
+          <div style={{ width: "100%" }}>
             <Box display="flex" alignItems="center">
               <Box flexGrow={1}>
                 <label>{noteContext}</label>
@@ -101,20 +101,20 @@ export default function NotePanel(props) {
           <Box>
             <MathJax.Context
               input="ascii"
-              onLoad={() => console.log('Loaded MathJax script!')}
+              onLoad={() => console.log("Loaded MathJax script!")}
               onError={(mj, error) => {
                 console.warn(error);
                 console.log(
-                  'Encountered a MathJax error, re-attempting a typeset!'
+                  "Encountered a MathJax error, re-attempting a typeset!"
                 );
               }}
               script="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=AM_HTMLorMML"
               options={{
                 asciimath2jax: {
                   useMathMLspacing: true,
-                  delimiters: [['$', '$']],
-                  preview: 'none'
-                }
+                  delimiters: [["$", "$"]],
+                  preview: "none",
+                },
               }}
             >
               <div>

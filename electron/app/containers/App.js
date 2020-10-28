@@ -65,7 +65,8 @@ function TabPanel(props) {
     </Typography>
   );
   */
-  if (value === index) return <>{children}</>;
+  if (value === index)
+    return <div style={{ paddingTop: "50px", height: "100%" }}>{children}</div>;
   return null;
 }
 

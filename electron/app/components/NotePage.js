@@ -8,6 +8,7 @@ import NoteControl from "../containers/NoteControl";
 import NoteEditorDialog from "../containers/NoteEditorDialog";
 import ResetConfirmDialog from "../containers/ResetConfirmDialog";
 import ResolveConflictDialog from "../containers/ResolveConflictDialog";
+import SyncProgressDialog from "../containers/SyncProgressDialog";
 import BackupDb from "../containers/BackupDb";
 
 import { getNoteId } from "../utils/common";
@@ -17,6 +18,13 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 const checkEqual = (prevProp, nextProp) => {
   if (prevProp.noteLoaded != nextProp.noteLoaded) return false;
+  if (prevProp.notes == null) {
+    if (nextProp.notes != null) return false;
+    return true;
+  }
+  if (nextProp.notes == null) {
+    return false;
+  }
   if (prevProp.notes.length != nextProp.notes.length) return false;
   for (let i = 0; i < prevProp.notes.length; i++) {
     const pn = prevProp.notes[i];
@@ -31,7 +39,7 @@ export const NotePage = React.memo(function NotePage(props) {
   const items = [];
   // eslint-disable-next-line react/prop-types
   const { notes, noteLoaded } = props;
-  console.log("note page: all notes ", notes);
+  //console.log("note page: all notes ", notes);
   /*
     if (notes) {
       notes.forEach((note) => {
@@ -48,7 +56,7 @@ export const NotePage = React.memo(function NotePage(props) {
   const Row = ({ index, style }) => {
     const note = notes[index];
     const domKey = `notepanel-${getNoteId(note)}`;
-    console.log("XXX create note panel ", index);
+
     return (
       <div style={style}>
         <NotePanel nid={getNoteId(note)} key={domKey} />
@@ -106,6 +114,7 @@ export const NotePage = React.memo(function NotePage(props) {
         </AutoSizer>
         <NoteEditorDialog />
         <ResetConfirmDialog />
+        <SyncProgressDialog />
         <ResolveConflictDialog />
       </Paper>
       )}

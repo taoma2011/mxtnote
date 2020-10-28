@@ -13,8 +13,8 @@ function mapStateToProps(state) {
   Object.keys(notes).forEach((key) => {
     noteArray.push(notes[key]);
   });
-  console.log("notes before filter ", notes);
-  console.log("filter is ", noteTodoFilter);
+  //console.log("notes before filter ", notes);
+  //console.log("filter is ", noteTodoFilter);
   const noteArrayFiltered = noteTodoFilter
     ? noteArray.filter((n) => {
         return (
@@ -22,7 +22,7 @@ function mapStateToProps(state) {
         );
       })
     : noteArray;
-  console.log("notes after filter ", noteArrayFiltered);
+  //console.log("notes after filter ", noteArrayFiltered);
   const noteArraySorted = noteArrayFiltered.sort(function(n1, n2) {
     const t1 = n1.lastModified || 0;
     const t2 = n2.lastModified || 0;

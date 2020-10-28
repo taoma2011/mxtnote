@@ -52,6 +52,8 @@ import {
   OPEN_NOTE_EDITOR,
   RESOLVE_CONFLICT,
   RESOLVE_DONE,
+  SYNC_PROGRESS,
+  SYNC_DONE,
 } from "../actions/file";
 import type { FileStateType, Action } from "./types";
 import {
@@ -101,7 +103,7 @@ import { mergeVersions, newNode } from "../../version/version";
 export async function doSync(dispatch) {
   const currentDocs = await GetAllDocumentsPromise();
   const remoteDb = await callImportRemoteDb(currentDocs);
-  console.log("remote db: ", remoteDb);
+  //console.log("remote db: ", remoteDb);
 
   remoteDb.files.forEach((f) => {
     f._id = f.id;
@@ -312,7 +314,7 @@ export default function file(state: FileStateType, action: Action) {
       openResetConfirmDialog: false,
     };
   }
-  console.log("action is ", action);
+  //console.log("action is ", action);
   switch (action.type) {
     // user click on a document from library page
     case OPEN_GIVEN_FILE: {
@@ -640,7 +642,7 @@ export default function file(state: FileStateType, action: Action) {
       };
     }
     case ADD_TODO_FROM_DB: {
-      console.log("get add todo from db");
+      //console.log("get add todo from db");
 
       return {
         ...state,
@@ -1015,6 +1017,19 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         showResolveConflictDialog: false,
+      };
+    }
+    case SYNC_PROGRESS: {
+      return {
+        ...state,
+        showSyncProgress: true,
+        syncProgress: action.progress,
+      };
+    }
+    case SYNC_DONE: {
+      return {
+        ...state,
+        showSyncProgress: false,
       };
     }
     default:
