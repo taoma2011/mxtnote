@@ -1,4 +1,8 @@
-import { GetNoteByUuid, UpdateNotePromise } from "./db";
+import {
+  GetNoteByUuid,
+  UpdateNotePromise,
+  GetDocumentByUuidPromise,
+} from "./db";
 
 const { machineIdSync } = require("node-machine-id");
 const version = require("../../version/version");
@@ -197,7 +201,16 @@ function rectToCenter(left, top, right, bottom, pageW, pageH) {
   };
 }
 
-export const importRemoteDb = async () => {
+const hasLocalDoc = (f, localDocs) => {
+  for (let i = 0; i < localDocs.length; i++) {
+    const d = localDocs[i];
+    if (d.fileUuid && f.fileUuid && d.fileUuid == f.fileUuid) {
+      return d;
+    }
+  }
+  return null;
+};
+export const importRemoteDb = async (localDocs) => {
   const result = await secureGet(BASE_URL + "/db");
   //console.log("remote db: ", result);
   const newFiles = [];
@@ -206,10 +219,15 @@ export const importRemoteDb = async () => {
   const newTags = [];
 
   for (var i = 0; i < result.files.length; i++) {
-    const newFile = await remoteFileToLocalFile(result.files[i]);
-    newFile.synced = true;
-    newFiles.push(newFile);
-    fileMap[newFile.id] = newFile;
+    const f = result.files[i];
+    const localFile = hasLocalDoc(f, localDocs);
+    if (localFile) {
+      fileMap[f.id] = localFile;
+    } else {
+      const newFile = await remoteFileToLocalFile(result.files[i]);
+      newFiles.push(newFile);
+      fileMap[f.id] = newFile;
+    }
     //UpdateDocument(newFile.id, newFile);
   }
 
@@ -459,10 +477,10 @@ export const startIpcMain = () => {
   });
 };
 
-export const callImportRemoteDb = async () => {
+export const callImportRemoteDb = async (arg) => {
   try {
     console.log("before calling import remote db");
-    const result = await ipcRenderer.invoke("import-db-api", {});
+    const result = await ipcRenderer.invoke("import-db-api", arg);
     console.log("call import got result: ", result);
     return result;
   } catch (e) {
@@ -550,6 +568,12 @@ export async function localFileToRemoteFile(localFile) {
         // this could be the file already exist in remote
         // for now we still upload the file again
         id = e.id;
+        console.log("remote file already exist ", id);
+        return {
+          id: id,
+          width: e.width,
+          height: e.height,
+        };
       } else {
         throw e;
       }

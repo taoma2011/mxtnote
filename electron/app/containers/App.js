@@ -24,33 +24,33 @@ import { getElectron } from "../utils/common";
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
   appBar: {
-    zIndex: theme.zIndex.drawer + 1
+    zIndex: theme.zIndex.drawer + 1,
   },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    backgroundColor: `#663399`
+    backgroundColor: `#663399`,
   },
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
   },
   content: {
     marginTop: 30,
     flexGrow: 1,
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
   },
-  toolbar: theme.mixins.toolbar
+  toolbar: theme.mixins.toolbar,
 }));
 
 function TabPanel(props) {
   // eslint-disable-next-line react/prop-types
   const { children, value, index, ...other } = props;
-
+  /*
   return (
     <Typography
       component="div"
@@ -64,6 +64,9 @@ function TabPanel(props) {
       {value === index && <Box p={3}>{children}</Box>}
     </Typography>
   );
+  */
+  if (value === index) return <>{children}</>;
+  return null;
 }
 
 function App(props) {
@@ -116,7 +119,7 @@ function App(props) {
         className={classes.drawer}
         variant="permanent"
         classes={{
-          paper: classes.drawerPaper
+          paper: classes.drawerPaper,
         }}
       >
         <div className={classes.toolbar} />
@@ -151,12 +154,12 @@ function App(props) {
         </List>
       </Drawer>
 
-      <main className={classes.content}>
-        <div className={classes.toolbar}>
+      <main className={classes.content} style={{ height: "100vh" }}>
+        <div className={classes.toolbar} style={{ height: "100vh" }}>
           <TabPanel value={currentTab} index={0}>
             <FilePage />
           </TabPanel>
-          <TabPanel value={currentTab} index={1}>
+          <TabPanel value={currentTab} index={1} style={{ height: "100vh" }}>
             <NotePage />
           </TabPanel>
           <TabPanel value={currentTab} index={2}>
@@ -178,18 +181,18 @@ function mapStateToProps(state) {
   return {
     currentTab: currentTab || 0,
     libraryLoaded,
-    todoLoaded
+    todoLoaded,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    setTab: tab => {
+    setTab: (tab) => {
       return dispatch({
         type: SET_TAB,
-        tab
+        tab,
       });
-    }
+    },
   };
 }
 

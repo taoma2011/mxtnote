@@ -99,7 +99,8 @@ import {
 import { mergeVersions, newNode } from "../../version/version";
 
 export async function doSync(dispatch) {
-  const remoteDb = await callImportRemoteDb();
+  const currentDocs = await GetAllDocumentsPromise();
+  const remoteDb = await callImportRemoteDb(currentDocs);
   console.log("remote db: ", remoteDb);
 
   remoteDb.files.forEach((f) => {

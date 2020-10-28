@@ -100,6 +100,17 @@ export const GetAllDocumentsPromise = () =>
     });
   });
 
+export const GetDocumentByUuidPromise = (fileUuid) =>
+  new Promise((resolve, reject) => {
+    docDb.findOne({ fileUuid: fileUuid }, (err, doc) => {
+      if (!err) {
+        resolve(doc);
+      } else {
+        reject(err);
+      }
+    });
+  });
+
 export const DeleteAllNotes = () => {
   noteDb.remove({}, { multi: true });
 };
