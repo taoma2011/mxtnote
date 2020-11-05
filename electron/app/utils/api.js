@@ -535,7 +535,7 @@ export const callLogin = async (username, password) => {
 
 const remoteFileDirectory = () => {
   const app = require("electron").app;
-  const retPath = app.getAppPath() + "/remote_files/";
+  const retPath = app.getPath("appData") + "/remote_files/";
   //console.log("remote file path = ", retPath);
   return retPath;
 };
