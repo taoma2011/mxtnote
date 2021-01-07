@@ -4,13 +4,14 @@ const electronPath = require("electron"); // Require Electron from the binaries 
 const path = require("path");
 
 describe("My Test App", function() {
-  let app;
   this.timeout(20000);
 
   before(function() {
+    const appDir = path.join(__dirname, "../../app");
+    console.log("appDir is ", appDir);
     this.app = new Application({
       path: electronPath,
-      args: [path.join(__dirname, "../../app")],
+      args: [appDir],
     });
 
     //return this.app.start().catch(console.error);
