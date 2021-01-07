@@ -12,6 +12,8 @@ describe("My Test App", function() {
     this.app = new Application({
       path: electronPath,
       args: [appDir],
+      port: 9888,
+      chromeDriverLogPath: "chrome.log",
     });
 
     //return this.app.start().catch(console.error);
@@ -27,6 +29,6 @@ describe("My Test App", function() {
   it("Should have the correct title", async function() {
     // actual test
     const title = await this.app.client.getTitle();
-    assert.equal(title, "My Test App");
+    assert.equal(title, "MxtNote");
   });
 });
