@@ -23,20 +23,20 @@ describe("merge with one side empty", function() {
     const date2 = new Date(date1.getTime() + 60000);
     const version1 = {
       tree: flatToNested.convert([{ id: 1 }]),
-      lastModified: date2,
-      syncTime: date1,
+      lastModified: date1,
+      lastSynced: date1,
     };
     const version2 = {
       tree: flatToNested.convert([{ id: 1 }]),
-      lastModified: date1,
-      syncTime: date1,
+      lastModified: date2,
+      lastSynced: date1,
     };
     let res;
     res = mergeVersions(version1, version2);
     expect(res).to.not.null;
-    expect(res).to.have.property("status", "ok");
+    expect(res).to.have.property("status", "remote");
     res = mergeVersions(version2, version1);
     expect(res).to.not.null;
-    expect(res).to.have.property("status", "ok");
+    expect(res).to.have.property("status", "local");
   });
 });

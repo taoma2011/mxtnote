@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { GetAllDocuments } from "../utils/db";
+import { GetAllActiveDocuments } from "../utils/db";
 
 export default function LoadLibrary(props) {
   // eslint-disable-next-line react/prop-types
@@ -10,7 +10,7 @@ export default function LoadLibrary(props) {
   };
   useEffect(() => {
     //console.log('loading db doc');
-    GetAllDocuments(handleDoc);
+    GetAllActiveDocuments(handleDoc);
   });
 
   return <div />;

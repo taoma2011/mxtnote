@@ -89,6 +89,14 @@ export const GetAllDocuments = (handleDoc) => {
   });
 };
 
+export const GetAllActiveDocuments = (handleDoc) => {
+  docDb.find({ deleted: { $ne: true } }, (err, doc) => {
+    if (!err) {
+      handleDoc(doc);
+    }
+  });
+};
+
 export const GetAllDocumentsPromise = () =>
   new Promise((resolve, reject) => {
     docDb.find({}, (err, doc) => {

@@ -205,6 +205,12 @@ const hasLocalDoc = (f, localDocs) => {
   }
   return null;
 };
+
+const setLocalFileDeleted = (f) => {
+  f.deleted = true;
+  f.deletedDate = new Date();
+};
+
 export const importRemoteDb = async (event, localDocs) => {
   const result = await secureGet(BASE_URL + "/db");
   //console.log("remote db: ", result);
@@ -212,6 +218,7 @@ export const importRemoteDb = async (event, localDocs) => {
   const fileMap = {};
   const tagMap = {};
   const newTags = [];
+  const deletedFiles = [];
 
   event.sender.send("sync-progress", "Download remote files");
   for (var i = 0; i < result.files.length; i++) {
@@ -219,6 +226,10 @@ export const importRemoteDb = async (event, localDocs) => {
     const localFile = hasLocalDoc(f, localDocs);
     if (localFile) {
       fileMap[f.id] = localFile;
+      if (f.deleted) {
+        setLocalFileDeleted(localFile);
+        deletedFiles.push(localFile);
+      }
     } else {
       event.sender.send(
         "sync-progress",
@@ -320,11 +331,13 @@ export const importRemoteDb = async (event, localDocs) => {
   }
   // mobile version has tags which is not separate record
 
+  // return the data to be updated, the update will be driven by ui thread
   return {
     ...result,
     files: newFiles,
     notes: newNotes,
     todos: newTags,
+    deletedFiles,
   };
 };
 
@@ -358,6 +371,11 @@ export const exportRemoteDb = async (event, db) => {
     if (localFile.originalDevice != myId) {
       // originally non-local file, don't need to send again
       fileMap[localFile._id] = localFile;
+
+      // check if the file has been deleted locally, if so we need to notify remote
+      if (localFile.deleted) {
+        await notifyLocalFileDelete(loalFile);
+      }
       continue;
     }
     console.log("originalDeviceId is ", localFile.originalDevice);
@@ -572,6 +590,20 @@ export async function remoteFileToLocalFile(remoteFile) {
     file: getLocalFileNameForRemoteFile(remoteFile),
     description: remoteFile.filename,
   };
+}
+
+export async function notifylocalFileDelete(localFile) {
+  // is localFile._id aways uuid?
+  try {
+    // XXX need to implement this api
+    const res = await securePost(BASE_URL + "/files/notify", {
+      fileUuid: localFile._id,
+      action: "delete",
+    });
+  } catch (e) {
+    console.log("notify local file delete error ", e);
+    return null;
+  }
 }
 
 export async function localFileToRemoteFile(localFile) {

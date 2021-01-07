@@ -110,6 +110,10 @@ export async function doSync(dispatch) {
     UpdateDocument(f.id, f);
   });
 
+  remoteDb.deletedFiles.forEach((f) => {
+    UpdateDocument(f._id, f);
+  });
+
   return await mergeAndExport(remoteDb, 0, null);
 }
 
