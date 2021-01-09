@@ -8,7 +8,15 @@ const { machineIdSync } = require("node-machine-id");
 const version = require("../../version/version");
 const uuid = require("uuid");
 const BASE_URL = "https://note.mxtsoft.com:4001";
-//const BASE_URL = "http://localhost:4001";
+const TEST_BASE_URL = "http://localhost:4001";
+
+const getBaseUrl = () => {
+  if (process.env.NODE_ENV === "test") {
+    return TEST_BASE_URL;
+  }
+  return BASE_URL;
+};
+
 const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
@@ -23,7 +31,7 @@ export const login = (args) =>
     console.log("post data ", postData);
     const request = net.request({
       method: "POST",
-      url: BASE_URL + "/users/authenticate",
+      url: getBaseUrl() + "/users/authenticate",
     });
     request.setHeader("Content-Type", "application/json");
     request.on("response", (response) => {
@@ -212,14 +220,19 @@ const setLocalFileDeleted = (f) => {
 };
 
 export const updateSender = (event, command, msg) => {
+  if (process.env.NODE_ENV === "test") {
+    return;
+  }
+
   if (event) {
     event.sender.send(command, msg);
   }
 };
 
 export const importRemoteDb = async (event, localDocs) => {
-  const result = await secureGet(BASE_URL + "/db");
-  console.log("remote db: ", result);
+  const result = await secureGet(getBaseUrl() + "/db");
+  //console.log("DEBUG local is ", localDocs);
+  //console.log("DEBUG remote db: ", result);
   const newFiles = [];
   const fileMap = {};
   const tagMap = {};
@@ -491,7 +504,7 @@ const createRemoteNote = async (note) => {
     };
     delete n._id;
 
-    const res = await securePost(BASE_URL + "/notes/sync", n);
+    const res = await securePost(getBaseUrl() + "/notes/sync", n);
     return res;
   } catch (e) {
     console.log("create note error ", e);
@@ -587,7 +600,7 @@ export async function downloadRemoteFile(remoteFile) {
     getLocalFileNameForRemoteFile(remoteFile)
   );
   await secureDownloadFile(
-    BASE_URL + "/files/download/" + remoteFile.id,
+    getBaseUrl() + "/files/download/" + remoteFile.id,
     localFile
   );
   localFile.close();
@@ -606,7 +619,7 @@ export async function notifylocalFileDelete(localFile) {
   // is localFile._id aways uuid?
   try {
     // XXX need to implement this api
-    const res = await securePost(BASE_URL + "/files/notify", {
+    const res = await securePost(getBaseUrl() + "/files/notify", {
       fileUuid: localFile._id,
       action: "delete",
     });
@@ -620,7 +633,7 @@ export async function localFileToRemoteFile(localFile) {
   try {
     let id = null;
     try {
-      const res = await securePost(BASE_URL + "/files/create", {
+      const res = await securePost(getBaseUrl() + "/files/create", {
         username: remoteUserName,
         filename: localFile.description,
         fileUuid: localFile._id,
@@ -645,7 +658,7 @@ export async function localFileToRemoteFile(localFile) {
     // now upload the file
     const fileData = fs.readFileSync(localFile.file);
     const uploadRes = await secureUploadFile(
-      BASE_URL + "/files/upload",
+      getBaseUrl() + "/files/upload",
       id,
       localFile.description,
       fileData

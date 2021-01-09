@@ -21,10 +21,7 @@ function mapStateToProps(state) {
 function syncRemoteThunk() {
   return function(dispatch) {
     return doSync().then((result) => {
-      if (typeof result === "object") {
-        // there is conflict, need manual resulve
-        dispatch(result);
-      } else dispatch({ type: IMPORT_NOTE_FROM_REMOTE });
+      dispatch(result);
     });
   };
 }

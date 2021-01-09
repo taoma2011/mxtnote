@@ -14,6 +14,15 @@ export const InitDb = () => {
   settingsDb = new Datastore({ filename: "settings.db", autoload: true });
 };
 
+export const TestInitDb = () => {
+  // eslint-disable-next-line global-require
+  const Datastore = require("nedb");
+  docDb = new Datastore({ filename: "test-doc.db", autoload: true });
+  noteDb = new Datastore({ filename: "test-note.db", autoload: true });
+  todoDb = new Datastore({ filename: "test-todo.db", autoload: true });
+  settingsDb = new Datastore({ filename: "test-settings.db", autoload: true });
+};
+
 export const GetNoteByUuid = (uuid) => {
   return new Promise(function(resolve, reject) {
     noteDb.find({ noteUuid: uuid }, function(err, doc) {

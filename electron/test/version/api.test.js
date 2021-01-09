@@ -40,3 +40,27 @@ describe("merge with one side empty", function() {
     expect(res).to.have.property("status", "local");
   });
 });
+
+/*
+ * example output of /db
+{
+  files: [
+    {
+      username: 'tao',
+      filename: 'berger',
+      userId: '5ff94d0522a013489a276c5b',
+      createdDate: '2021-01-09T06:28:21.940Z',
+      fileUuid: '5ff94d0522a013489a276c5c',
+      height: 792,
+      numPages: 22,
+      originalDevice: 'a5c556fd851f4f5988e185d7cf469341607d74fcb5ed56c0116a7c2e55488e6b:xtserver',
+      size: 249375,
+      width: 612,
+      id: '5ff94d0522a013489a276c5c'
+    }
+  ],
+  notes: [],
+  tags: []
+}
+
+*/

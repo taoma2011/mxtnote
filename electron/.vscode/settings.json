@@ -1,0 +1,5 @@
+{
+  "git.ignoreLimitWarning": true,
+  "mochaExplorer.files": ["test/version/*.js", "test/db/*.js"],
+  "mochaExplorer.require": "esm"
+}

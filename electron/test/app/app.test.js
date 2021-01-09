@@ -4,7 +4,7 @@ const electronPath = require("electron"); // Require Electron from the binaries 
 const path = require("path");
 
 describe("My Test App", function() {
-  this.timeout(10000);
+  this.timeout(20000);
 
   before(function() {
     const appDir = path.join(__dirname, "../../app");
@@ -21,6 +21,11 @@ describe("My Test App", function() {
   });
 
   after(function() {
+    this.app.client.getMainProcessLogs().then(function(logs) {
+      logs.forEach(function(log) {
+        console.log(log);
+      });
+    });
     if (this.app && this.app.isRunning()) {
       return this.app.stop();
     }
@@ -35,9 +40,18 @@ describe("My Test App", function() {
   it("test login api", async function() {
     console.log("before call invoke");
     const result = await this.app.electron.ipcRenderer.invoke("login-api", {
-      username: "tao",
-      password: "tt",
+      username: process.env.TEST_USER,
+      password: process.env.TEST_PASSWORD,
     });
     console.log("result is ", result);
+    this.app.electron.ipcRenderer.on("sync-progress", (event, arg) => {
+      console.log(arg);
+    });
+    console.log("before call import");
+    const importResult = await this.app.electron.ipcRenderer.invoke(
+      "import-db-api",
+      []
+    );
+    console.log("import result is ", importResult);
   });
 });
