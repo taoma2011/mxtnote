@@ -211,16 +211,23 @@ const setLocalFileDeleted = (f) => {
   f.deletedDate = new Date();
 };
 
+export const updateSender = (event, command, msg) => {
+  if (event) {
+    event.sender.send(command, msg);
+  }
+};
+
 export const importRemoteDb = async (event, localDocs) => {
   const result = await secureGet(BASE_URL + "/db");
-  //console.log("remote db: ", result);
+  console.log("remote db: ", result);
   const newFiles = [];
   const fileMap = {};
   const tagMap = {};
   const newTags = [];
   const deletedFiles = [];
 
-  event.sender.send("sync-progress", "Download remote files");
+  updateSender(event, "sync-progress", "Download remote files");
+
   for (var i = 0; i < result.files.length; i++) {
     const f = result.files[i];
     const localFile = hasLocalDoc(f, localDocs);
@@ -231,12 +238,14 @@ export const importRemoteDb = async (event, localDocs) => {
         deletedFiles.push(localFile);
       }
     } else {
-      event.sender.send(
+      updateSender(
+        event,
         "sync-progress",
         `Download file ${result.files[i].filename} ${i + 1}/${
           result.files.length
         }`
       );
+
       const newFile = await remoteFileToLocalFile(result.files[i]);
       newFiles.push(newFile);
       fileMap[f.id] = newFile;
@@ -257,7 +266,8 @@ export const importRemoteDb = async (event, localDocs) => {
 
   const newNotes = [];
   for (var i = 0; i < result.notes.length; i++) {
-    event.sender.send(
+    updateSender(
+      event,
       "sync-progress",
       `Download note ${i + 1}/${result.notes.length}`
     );

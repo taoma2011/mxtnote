@@ -1,6 +1,6 @@
 {
  "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 8,
          "sourceType": "module"
     },
   "extends": "plugin:testcafe/recommended",
@@ -8,7 +8,7 @@
 
     "jest/globals": true
   },
-  "plugins": ["jest", "testcafe"],
+  "plugins": ["jest", "testcafe", "mocha"],
   "rules": {
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",

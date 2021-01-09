@@ -25,7 +25,7 @@ function mapStateToProps(state) {
 function continueMergeThunk(remoteDb, currIndex, resolveResult) {
   return function(dispatch) {
     return mergeAndExport(remoteDb, currIndex, resolveResult).then((result) => {
-      dispatch({ type: IMPORT_NOTE_FROM_REMOTE });
+      dispatch(result);
     });
   };
 }

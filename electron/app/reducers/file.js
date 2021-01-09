@@ -118,7 +118,12 @@ export async function doSync(dispatch) {
 }
 
 //
-// this function will be called after conflict is resolved manually
+// this function will be called when we start to merge,
+// and every time after conflict is resolved manually
+// it return the next action, which is either to complete
+// the sync process, or prompt the user to resolve the
+// current conflict
+//
 export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
   const syncTime = new Date();
   console.log("merging notes");
@@ -231,7 +236,9 @@ export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
   };
   await callExportRemoteDb(db);
 
-  return true;
+  return {
+    type: IMPORT_NOTE_FROM_REMOTE,
+  };
 }
 
 function saveLastPageNumber(state) {

@@ -4,7 +4,7 @@ const electronPath = require("electron"); // Require Electron from the binaries 
 const path = require("path");
 
 describe("My Test App", function() {
-  this.timeout(20000);
+  this.timeout(10000);
 
   before(function() {
     const appDir = path.join(__dirname, "../../app");
@@ -30,5 +30,14 @@ describe("My Test App", function() {
     // actual test
     const title = await this.app.client.getTitle();
     assert.equal(title, "MxtNote");
+  });
+
+  it("test login api", async function() {
+    console.log("before call invoke");
+    const result = await this.app.electron.ipcRenderer.invoke("login-api", {
+      username: "tao",
+      password: "tt",
+    });
+    console.log("result is ", result);
   });
 });
