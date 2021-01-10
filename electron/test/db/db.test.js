@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-global-assign
 require = require("esm")(module);
 
 const { TestInitDb, GetAllDocumentsPromise } = require("../../app/utils/db.js");
@@ -7,8 +8,6 @@ const { app } = require("electron");
 describe("test db", function() {
   before(async function() {
     TestInitDb();
-    //useNetFromNode();
-    await app.whenReady();
   });
 
   after(function() {});
@@ -28,7 +27,11 @@ describe("test db", function() {
       password: process.env.TEST_PASSWORD,
     });
     console.log("log in result is ", loginResult);
-    const importResult = await importRemoteDb(null, allDoc);
-    console.log("import result is ", importResult);
+    try {
+      const importResult = await importRemoteDb(null, allDoc);
+      console.log("import result is ", importResult);
+    } catch (e) {
+      console.log("import exception: ", e);
+    }
   });
 });

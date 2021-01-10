@@ -242,7 +242,7 @@ export const importRemoteDb = async (event, localDocs) => {
 
   updateSender(event, "sync-progress", "Download remote files");
 
-  for (var i = 0; i < result.files.length; i++) {
+  for (let i = 0; i < result.files.length; i++) {
     const f = result.files[i];
     const localFile = hasLocalDoc(f, localDocs);
     if (localFile) {
@@ -252,6 +252,11 @@ export const importRemoteDb = async (event, localDocs) => {
         deletedFiles.push(localFile);
       }
     } else {
+      if (f.deleted) {
+        // if we haven't seen this file and its deleted already, we don't need
+        // to create any record
+        continue;
+      }
       updateSender(
         event,
         "sync-progress",
@@ -259,7 +264,7 @@ export const importRemoteDb = async (event, localDocs) => {
           result.files.length
         }`
       );
-
+      console.log("download remote file ", result.files[i]);
       const newFile = await remoteFileToLocalFile(result.files[i]);
       newFiles.push(newFile);
       fileMap[f.id] = newFile;
@@ -267,7 +272,7 @@ export const importRemoteDb = async (event, localDocs) => {
     //UpdateDocument(newFile.id, newFile);
   }
 
-  for (var i = 0; i < result.tags.length; i++) {
+  for (let i = 0; i < result.tags.length; i++) {
     const oldTag = result.tags[i];
     const newTag = {
       ...oldTag,
@@ -279,7 +284,7 @@ export const importRemoteDb = async (event, localDocs) => {
   }
 
   const newNotes = [];
-  for (var i = 0; i < result.notes.length; i++) {
+  for (let i = 0; i < result.notes.length; i++) {
     updateSender(
       event,
       "sync-progress",
