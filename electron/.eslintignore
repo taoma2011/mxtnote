@@ -1,0 +1,3 @@
+app/dist/*
+dll/*
+app/main.prod.js
