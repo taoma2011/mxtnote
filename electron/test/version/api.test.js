@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 var mergeVersions = require("../../version/version.js").mergeVersions;
 
-var FlatToNested, flatToNested, flat;
+var FlatToNested, flatToNested;
 
 FlatToNested = require("flat-to-nested");
 flatToNested = new FlatToNested();

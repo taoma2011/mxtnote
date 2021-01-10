@@ -58,6 +58,7 @@ export const secureGet = (url) =>
   new Promise((resolve, reject) => {
     const { net } = require("electron");
     let responseStr = "";
+    //console.log("111 url is ", url);
     const request = net.request({
       url: url,
     });
