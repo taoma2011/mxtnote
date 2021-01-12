@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from "react";
+import React from "react";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
 import NotePanel from "../containers/NotePanel";
 import LoadNote from "../containers/LoadNote";
 import NoteControl from "../containers/NoteControl";
@@ -36,7 +35,7 @@ const checkEqual = (prevProp, nextProp) => {
   return true;
 };
 export const NotePage = React.memo(function NotePage(props) {
-  const items = [];
+  //const items = [];
   // eslint-disable-next-line react/prop-types
   const { notes, noteLoaded } = props;
   //console.log("note page: all notes ", notes);

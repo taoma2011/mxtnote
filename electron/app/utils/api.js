@@ -26,6 +26,7 @@ let remoteUserId = null;
 
 export const login = (args) =>
   new Promise((resolve, reject) => {
+    console.log("in login");
     const { net } = require("electron");
     const postData = JSON.stringify(args);
     console.log("post data ", postData);
@@ -233,7 +234,7 @@ export const updateSender = (event, command, msg) => {
 export const importRemoteDb = async (event, localDocs) => {
   const result = await secureGet(getBaseUrl() + "/db");
   //console.log("DEBUG local is ", localDocs);
-  //console.log("DEBUG remote db: ", result);
+  console.log("DEBUG remote db: ", result);
   const newFiles = [];
   const fileMap = {};
   const tagMap = {};

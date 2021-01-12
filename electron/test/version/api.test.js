@@ -63,4 +63,34 @@ describe("merge with one side empty", function() {
   tags: []
 }
 
+example note:
+ {
+      tags: [],
+      userId: '5ef8603500d4e368b5b3eba4',
+      fileId: '5f5eb52a2b1de3001c3d9941',
+      page: 11,
+      pageX: 0.4863417699555785,
+      pageY: 0.3688892954091527,
+      width: 0.8351851851851838,
+      height: 0.1045370370370369,
+      detail: 'horizontal section',
+      lastModifiedTime: '2020-12-11T20:14:09.624Z',
+      creationTime: '2020-09-13T18:44:11.265Z',
+      hasMathSymbol: false,
+      noteUuid: '5f5ecaec2b1de3001c3d9945',
+      originalDevice: '962f496a15ebae6bffb3b52414def99c3ec2f7fac587c4e18700cc486e54c323:xtserver',
+      lastSynced: '2021-01-12T03:15:19.217Z',
+      syncRecord: '{"id":"17d5e5da-99f3-4a15-af5c-7a0419e25310"}',
+      id: '5f5ecaec2b1de3001c3d9945'
+    },
+
+    example tag:
+      {
+      members: [],
+      userId: '5ef8603500d4e368b5b3eba4',
+      name: 'p adic hodge',
+      createdDate: '2020-07-19T02:57:58.061Z',
+      id: '5f13b6b6f7008b5f1b782352'
+    },
+
 */

@@ -208,6 +208,8 @@ export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
     console.log("create new note ", n.id);
     n._id = n.id;
     n.lastSynced = syncTime;
+    // convert to local field name/format
+    n.lastModified = n.lastModifiedTime;
     await UpdateNotePromise(n.id, n);
   }
   remoteDb.todos.forEach((t) => {
@@ -447,7 +449,7 @@ export default function file(state: FileStateType, action: Action) {
 
       console.log("adding new note ", newNid);
 
-      const now = Date.now();
+      const now = new Date();
 
       const defaultNote = {
         _id: newNid,
