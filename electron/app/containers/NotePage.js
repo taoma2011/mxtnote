@@ -22,7 +22,7 @@ function mapStateToProps(state) {
         );
       })
     : noteArray;
-  console.log("notes after filter ", noteArrayFiltered);
+  //console.log("notes after filter ", noteArrayFiltered);
   const noteArraySorted = noteArrayFiltered.sort(function(n1, n2) {
     const t1 = n1.lastModified ? Date.parse(n1.lastModified) : 0;
     const t2 = n2.lastModified ? Date.parse(n2.lastModified) : 0;

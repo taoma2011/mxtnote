@@ -21,19 +21,19 @@ export default function LoadImage(props) {
     //console.log("existing image file is ", imageFile);
     if (!imageFile && !image && pdfFile) {
       // load image from pdf
-      //console.log("load image from pdf");
+      console.log("load image from pdf: ", noteId);
       loadImageFromPdf(pdfFile, note, function(data) {
         imageDataReady(noteId, data);
       });
     } else if (imageFile && !image) {
-      //console.log("load image from file");
+      console.log("load image from file: ", noteId);
       fs.readFile(imageFile, function(err, contents) {
         if (!err) {
           imageDataReady(noteId, contents);
         }
       });
     } else if (image && !imageFile) {
-      //console.log("write image file");
+      console.log("write image file: ", noteId);
       const fileName = `${noteId}.img`;
       const path = require("path");
       const newImageFile = path.join(remote.app.getPath("userData"), fileName);
