@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import PdfPage from "../components/PdfPage";
-import { RENDER_COMPLETE, ADD_NOTE } from "../actions/file";
+import { RENDER_COMPLETE, ADD_NOTE, PAGE_SIZE_READY } from "../actions/file";
 
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
@@ -17,6 +17,8 @@ function mapDispatchToProps(dispatch) {
   return {
     notifyRenderComplete: (canvas) =>
       dispatch({ type: RENDER_COMPLETE, canvas }),
+    notifyPageSizeReady: (pageWidth, pageHeight) =>
+      dispatch({ type: PAGE_SIZE_READY, pageWidth, pageHeight }),
     addNoteAt: (e) =>
       dispatch({
         type: ADD_NOTE,

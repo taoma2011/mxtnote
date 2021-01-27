@@ -5,6 +5,7 @@ import {
   NEXT_PAGE,
   FILE_LOADED,
   PAGE_LOADED,
+  PAGE_SIZE_READY,
   SET_RECT_STATE,
   START_ADD_NOTE,
   ADD_NOTE,
@@ -397,6 +398,13 @@ export default function file(state: FileStateType, action: Action) {
       return {
         ...state,
         page: action.page,
+      };
+    }
+    case PAGE_SIZE_READY: {
+      return {
+        ...state,
+        pageWidth: action.pageWidth,
+        pageHeight: action.pageHeight,
       };
     }
     case SET_RECT_STATE: {

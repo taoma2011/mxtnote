@@ -7,8 +7,11 @@ export default class PdfPage extends Component {
     this.painting = false;
     this.canvas = React.createRef();
     this.notifyRenderComplete = props.notifyRenderComplete;
+    this.notifyPageSizeReady = props.notifyPageSizeReady;
     this.addNoteAt = props.addNoteAt;
     this.handleClick = this.handleClick.bind(this);
+    this.pageWidth = props.pageWidth;
+    this.pageHeight = props.pageHeight;
   }
 
   componentDidMount() {
@@ -43,9 +46,14 @@ export default class PdfPage extends Component {
     canvas.height = viewport.height;
     canvas.width = viewport.width;
 
-    canvas.style.height = Math.floor(viewport.height / moreScale) + "px";
-    canvas.style.width = Math.floor(viewport.width / moreScale) + "px";
+    const pageHeight = Math.floor(viewport.height / moreScale);
+    const pageWidth = Math.floor(viewport.width / moreScale);
 
+    canvas.style.height = pageHeight + "px";
+    canvas.style.width = pageWidth + "px";
+    if (pageWidth != this.pageWidth || pageHeight != this.pageHeight) {
+      this.notifyPageSizeReady(pageWidth, pageHeight);
+    }
     //canvas.style.height = Math.floor(viewport.height / moreScale);
     //canvas.style.width = Math.floor(viewport.width / moreScale);
 

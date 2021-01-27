@@ -5,7 +5,7 @@ import StaticRect from "../containers/StaticRect";
 
 export const PageWrapper = (props) => {
   const [page, setPage] = React.useState(null);
-  const { pdfDoc, pageNum, notes, fileId } = props;
+  const { pdfDoc, pageNum, notes, fileId, pageWidth, pageHeight } = props;
   React.useEffect(() => {
     console.log(`loading ${pageNum}`);
     pdfDoc.getPage(pageNum).then((page) => {
@@ -32,7 +32,7 @@ export const PageWrapper = (props) => {
       <>
         <SelectRect />
         {items}
-        <PdfPage pdfPage={page} />
+        <PdfPage pdfPage={page} pageWidth={pageWidth} pageHeight={pageHeight} />
       </>
     );
   }

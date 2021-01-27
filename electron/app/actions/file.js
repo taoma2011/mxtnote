@@ -5,6 +5,7 @@ export const OPEN_GIVEN_FILE = "OPEN_GIVEN_FILE";
 export const NEXT_PAGE = "NEXT_PAGE";
 export const PREV_PAGE = "PREV_PAGE";
 export const FILE_LOADED = "FILE_LOADED";
+export const PAGE_SIZE_READY = "PAGE_SIZE_READY";
 export const PAGE_LOADED = "PAGE_LOADED";
 export const SET_RECT_STATE = "SET_RECT_STATE";
 export const START_ADD_NOTE = "START_ADD_NOTE";
