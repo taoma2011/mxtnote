@@ -9,8 +9,17 @@ import * as FileActions from "../actions/file";
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
   const { file } = state;
-  const { notes, pageNum, numPages, fileId, doc, docLoading, noteLoaded } =
-    file || {};
+  const {
+    notes,
+    pageNum,
+    numPages,
+    fileId,
+    doc,
+    docLoading,
+    noteLoaded,
+    pageWidth,
+    pageHeight,
+  } = file || {};
   return {
     doc,
     docLoading,
@@ -19,6 +28,8 @@ function mapStateToProps(state) {
     fileId,
     notes,
     noteLoaded,
+    pageWidth,
+    pageHeight,
   };
 }
 function mapDispatchToProps(dispatch) {

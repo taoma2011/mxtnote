@@ -7,6 +7,7 @@ export const PREV_PAGE = "PREV_PAGE";
 export const FILE_LOADED = "FILE_LOADED";
 export const PAGE_SIZE_READY = "PAGE_SIZE_READY";
 export const PAGE_LOADED = "PAGE_LOADED";
+export const PAGE_SCROLL_NOTIFY = "PAGE_SCROLL_NOTIFY";
 export const SET_RECT_STATE = "SET_RECT_STATE";
 export const START_ADD_NOTE = "START_ADD_NOTE";
 export const ADD_NOTE = "ADD_NOTE";
@@ -82,3 +83,10 @@ export const RESOLVE_DONE = "RESOLVE_DONE";
 export const SYNC_PROGRESS = "SYNC_PROGRESS";
 
 export const SYNC_DONE = "SYNC_DONE";
+
+export const updatePageScroll = (p) => {
+  return {
+    type: PAGE_SCROLL_NOTIFY,
+    page: p,
+  };
+};

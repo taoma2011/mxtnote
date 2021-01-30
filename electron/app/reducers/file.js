@@ -5,6 +5,7 @@ import {
   NEXT_PAGE,
   FILE_LOADED,
   PAGE_LOADED,
+  PAGE_SCROLL_NOTIFY,
   PAGE_SIZE_READY,
   SET_RECT_STATE,
   START_ADD_NOTE,
@@ -351,6 +352,7 @@ export default function file(state: FileStateType, action: Action) {
         fileName: action.file,
         fileId: action.fileId,
         pageNum,
+        currentPageNum: pageNum,
         currentTab: 0,
       };
     }
@@ -368,17 +370,19 @@ export default function file(state: FileStateType, action: Action) {
       }
       const newState = {
         ...state,
-        pageNum: state.pageNum + 1,
+        pageNum: state.currentPageNum + 1,
+        currentPageNum: state.currentPageNum + 1,
       };
       return saveLastPageNumber(newState);
     }
     case PREV_PAGE: {
-      if (!state.pageNum || state.pageNum <= 1) {
+      if (!state.pageNum || state.currentPageNum <= 1) {
         return state;
       }
       const newState = {
         ...state,
-        pageNum: state.pageNum - 1,
+        pageNum: state.currentPageNum - 1,
+        currentPageNum: state.currentPageNum - 1,
       };
       return saveLastPageNumber(newState);
     }
@@ -391,8 +395,16 @@ export default function file(state: FileStateType, action: Action) {
       const newState = {
         ...state,
         pageNum: page,
+        currentPageNum: page,
       };
       return saveLastPageNumber(newState);
+    }
+    case PAGE_SCROLL_NOTIFY: {
+      // TODO: update the file last page
+      return {
+        ...state,
+        currentPageNum: action.page,
+      };
     }
     case PAGE_LOADED: {
       return {
@@ -526,6 +538,7 @@ export default function file(state: FileStateType, action: Action) {
         return {
           ...state,
           pageNum: n.page,
+          currentPageNum: n.page,
           // goto file tab
           currentTab: 0,
         };
@@ -548,6 +561,7 @@ export default function file(state: FileStateType, action: Action) {
         fileName,
         docLoading: true,
         pageNum: n.page,
+        currentPageNum: n.page,
         // goto file tab
         currentTab: 0,
       };

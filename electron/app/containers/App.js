@@ -13,7 +13,7 @@ import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Box from "@material-ui/core/Box";
-import { FilePage } from "../components/FilePage";
+import FilePage from "./FilePage";
 import NotePage from "./NotePage";
 import LoadLibrary from "./LoadLibrary";
 import LoadTodo from "./LoadTodo";

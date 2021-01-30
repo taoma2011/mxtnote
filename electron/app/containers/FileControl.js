@@ -1,18 +1,18 @@
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 import {
   OPEN_FILE,
   NEXT_PAGE,
   PREV_PAGE,
   START_ADD_NOTE,
   SCALE_CHANGED,
-  SET_PAGE_NUMBER
-} from '../actions/file';
-import FileControl from '../components/FileControl';
+  SET_PAGE_NUMBER,
+} from "../actions/file";
+import FileControl from "../components/FileControl";
 
 function mapStateToProps(state) {
   const { file } = state;
-  const { pageNum, scale } = file || {};
-  return { pageNum, scale };
+  const { currentPageNum, scale } = file || {};
+  return { pageNum: currentPageNum, scale };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -23,7 +23,8 @@ function mapDispatchToProps(dispatch) {
     addNote: () => dispatch({ type: START_ADD_NOTE }),
     scaleChanged: (event, value) =>
       dispatch({ type: SCALE_CHANGED, scale: value }),
-    textChanged: e => dispatch({ type: SET_PAGE_NUMBER, page: e.target.value })
+    textChanged: (e) =>
+      dispatch({ type: SET_PAGE_NUMBER, page: e.target.value }),
   };
 }
 

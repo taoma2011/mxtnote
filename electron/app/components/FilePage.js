@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Paper from "@material-ui/core/Paper";
 
 import FileControl from "../containers/FileControl";
@@ -12,6 +12,8 @@ import LoadFile from "../containers/LoadFile";
 import LoadSettings from "../containers/LoadSettings";
 import LoadPage from "../containers/LoadPage";
 
+//import { updatePageScroll } from "../actions/file";
+
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -21,7 +23,7 @@ const { BrowserWindow } = require("electron").remote;
 
 export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
-  const file = useSelector((state) => state.file);
+  //const file = useSelector((state) => state.file);
   const {
     doc,
     pageNum,
@@ -33,8 +35,10 @@ export const FilePage = (props) => {
     settingsLoaded,
     pageWidth,
     pageHeight,
-  } = file || {};
+    updatePageScroll,
+  } = props;
   //console.log("all notes ", notes);
+  //const dispatch = useDispatch();
 
   const pageDivStyle = {
     position: "relative",
@@ -64,6 +68,17 @@ export const FilePage = (props) => {
     () => (pageHeight ? pageHeight : 80),
     [pageHeight]
   );
+
+  const [currentPage, setCurrentPage] = React.useState(pageNum);
+  const scrollUpdate = ({ scrollOffset }) => {
+    if (pageHeight) {
+      const newPageNum = Math.floor(scrollOffset / pageHeight) + 1;
+      if (newPageNum != currentPage) {
+        console.log("update page scroll: ", newPageNum);
+        updatePageScroll(newPageNum);
+      }
+    }
+  };
   const pages = () => {
     if (doc) {
       console.log("doc is ready");
@@ -75,6 +90,8 @@ export const FilePage = (props) => {
               itemCount={numPages}
               itemSize={displayPageHeight}
               width={width}
+              initialScrollOffset={(pageNum - 1) * pageHeight}
+              onScroll={scrollUpdate}
             >
               {Row}
             </List>
