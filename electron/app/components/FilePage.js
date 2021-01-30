@@ -83,6 +83,7 @@ export const FilePage = (props) => {
     if (doc) {
       console.log("doc is ready");
       return (
+        // somehow the initialScrollOffset doesn't like 0 value
         <AutoSizer>
           {({ height, width }) => (
             <List
@@ -90,7 +91,7 @@ export const FilePage = (props) => {
               itemCount={numPages}
               itemSize={displayPageHeight}
               width={width}
-              initialScrollOffset={(pageNum - 1) * pageHeight}
+              initialScrollOffset={pageNum > 1 ? (pageNum - 1) * pageHeight : 1}
               onScroll={scrollUpdate}
             >
               {Row}
