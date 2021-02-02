@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Paper from "@material-ui/core/Paper";
 
 import FileControl from "../containers/FileControl";
+import { SearchControl } from "../components/SearchControl";
 import DeleteNoteDialog from "../containers/DeleteNoteDialog";
 
 import { PageWrapper } from "../components/PageWrapper";
@@ -117,6 +118,7 @@ export const FilePage = (props) => {
         }}
       >
         <FileControl />
+        <SearchControl doc={doc} />
       </div>
       <div style={{ top: 30, height: viewPortHeight }}>
         <Paper height="100%" style={{ height: "100%" }}>

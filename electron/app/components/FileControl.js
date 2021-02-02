@@ -1,15 +1,15 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React from "react";
 // import styles from './File.css';
 // import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Slider from '@material-ui/core/Slider';
-import Grid from '@material-ui/core/Grid';
-import Snackbar from '@material-ui/core/Snackbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Slider from "@material-ui/core/Slider";
+import Grid from "@material-ui/core/Grid";
+import Snackbar from "@material-ui/core/Snackbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 export default function FileControl(props) {
   // eslint-disable-next-line react/prop-types
@@ -20,7 +20,7 @@ export default function FileControl(props) {
     nextPage,
     textChanged,
     scaleChanged,
-    addNote
+    addNote,
   } = props;
 
   const [open, setOpen] = React.useState(false);
@@ -31,14 +31,14 @@ export default function FileControl(props) {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);
   };
 
   const style = {
-    width: 100
+    width: 100,
   };
   return (
     <Grid container spacing={2}>
@@ -60,7 +60,7 @@ export default function FileControl(props) {
           value={pageNum}
           type="number"
           InputLabelProps={{
-            shrink: true
+            shrink: true,
           }}
           size="small"
           style={style}
@@ -77,7 +77,7 @@ export default function FileControl(props) {
       <Grid item xs={1}>
         <Slider
           min={50}
-          max={200}
+          max={300}
           value={scale}
           onChange={scaleChanged}
           aria-labelledby="continuous-slider"
@@ -91,14 +91,14 @@ export default function FileControl(props) {
       </Grid>
       <Snackbar
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
+          vertical: "bottom",
+          horizontal: "right",
         }}
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
         ContentProps={{
-          'aria-describedby': 'message-id'
+          "aria-describedby": "message-id",
         }}
         message={<span id="message-id">Click on pdf to add note</span>}
         action={[
@@ -109,7 +109,7 @@ export default function FileControl(props) {
             onClick={handleClose}
           >
             <CloseIcon />
-          </IconButton>
+          </IconButton>,
         ]}
       />
     </Grid>
