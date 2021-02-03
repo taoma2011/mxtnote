@@ -7,9 +7,10 @@ const initialState = {
   error: null,
 };
 
-const searchTextInDoc = createAsyncThunk(
+export const searchTextInDoc = createAsyncThunk(
   "search/searchTextInDoc",
-  ({ searchText, doc }, { getState, dispatch, requestId }) => {
+  ({ searchText, doc }, { dispatch }) => {
+    console.log("in searchText thunk, text = ", searchText);
     console.log("doc = ", doc);
     var maxPages = doc.numPages;
     var searchPromises = []; // collecting all page promises
@@ -23,7 +24,7 @@ const searchTextInDoc = createAsyncThunk(
           return textContent.then(function(text) {
             // return content promise
             console.log(text.items);
-            dispatch(addSearchResult(j, 1, "test"));
+            dispatch(searchSlice.actions.addSearchResult(j, 1, "test"));
           });
         })
       );
@@ -59,3 +60,20 @@ export default searchSlice.reducer;
 export const selectAllSearchResult = (state) => state.search.searchResults;
 
 export const selectSearchText = (state) => state.search.searchText;
+
+/* example text
+dir: "ltr"
+fontName: "g_d0_f6"
+height: 10.9091
+str: "[9] Fontaine J-M.:"
+transform: Array(6)
+0: 10.9091
+1: 0
+2: 0
+3: 10.9091
+4: 78.71952000000002
+5: 593.1600999999998
+length: 6
+__proto__: Array(0)
+width: 87.11999841812
+*/

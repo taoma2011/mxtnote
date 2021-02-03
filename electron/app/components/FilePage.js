@@ -2,9 +2,10 @@
 import React, { Component } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Paper from "@material-ui/core/Paper";
-
+import Box from "@material-ui/core/Box";
 import FileControl from "../containers/FileControl";
 import { SearchControl } from "../components/SearchControl";
+import { SearchResult } from "../components/SearchResult";
 import DeleteNoteDialog from "../containers/DeleteNoteDialog";
 
 import { PageWrapper } from "../components/PageWrapper";
@@ -26,6 +27,8 @@ export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
   //const file = useSelector((state) => state.file);
   const {
+    status,
+    message,
     doc,
     pageNum,
     numPages,
@@ -69,6 +72,7 @@ export const FilePage = (props) => {
     () => (pageHeight ? pageHeight : 80),
     [pageHeight]
   );
+  console.log("display page height = ", displayPageHeight);
 
   const [currentPage, setCurrentPage] = React.useState(pageNum);
   const scrollUpdate = ({ scrollOffset }) => {
@@ -81,8 +85,9 @@ export const FilePage = (props) => {
     }
   };
   const pages = () => {
-    if (doc) {
-      console.log("doc is ready");
+    if (status === "ready") {
+      console.log("doc is ready, displayPageHeight is ", displayPageHeight);
+      console.log("num page is ", numPages);
       return (
         // somehow the initialScrollOffset doesn't like 0 value
         <AutoSizer>
@@ -127,7 +132,10 @@ export const FilePage = (props) => {
           {docLoading && <LoadFile />}
           <BackupDb />
           <DeleteNoteDialog />
-          {pages()}
+          <Box flexDirection="row" alignItems="stretch">
+            <SearchResult />
+            {pages()}
+          </Box>
         </Paper>
       </div>
     </div>

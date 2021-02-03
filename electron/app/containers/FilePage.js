@@ -20,7 +20,18 @@ function mapStateToProps(state) {
     pageWidth,
     pageHeight,
   } = file || {};
+
+  let status = "loading";
+  let message;
+  if (!doc) {
+    message = "loading document";
+  } else {
+    status = "ready";
+  }
+
   return {
+    status,
+    message,
     doc,
     docLoading,
     pageNum,
