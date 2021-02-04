@@ -120,20 +120,19 @@ export const FilePage = (props) => {
   };
 
   return (
-    <div>
+    <Box display="flex" flexDirection="column">
       <div
         style={{
           background: "white",
-          position: "fixed",
-          zIndex: 1,
           width: "100%",
-          maxHeight: 30,
         }}
       >
-        <FileControl />
-        <SearchControl doc={doc} />
+        <Box display="flex" flexDirection="row">
+          <FileControl />
+          <SearchControl doc={doc} />
+        </Box>
       </div>
-      <div style={{ top: 30, height: viewPortHeight }}>
+      <div style={{ height: viewPortHeight }}>
         <Paper height="100%" style={{ height: "100%" }}>
           {!noteLoaded && <LoadNote />}
           {!settingsLoaded && <LoadSettings />}
@@ -154,6 +153,6 @@ export const FilePage = (props) => {
           </SplitPane>
         </Paper>
       </div>
-    </div>
+    </Box>
   );
 };
