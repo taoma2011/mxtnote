@@ -293,6 +293,7 @@
     "react-resizable-rotatable-draggable": "^0.2.0",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
+    "react-split-pane": "^0.1.92",
     "react-virtualized-auto-sizer": "^1.0.2",
     "react-window": "^1.8.5",
     "redux": "^4.0.4",

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+//import { useSelector, useDispatch } from "react-redux";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import FileControl from "../containers/FileControl";
@@ -12,23 +12,23 @@ import { PageWrapper } from "../components/PageWrapper";
 import LoadNote from "../containers/LoadNote";
 import LoadFile from "../containers/LoadFile";
 import LoadSettings from "../containers/LoadSettings";
-import LoadPage from "../containers/LoadPage";
+//import LoadPage from "../containers/LoadPage";
 
 //import { updatePageScroll } from "../actions/file";
 
 import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
 
+//import Divider from "@material-ui/core/Divider";
+import SplitPane, { Pane } from "react-split-pane";
 import BackupDb from "../containers/BackupDb";
 
-const { BrowserWindow } = require("electron").remote;
+//const { BrowserWindow } = require("electron").remote;
 
 export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
   //const file = useSelector((state) => state.file);
   const {
     status,
-    message,
     doc,
     pageNum,
     numPages,
@@ -44,9 +44,11 @@ export const FilePage = (props) => {
   //console.log("all notes ", notes);
   //const dispatch = useDispatch();
 
+  /*
   const pageDivStyle = {
     position: "relative",
   };
+  */
 
   const Row = ({ index, style }) => {
     console.log("loading row ${index}");
@@ -74,7 +76,7 @@ export const FilePage = (props) => {
   );
   console.log("display page height = ", displayPageHeight);
 
-  const [currentPage, setCurrentPage] = React.useState(pageNum);
+  const [currentPage] = React.useState(pageNum);
   const scrollUpdate = ({ scrollOffset }) => {
     if (pageHeight) {
       const newPageNum = Math.floor(scrollOffset / pageHeight) + 1;
@@ -90,20 +92,17 @@ export const FilePage = (props) => {
       console.log("num page is ", numPages);
       return (
         // somehow the initialScrollOffset doesn't like 0 value
-        <AutoSizer>
-          {({ height, width }) => (
-            <List
-              height={height}
-              itemCount={numPages}
-              itemSize={displayPageHeight}
-              width={width}
-              initialScrollOffset={pageNum > 1 ? (pageNum - 1) * pageHeight : 1}
-              onScroll={scrollUpdate}
-            >
-              {Row}
-            </List>
-          )}
-        </AutoSizer>
+
+        <List
+          height={displayPageHeight}
+          itemCount={numPages}
+          itemSize={displayPageHeight}
+          width={pageWidth}
+          initialScrollOffset={pageNum > 1 ? (pageNum - 1) * pageHeight : 1}
+          onScroll={scrollUpdate}
+        >
+          {Row}
+        </List>
       );
     } else {
       return <p>loading file</p>;
@@ -111,6 +110,15 @@ export const FilePage = (props) => {
   };
 
   const viewPortHeight = displayPageHeight;
+
+  const styles = {
+    background: "#000",
+    width: "2px",
+    cursor: "col-resize",
+    margin: "0 5px",
+    height: "100%",
+  };
+
   return (
     <div>
       <div
@@ -132,10 +140,18 @@ export const FilePage = (props) => {
           {docLoading && <LoadFile />}
           <BackupDb />
           <DeleteNoteDialog />
-          <Box flexDirection="row" alignItems="stretch">
-            <SearchResult />
-            {pages()}
-          </Box>
+          <SplitPane
+            split="vertical"
+            minSize={50}
+            style={{ position: "relative" }}
+            resizerStyle={styles}
+          >
+            <div>
+              <SearchResult />
+            </div>
+
+            <div>{pages()}</div>
+          </SplitPane>
         </Paper>
       </div>
     </div>
