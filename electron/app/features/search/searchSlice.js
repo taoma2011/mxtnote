@@ -22,9 +22,45 @@ export const searchTextInDoc = createAsyncThunk(
           // add page promise
           var textContent = page.getTextContent();
           return textContent.then(function(text) {
-            // return content promise
+            // organize the text by lines
+            const lines = [];
+            let currentLineY;
+            let currentLine;
+            let lineNum = 1;
             console.log(text.items);
-            dispatch(searchSlice.actions.addSearchResult(j, 1, "test"));
+            text.items.map((it) => {
+              if (it.dir === "ltr") {
+                const thisY = it.transform[5];
+                //console.log("this y = ", thisY);
+                //console.log("currentLineY = ", currentLineY);
+                if (!currentLineY || Math.abs(thisY - currentLineY) > 5) {
+                  if (currentLine) {
+                    lines.push(currentLine);
+                  }
+                  currentLineY = thisY;
+                  currentLine = {
+                    y: currentLineY,
+                    line: lineNum,
+                    text: it.str,
+                  };
+                  lineNum = lineNum + 1;
+                } else {
+                  currentLine.text = currentLine.text + " " + it.str;
+                }
+              }
+            });
+            lines.map((l) => {
+              if (
+                l.text
+                  .toLocaleLowerCase()
+                  .includes(searchText.toLocaleLowerCase())
+              ) {
+                dispatch(
+                  searchSlice.actions.addSearchResult(j, l.line, l.text)
+                );
+              }
+            });
+            //console.log(lines);
           });
         })
       );
