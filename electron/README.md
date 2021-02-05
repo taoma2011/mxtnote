@@ -1,47 +1,24 @@
-<img src="internals/img/erb-banner.png" width="100%" />
+<img src=".erb/img/erb-banner.png" width="100%" />
 
 <br>
 
 <p>
-  Electron React Boilerplate uses <a href="http://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="http://webpack.github.io/docs/">Webpack</a> and <a href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a> for rapid application development (HMR).
+  Electron React Boilerplate uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="https://webpack.github.io/docs/">Webpack</a> and <a href="https://www.npmjs.com/package/react-refresh">React Fast Refresh</a>.
 </p>
 
 <br>
 
 <div align="center">
-  <a href="https://facebook.github.io/react/"><img src="./internals/img/react-padded-90.png" /></a>
-  <a href="https://webpack.github.io/"><img src="./internals/img/webpack-padded-90.png" /></a>
-  <a href="http://redux.js.org/"><img src="./internals/img/redux-padded-90.png" /></a>
-  <a href="https://github.com/ReactTraining/react-router"><img src="./internals/img/react-router-padded-90.png" /></a>
-  <a href="https://flowtype.org/"><img src="./internals/img/flow-padded-90.png" /></a>
-  <a href="http://eslint.org/"><img src="./internals/img/eslint-padded-90.png" /></a>
-  <a href="https://facebook.github.io/jest/"><img src="./internals/img/jest-padded-90.png" /></a>
-  <a href="https://yarnpkg.com/"><img src="./internals/img/yarn-padded-90.png" /></a>
-</div>
 
-<hr />
-<br />
-
-<div align="center">
-
-[![Build Status][travis-image]][travis-url]
-[![Appveyor Build Status][appveyor-image]][appveyor-url]
+[![Build Status][github-actions-status]][github-actions-url]
 [![Dependency Status][david-image]][david-url]
 [![DevDependency Status][david-dev-image]][david-dev-url]
 [![Github Tag][github-tag-image]][github-tag-url]
 
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/electron-react-blpt)
 [![OpenCollective](https://opencollective.com/electron-react-boilerplate/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/electron-react-boilerplate/sponsors/badge.svg)](#sponsors)
 [![Good first issues open][good-first-issue-image]][good-first-issue-url]
-[![StackOverflow](http://img.shields.io/badge/stackoverflow-electron_react_boilerplate-blue.svg)]( http://stackoverflow.com/questions/tagged/electron-react-boilerplate )
-
-
-</div>
-
-<div align="center">
-
-![Electron Boilerplate Demo](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
+[![StackOverflow][stackoverflow-img]][stackoverflow-url]
 
 </div>
 
@@ -49,25 +26,20 @@
 
 - **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)**
 
-First, clone the repo via git:
+First, clone the repo via git and install dependencies:
 
 ```bash
-git clone --depth 1 --single-branch --branch master https://github.com/electron-react-boilerplate/electron-react-boilerplate.git your-project-name
-```
-
-And then install the dependencies with yarn.
-
-```bash
-$ cd your-project-name
-$ yarn
+git clone --depth 1 --single-branch https://github.com/electron-react-boilerplate/electron-react-boilerplate.git your-project-name
+cd your-project-name
+yarn
 ```
 
 ## Starting Development
 
-Start the app in the `dev` environment. This starts the renderer process in [**hot-module-replacement**](https://webpack.js.org/guides/hmr-react/) mode and starts a webpack dev server that sends hot updates to the renderer process:
+Start the app in the `dev` environment:
 
 ```bash
-$ yarn dev
+yarn start
 ```
 
 ## Packaging for Production
@@ -75,19 +47,20 @@ $ yarn dev
 To package apps for the local platform:
 
 ```bash
-$ yarn package
+yarn package
 ```
 
 ## Docs
 
 See our [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
 
-## Maintainers
+## Donations
 
-- [Vikram Rangaraj](https://github.com/vikr01)
-- [Amila Welihinda](https://github.com/amilajack)
-- [C. T. Lin](https://github.com/chentsulin)
-- [Jhen-Jie Hong](https://github.com/jhen0409)
+**Donations will ensure the following:**
+
+- 🔨 Long term maintenance of the project
+- 🛣 Progress on the [roadmap](https://electron-react-boilerplate.js.org/docs/roadmap)
+- 🐛 Quick responses to bug reports and help requests
 
 ## Backers
 
@@ -159,17 +132,23 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/28/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/29/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/29/avatar.svg"></a>
 
+## Maintainers
+
+- [Amila Welihinda](https://github.com/amilajack)
+- [John Tran](https://github.com/jooohhn)
+- [C. T. Lin](https://github.com/chentsulin)
+- [Jhen-Jie Hong](https://github.com/jhen0409)
+
 ## License
 
 MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
 
-[npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
+[github-actions-status]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/workflows/Test/badge.svg
+[github-actions-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/actions
 [github-tag-image]: https://img.shields.io/github/tag/electron-react-boilerplate/electron-react-boilerplate.svg?label=version
 [github-tag-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/releases/latest
-[travis-image]: https://travis-ci.com/electron-react-boilerplate/electron-react-boilerplate.svg?branch=master
-[travis-url]: https://travis-ci.com/electron-react-boilerplate/electron-react-boilerplate
-[appveyor-image]: https://ci.appveyor.com/api/projects/status/4m972s6e4nf52hx6/branch/master?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/electron-react-boilerplate/electron-react-boilerplate/branch/master
+[stackoverflow-img]: https://img.shields.io/badge/stackoverflow-electron_react_boilerplate-blue.svg
+[stackoverflow-url]: https://stackoverflow.com/questions/tagged/electron-react-boilerplate
 [david-image]: https://img.shields.io/david/electron-react-boilerplate/electron-react-boilerplate.svg
 [david-url]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate
 [david-dev-image]: https://img.shields.io/david/dev/electron-react-boilerplate/electron-react-boilerplate.svg?label=devDependencies
