@@ -2,10 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Typography from "@material-ui/core/Typography";
+
 import { SET_PAGE_NUMBER } from "../actions/file";
 import {
   selectAllSearchResult,
@@ -51,10 +48,6 @@ export const SearchResult = () => {
   };
   return (
     <>
-      <IconButton type="submit" aria-label="clear" onClick={close}>
-        <CloseIcon />
-      </IconButton>
-
       <List dense={true}>
         {results.map((r, index) => (
           <ListItem key={`sr-${index}`} onClick={() => gotoSearchResult(r)}>

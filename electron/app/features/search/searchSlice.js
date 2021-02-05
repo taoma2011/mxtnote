@@ -104,6 +104,10 @@ const searchSlice = createSlice({
         };
       },
     },
+    cancelSearch(state) {
+      state.searchText = "";
+      state.searchResults = [];
+    },
   },
   extraReducers: {
     [searchTextInDoc.fulfilled]: (state, action) => {
@@ -112,7 +116,7 @@ const searchSlice = createSlice({
   },
 });
 
-export const { addSearchResult } = searchSlice.actions;
+export const { addSearchResult, cancelSearch } = searchSlice.actions;
 
 export default searchSlice.reducer;
 
