@@ -362,6 +362,9 @@ export default function file(state: FileStateType, action: Action) {
         docLoading: false,
         doc: action.doc,
         numPages: action.doc.numPages,
+        // page width/height will be known after one page is loaded
+        pageWidth: 0,
+        pageHeight: 0,
       };
     }
     case NEXT_PAGE: {

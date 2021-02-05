@@ -12,58 +12,68 @@ export const searchTextInDoc = createAsyncThunk(
   ({ searchText, doc }, { dispatch }) => {
     console.log("in searchText thunk, text = ", searchText);
     console.log("doc = ", doc);
+    dispatch(searchSlice.actions.setSearchText(searchText));
     var maxPages = doc.numPages;
     var searchPromises = []; // collecting all page promises
     for (var j = 1; j <= maxPages; j++) {
       var page = doc.getPage(j);
-
-      searchPromises.push(
-        page.then(function(page) {
-          // add page promise
-          var textContent = page.getTextContent();
-          return textContent.then(function(text) {
-            // organize the text by lines
-            const lines = [];
-            let currentLineY;
-            let currentLine;
-            let lineNum = 1;
-            console.log(text.items);
-            text.items.map((it) => {
-              if (it.dir === "ltr") {
-                const thisY = it.transform[5];
-                //console.log("this y = ", thisY);
-                //console.log("currentLineY = ", currentLineY);
-                if (!currentLineY || Math.abs(thisY - currentLineY) > 5) {
-                  if (currentLine) {
-                    lines.push(currentLine);
+      (function(pn) {
+        searchPromises.push(
+          page.then(function(page) {
+            // add page promise
+            var textContent = page.getTextContent();
+            return textContent.then(function(text) {
+              // organize the text by lines
+              const lines = [];
+              let currentLineY;
+              let currentLine;
+              let maxHeight;
+              let lineNum = 1;
+              //console.log(text.items);
+              text.items.map((it) => {
+                if (it.dir === "ltr") {
+                  const thisY = it.transform[5];
+                  //console.log("this y = ", thisY);
+                  //console.log("currentLineY = ", currentLineY);
+                  if (!currentLineY || Math.abs(thisY - currentLineY) > 5) {
+                    if (currentLine) {
+                      currentLine.endX = it.transform[4] + it.width;
+                      currentLine.height = maxHeight;
+                      lines.push(currentLine);
+                    }
+                    currentLineY = thisY;
+                    maxHeight = it.height;
+                    currentLine = {
+                      y: currentLineY,
+                      startX: it.transform[4],
+                      line: lineNum,
+                      text: it.str,
+                    };
+                    lineNum = lineNum + 1;
+                  } else {
+                    if (it.height > maxHeight) {
+                      maxHeight = it.height;
+                    }
+                    currentLine.text = currentLine.text + " " + it.str;
                   }
-                  currentLineY = thisY;
-                  currentLine = {
-                    y: currentLineY,
-                    line: lineNum,
-                    text: it.str,
-                  };
-                  lineNum = lineNum + 1;
-                } else {
-                  currentLine.text = currentLine.text + " " + it.str;
                 }
-              }
+              });
+              lines.map((l) => {
+                if (
+                  l.text
+                    .toLocaleLowerCase()
+                    .includes(searchText.toLocaleLowerCase())
+                ) {
+                  dispatch(
+                    searchSlice.actions.addSearchResult(pn, l.line, l.text)
+                  );
+                }
+              });
+              //console.log(lines);
             });
-            lines.map((l) => {
-              if (
-                l.text
-                  .toLocaleLowerCase()
-                  .includes(searchText.toLocaleLowerCase())
-              ) {
-                dispatch(
-                  searchSlice.actions.addSearchResult(j, l.line, l.text)
-                );
-              }
-            });
-            //console.log(lines);
-          });
-        })
-      );
+          })
+        );
+      })(j);
     }
     return Promise.all(searchPromises);
   }
@@ -79,6 +89,19 @@ const searchSlice = createSlice({
       },
       prepare(page, line, text) {
         return { payload: { page, line, text } };
+      },
+    },
+    setSearchText: {
+      reducer(state, action) {
+        state.searchText = action.payload.searchText;
+        state.searchResults = [];
+      },
+      prepare(searchText) {
+        return {
+          payload: {
+            searchText,
+          },
+        };
       },
     },
   },

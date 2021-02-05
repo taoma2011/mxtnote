@@ -1,15 +1,54 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-import { selectAllSearchResult } from "../features/search/searchSlice";
+import Typography from "@material-ui/core/Typography";
+import { SET_PAGE_NUMBER } from "../actions/file";
+import {
+  selectAllSearchResult,
+  selectSearchText,
+} from "../features/search/searchSlice";
 
 export const SearchResult = () => {
+  const searchText = useSelector(selectSearchText);
   const results = useSelector(selectAllSearchResult);
   const close = () => {};
+  const dispatch = useDispatch();
+  const gotoSearchResult = (r) => {
+    dispatch({
+      type: SET_PAGE_NUMBER,
+      page: r.page,
+    });
+  };
+  if (!searchText) {
+    return null;
+  }
+  const decoratedText = (text) => {
+    //console.log("prepare decorated text for ", text);
+    const lcSearchText = searchText.toLocaleLowerCase();
+    const children = [];
+    let remainText = text;
+    let i = remainText.toLocaleLowerCase().indexOf(lcSearchText);
+    while (i != -1) {
+      console.log("i = ", i);
+      const beforeMatch = text.substring(0, i);
+      children.push(<span>{beforeMatch}</span>);
+      children.push(
+        <span style={{ background: "red" }}>
+          {text.substring(i, i + searchText.length)}
+        </span>
+      );
+      remainText = remainText.substring(i + searchText.length);
+      i = remainText.toLocaleLowerCase().indexOf(lcSearchText);
+    }
+    if (remainText) {
+      children.push(<span>{remainText}</span>);
+    }
+    return children;
+  };
   return (
     <>
       <IconButton type="submit" aria-label="clear" onClick={close}>
@@ -18,8 +57,10 @@ export const SearchResult = () => {
 
       <List dense={true}>
         {results.map((r, index) => (
-          <ListItem key={`sr-${index}`}>
-            <ListItemText primary={`${r.text}`} />
+          <ListItem key={`sr-${index}`} onClick={() => gotoSearchResult(r)}>
+            <div style={{ whiteSpace: "nowrap" }}>
+              <span>Page {r.page}:</span> {decoratedText(r.text)}
+            </div>
           </ListItem>
         ))}
       </List>
