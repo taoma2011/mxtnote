@@ -7,9 +7,10 @@ const initialState = {
   error: null,
 };
 
-async function searchPage(pn, page, searchText, dispatch) {
+async function searchPage(doc, pn, searchText, dispatch) {
+  const pageHandle = await doc.getPage(pn);
   // add page promise
-  const text = await page.getTextContent();
+  const text = await pageHandle.getTextContent();
 
   // organize the text by lines
   const lines = [];
@@ -18,6 +19,7 @@ async function searchPage(pn, page, searchText, dispatch) {
   let maxHeight;
   let lineNum = 1;
   // console.log(text.items);
+  console.log(`search page ${pn} for ${searchText}`);
   text.items.forEach((it) => {
     if (it.dir === 'ltr') {
       const thisY = it.transform[5];
@@ -63,9 +65,8 @@ export const searchTextInDoc = createAsyncThunk(
     const maxPages = doc.numPages;
     const searchPromises = []; // collecting all page promises
     for (let j = 1; j <= maxPages; j += 1) {
-      const pageHandle = doc.getPage(j);
       (function (pn) {
-        searchPromises.push(searchPage(pn, pageHandle, searchText, dispatch));
+        searchPromises.push(searchPage(doc, pn, searchText, dispatch));
       })(j);
     }
     return Promise.all(searchPromises);
