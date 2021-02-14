@@ -1,13 +1,13 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
-import { SET_PAGE_NUMBER } from "../actions/file";
+import { SET_PAGE_NUMBER } from '../actions/file';
 import {
   selectAllSearchResult,
   selectSearchText,
-} from "../features/search/searchSlice";
+} from '../features/search/searchSlice';
 
 export const SearchResult = () => {
   const searchText = useSelector(selectSearchText);
@@ -24,17 +24,17 @@ export const SearchResult = () => {
     return null;
   }
   const decoratedText = (text) => {
-    //console.log("prepare decorated text for ", text);
+    // console.log("prepare decorated text for ", text);
     const lcSearchText = searchText.toLocaleLowerCase();
     const children = [];
     let remainText = text;
     let i = remainText.toLocaleLowerCase().indexOf(lcSearchText);
-    while (i != -1) {
-      console.log("i = ", i);
+    while (i !== -1) {
+      console.log('i = ', i);
       const beforeMatch = text.substring(0, i);
       children.push(<span>{beforeMatch}</span>);
       children.push(
-        <span style={{ background: "red" }}>
+        <span style={{ background: 'red' }}>
           {text.substring(i, i + searchText.length)}
         </span>
       );
@@ -48,10 +48,11 @@ export const SearchResult = () => {
   };
   return (
     <>
-      <List dense={true}>
+      <List dense>
         {results.map((r, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <ListItem key={`sr-${index}`} onClick={() => gotoSearchResult(r)}>
-            <div style={{ whiteSpace: "nowrap" }}>
+            <div style={{ whiteSpace: 'nowrap' }}>
               <span>Page {r.page}:</span> {decoratedText(r.text)}
             </div>
           </ListItem>
@@ -60,3 +61,5 @@ export const SearchResult = () => {
     </>
   );
 };
+
+export default SearchResult;

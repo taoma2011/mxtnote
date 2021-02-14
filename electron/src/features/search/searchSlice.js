@@ -1,78 +1,71 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const initialState = {
-  searchText: "",
+  searchText: '',
   searchResults: [],
-  status: "idle",
+  status: 'idle',
   error: null,
 };
 
+async function searchPage(pn, page, searchText, dispatch) {
+  // add page promise
+  const text = await page.getTextContent();
+
+  // organize the text by lines
+  const lines = [];
+  let currentLineY;
+  let currentLine;
+  let maxHeight;
+  let lineNum = 1;
+  // console.log(text.items);
+  text.items.forEach((it) => {
+    if (it.dir === 'ltr') {
+      const thisY = it.transform[5];
+      // console.log("this y = ", thisY);
+      // console.log("currentLineY = ", currentLineY);
+      if (!currentLineY || Math.abs(thisY - currentLineY) > 5) {
+        if (currentLine) {
+          currentLine.endX = it.transform[4] + it.width;
+          currentLine.height = maxHeight;
+          lines.push(currentLine);
+        }
+        currentLineY = thisY;
+        maxHeight = it.height;
+        currentLine = {
+          y: currentLineY,
+          startX: it.transform[4],
+          line: lineNum,
+          text: it.str,
+        };
+        lineNum += 1;
+      } else {
+        if (it.height > maxHeight) {
+          maxHeight = it.height;
+        }
+        currentLine.text = `${currentLine.text} ${it.str}`;
+      }
+    }
+  });
+  lines.forEach((l) => {
+    if (l.text.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())) {
+      dispatch(searchSlice.actions.addSearchResult(pn, l.line, l.text));
+    }
+  });
+  // console.log(lines);
+}
+
 export const searchTextInDoc = createAsyncThunk(
-  "search/searchTextInDoc",
+  'search/searchTextInDoc',
   ({ searchText, doc }, { dispatch }) => {
-    console.log("in searchText thunk, text = ", searchText);
-    console.log("doc = ", doc);
+    console.log('in searchText thunk, text = ', searchText);
+    console.log('doc = ', doc);
     dispatch(searchSlice.actions.setSearchText(searchText));
-    var maxPages = doc.numPages;
-    var searchPromises = []; // collecting all page promises
-    for (var j = 1; j <= maxPages; j++) {
-      var page = doc.getPage(j);
-      (function(pn) {
-        searchPromises.push(
-          page.then(function(page) {
-            // add page promise
-            var textContent = page.getTextContent();
-            return textContent.then(function(text) {
-              // organize the text by lines
-              const lines = [];
-              let currentLineY;
-              let currentLine;
-              let maxHeight;
-              let lineNum = 1;
-              //console.log(text.items);
-              text.items.map((it) => {
-                if (it.dir === "ltr") {
-                  const thisY = it.transform[5];
-                  //console.log("this y = ", thisY);
-                  //console.log("currentLineY = ", currentLineY);
-                  if (!currentLineY || Math.abs(thisY - currentLineY) > 5) {
-                    if (currentLine) {
-                      currentLine.endX = it.transform[4] + it.width;
-                      currentLine.height = maxHeight;
-                      lines.push(currentLine);
-                    }
-                    currentLineY = thisY;
-                    maxHeight = it.height;
-                    currentLine = {
-                      y: currentLineY,
-                      startX: it.transform[4],
-                      line: lineNum,
-                      text: it.str,
-                    };
-                    lineNum = lineNum + 1;
-                  } else {
-                    if (it.height > maxHeight) {
-                      maxHeight = it.height;
-                    }
-                    currentLine.text = currentLine.text + " " + it.str;
-                  }
-                }
-              });
-              lines.map((l) => {
-                if (
-                  l.text
-                    .toLocaleLowerCase()
-                    .includes(searchText.toLocaleLowerCase())
-                ) {
-                  dispatch(
-                    searchSlice.actions.addSearchResult(pn, l.line, l.text)
-                  );
-                }
-              });
-              //console.log(lines);
-            });
-          })
-        );
+    const maxPages = doc.numPages;
+    const searchPromises = []; // collecting all page promises
+    for (let j = 1; j <= maxPages; j += 1) {
+      const pageHandle = doc.getPage(j);
+      (function (pn) {
+        searchPromises.push(searchPage(pn, pageHandle, searchText, dispatch));
       })(j);
     }
     return Promise.all(searchPromises);
@@ -80,7 +73,7 @@ export const searchTextInDoc = createAsyncThunk(
 );
 
 const searchSlice = createSlice({
-  name: "search",
+  name: 'search',
   initialState,
   reducers: {
     addSearchResult: {
@@ -105,13 +98,13 @@ const searchSlice = createSlice({
       },
     },
     cancelSearch(state) {
-      state.searchText = "";
+      state.searchText = '';
       state.searchResults = [];
     },
   },
   extraReducers: {
     [searchTextInDoc.fulfilled]: (state, action) => {
-      state.status = "idle";
+      state.status = 'idle';
     },
   },
 });
