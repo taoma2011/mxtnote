@@ -17,7 +17,7 @@ export const SearchMatchRect = (props) => {
     borderWidth: 2,
     borderStyle: 'solid',
     borderColor: 'red',
-    // background: rgba(0, 0, 0, 0.5)
+    backgroundColor: 'rgba(255, 0, 0, 0.5)',
   };
   // eslint-disable-next-line jsx-a11y/control-has-associated-label
   return <div role="button" style={style} />;

@@ -34,12 +34,13 @@ function computeBBox(index, length, boxes) {
         (boxW * (boxEndIndex - intersectionEnd)) / boxCharCount;
       const adjustedW = boxW - leftAdjust - rightAdjust;
       const newBox = {
-        top: boxX + leftAdjust,
-        left: boxY,
+        x: boxX + leftAdjust,
+        y: boxY,
         width: adjustedW,
         height: boxH,
       };
-      matchedBoxes.append(newBox);
+      console.log('add match box ', newBox);
+      matchedBoxes.push(newBox);
     }
   });
   return matchedBoxes;
@@ -110,7 +111,7 @@ async function searchPage(doc, pn, searchText, dispatch) {
           maxHeight = it.height;
         }
         currentLine.text = `${currentLine.text} ${it.str}`;
-        currentLine.boxes.append({ startIndex: currentCharIndex + 1, box: it });
+        currentLine.boxes.push({ startIndex: currentCharIndex + 1, box: it });
         currentCharIndex += it.str.length + 1;
       }
     }

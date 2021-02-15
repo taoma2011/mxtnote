@@ -28,6 +28,8 @@ export const FilePage = (props) => {
     docLoading,
     noteLoaded,
     notes,
+    scale,
+    searchResults,
     settingsLoaded,
     pageWidth,
     pageHeight,
@@ -49,6 +51,8 @@ export const FilePage = (props) => {
         <PageWrapper
           pageNum={index + 1}
           notes={notes}
+          scale={scale}
+          searchResults={searchResults}
           pdfDoc={doc}
           key={domKey}
           fileId={fileId}

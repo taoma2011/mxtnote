@@ -15,9 +15,7 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import {startIpcMain, startIpcRender } from './utils/api';
-
-
+import { startIpcMain, startIpcRender } from './utils/api';
 
 export default class AppUpdater {
   constructor() {
@@ -77,7 +75,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
     },
   });
 
@@ -131,7 +129,6 @@ if (!gotTheLock) {
   });
 }
 
-
 /**
  * Add event listeners...
  */
@@ -144,6 +141,7 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.commandLine.appendSwitch('remote-debugging-port', '9223');
 app.whenReady().then(createWindow).catch(console.log);
 
 app.on('activate', () => {

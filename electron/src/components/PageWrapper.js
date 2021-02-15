@@ -43,11 +43,24 @@ export const PageWrapper = (props) => {
       }
     });
   }
-  if (searchResults) {
+  if (searchResults && pageHeight) {
     searchResults.forEach((sr) => {
       if (sr.page === pageNum) {
         sr.boxes.forEach((b0) => {
-          const b = scaleRect(b0, scale / 100);
+          // the pdf coordinate system, the origin is at the bottom left
+          // we convert to screen system first
+          const b = scaleRect(
+            {
+              left: b0.x,
+              top: -b0.y - b0.height,
+              width: b0.width,
+              height: b0.height,
+            },
+            scale / 100
+          );
+
+          b.top += pageHeight;
+
           items.push(
             <SearchMatchRect
               top={b.top}
