@@ -13,7 +13,7 @@ export default class StaticRect extends Component {
       height,
       visible,
       editNote,
-      disableClick
+      disableClick,
     } = this.props;
     console.log(
       'static rect render called ',
@@ -40,7 +40,7 @@ export default class StaticRect extends Component {
       height: this.height,
       borderWidth: 2,
       borderStyle: 'solid',
-      borderColor: 'red'
+      borderColor: 'red',
       // background: rgba(0, 0, 0, 0.5)
     };
 

@@ -34,7 +34,7 @@ export const SearchResult = () => {
       const beforeMatch = text.substring(0, i);
       children.push(<span>{beforeMatch}</span>);
       children.push(
-        <span style={{ background: 'red' }}>
+        <span style={{ background: 'orange' }}>
           {text.substring(i, i + searchText.length)}
         </span>
       );

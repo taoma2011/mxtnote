@@ -1,16 +1,17 @@
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 // eslint-disable-next-line no-unused-vars
-import { sizing } from "@material-ui/system";
-import { FilePage } from "../components/FilePage";
-import * as FileActions from "../actions/file";
+import { sizing } from '@material-ui/system';
+import { FilePage } from '../components/FilePage';
+import * as FileActions from '../actions/file';
 
 // this file is not used now
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
-  const { file } = state;
+  const { file, search } = state;
   const {
     notes,
+    scale,
     pageNum,
     numPages,
     fileId,
@@ -20,13 +21,14 @@ function mapStateToProps(state) {
     pageWidth,
     pageHeight,
   } = file || {};
+  const { searchResults } = search || {};
 
-  let status = "loading";
+  let status = 'loading';
   let message;
   if (!doc) {
-    message = "loading document";
+    message = 'loading document';
   } else {
-    status = "ready";
+    status = 'ready';
   }
 
   return {
@@ -38,6 +40,8 @@ function mapStateToProps(state) {
     numPages,
     fileId,
     notes,
+    scale,
+    searchResults,
     noteLoaded,
     pageWidth,
     pageHeight,

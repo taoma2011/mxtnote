@@ -7,6 +7,68 @@ const initialState = {
   error: null,
 };
 
+/**
+ * compute the bounding box based on the index, and the boxes from the
+ * pdf information
+ */
+function computeBBox(index, length, boxes) {
+  // see which box it falls into
+  const matchStartIndex = index;
+  const matchEndIndex = matchStartIndex + length - 1;
+  const matchedBoxes = [];
+  boxes.forEach((b) => {
+    const boxStartIndex = b.startIndex;
+    const boxEndIndex = b.startIndex + b.box.str.length - 1;
+    const boxCharCount = b.box.str.length;
+    if (boxCharCount === 0) return;
+    const intersectionStart = Math.max(matchStartIndex, boxStartIndex);
+    const intersectionEnd = Math.min(matchEndIndex, boxEndIndex);
+    if (intersectionEnd >= intersectionStart) {
+      const boxX = b.box.transform[4];
+      const boxY = b.box.transform[5];
+      const boxW = b.box.width;
+      const boxH = b.box.height;
+      const leftAdjust =
+        (boxW * (intersectionStart - boxStartIndex)) / boxCharCount;
+      const rightAdjust =
+        (boxW * (boxEndIndex - intersectionEnd)) / boxCharCount;
+      const adjustedW = boxW - leftAdjust - rightAdjust;
+      const newBox = {
+        top: boxX + leftAdjust,
+        left: boxY,
+        width: adjustedW,
+        height: boxH,
+      };
+      matchedBoxes.append(newBox);
+    }
+  });
+  return matchedBoxes;
+}
+
+function getIndicesOf(searchStr, str) {
+  const searchStrLen = searchStr.length;
+  if (searchStrLen === 0) {
+    return [];
+  }
+  let startIndex = 0;
+
+  let index;
+  const indices = [];
+
+  const lowerStr = str.toLowerCase();
+  const lowerSearchStr = searchStr.toLowerCase();
+
+  while (true) {
+    index = lowerStr.indexOf(lowerSearchStr, startIndex);
+    if (index === -1) {
+      break;
+    }
+    indices.push(index);
+    startIndex = index + searchStrLen;
+  }
+  return indices;
+}
+
 async function searchPage(doc, pn, searchText, dispatch) {
   const pageHandle = await doc.getPage(pn);
   // add page promise
@@ -16,6 +78,7 @@ async function searchPage(doc, pn, searchText, dispatch) {
   const lines = [];
   let currentLineY;
   let currentLine;
+  let currentCharIndex;
   let maxHeight;
   let lineNum = 1;
   // console.log(text.items);
@@ -38,19 +101,33 @@ async function searchPage(doc, pn, searchText, dispatch) {
           startX: it.transform[4],
           line: lineNum,
           text: it.str,
+          boxes: [{ startIndex: 0, box: it }],
         };
         lineNum += 1;
+        currentCharIndex = it.str.length;
       } else {
         if (it.height > maxHeight) {
           maxHeight = it.height;
         }
         currentLine.text = `${currentLine.text} ${it.str}`;
+        currentLine.boxes.append({ startIndex: currentCharIndex + 1, box: it });
+        currentCharIndex += it.str.length + 1;
       }
     }
   });
   lines.forEach((l) => {
     if (l.text.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())) {
-      dispatch(searchSlice.actions.addSearchResult(pn, l.line, l.text));
+      // need to find the bounding boxes for the match
+      const indices = getIndicesOf(searchText, l.text);
+
+      let matchedBoxes = [];
+      indices.forEach((i) => {
+        const bbox = computeBBox(i, searchText.length, l.boxes);
+        matchedBoxes = matchedBoxes.concat(bbox);
+      });
+      dispatch(
+        searchSlice.actions.addSearchResult(pn, l.line, l.text, matchedBoxes)
+      );
     }
   });
   // console.log(lines);
@@ -81,8 +158,8 @@ const searchSlice = createSlice({
       reducer(state, action) {
         state.searchResults.push(action.payload);
       },
-      prepare(page, line, text) {
-        return { payload: { page, line, text } };
+      prepare(page, line, text, boxes) {
+        return { payload: { page, line, text, boxes } };
       },
     },
     setSearchText: {
