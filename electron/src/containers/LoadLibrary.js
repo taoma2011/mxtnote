@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
-import LoadLibrary from '../components/LoadLibrary';
+import LoadLibrary from '../components/LoadLibrary2';
 import { ADD_FILE_FROM_DB } from '../actions/file';
 
 function mapDispatchToProps(dispatch) {
   return {
-    addFiles: docs =>
+    addFiles: (docs) =>
       dispatch({
         type: ADD_FILE_FROM_DB,
-        files: docs
-      })
+        files: docs,
+      }),
   };
 }
 
