@@ -60,6 +60,7 @@ import {
   RESOLVE_DONE,
   SYNC_PROGRESS,
   SYNC_DONE,
+  SET_API_STATE,
 } from '../actions/file';
 
 import { SetScale } from '../utils/db';
@@ -111,9 +112,7 @@ import {
 } from '../utils/api';
 import { mergeVersions, newNode } from '../version/version';
 
-const dataApi = getDataApi();
-
-export async function doSync(dispatch) {
+export async function doSync(dataApi) {
   const currentDocs = await dataApi.GetAllDocumentsPromise();
   const remoteDb = await callImportRemoteDb(currentDocs);
   // console.log("remote db: ", remoteDb);
@@ -127,7 +126,7 @@ export async function doSync(dispatch) {
     dataApi.UpdateDocument(f._id, f);
   });
 
-  await mergeAndExport(remoteDb, 0, null);
+  await mergeAndExport(dataApi, remoteDb, 0, null);
 }
 
 //
@@ -137,7 +136,12 @@ export async function doSync(dispatch) {
 // the sync process, or prompt the user to resolve the
 // current conflict
 //
-export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
+export async function mergeAndExport(
+  dataApi,
+  remoteDb,
+  currentIndex,
+  resolveResult
+) {
   const syncTime = new Date();
   console.log('merging notes');
 
@@ -256,7 +260,7 @@ export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
   };
 }
 
-function saveLastPageNumber(state) {
+function saveLastPageNumber(dataApi, state) {
   const { files } = state;
   if (!files) {
     return state;
@@ -330,6 +334,8 @@ function exportStateToFile(state, f) {
 
 export default function file(state, action) {
   if (!state) {
+    const dataApi = getDataApi();
+    const apiState = dataApi.Initialize();
     return {
       currentTab: 2,
       files: [],
@@ -339,8 +345,11 @@ export default function file(state, action) {
       scale: 100,
       settingsLoaded: false,
       openResetConfirmDialog: false,
+      apiState,
+      dataApi,
     };
   }
+  const { dataApi } = state;
   // console.log("action is ", action);
   switch (action.type) {
     // user click on a document from library page
@@ -388,7 +397,7 @@ export default function file(state, action) {
         pageNum: state.currentPageNum + 1,
         currentPageNum: state.currentPageNum + 1,
       };
-      return saveLastPageNumber(newState);
+      return saveLastPageNumber(dataApi, newState);
     }
     case PREV_PAGE: {
       if (!state.pageNum || state.currentPageNum <= 1) {
@@ -399,7 +408,7 @@ export default function file(state, action) {
         pageNum: state.currentPageNum - 1,
         currentPageNum: state.currentPageNum - 1,
       };
-      return saveLastPageNumber(newState);
+      return saveLastPageNumber(dataApi, newState);
     }
     case SET_PAGE_NUMBER: {
       const page = Number(action.page);
@@ -412,7 +421,7 @@ export default function file(state, action) {
         pageNum: page,
         currentPageNum: page,
       };
-      return saveLastPageNumber(newState);
+      return saveLastPageNumber(dataApi, newState);
     }
     case PAGE_SCROLL_NOTIFY: {
       // TODO: update the file last page
@@ -1085,6 +1094,12 @@ export default function file(state, action) {
       return {
         ...state,
         showSyncProgress: false,
+      };
+    }
+    case SET_API_STATE: {
+      return {
+        ...state,
+        apiState: action.apiState,
       };
     }
     default:

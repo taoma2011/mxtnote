@@ -1,15 +1,21 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React from 'react';
 // import styles from './File.css';
 // import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Slider from "@material-ui/core/Slider";
-import Grid from "@material-ui/core/Grid";
-import Snackbar from "@material-ui/core/Snackbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Slider from '@material-ui/core/Slider';
+import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+
+import { useDispatch } from 'react-redux';
+import { SetUserPass } from '../utils/db';
+import { LoginDialog } from './LoginDialog';
+
+import { SET_API_STATE } from '../actions/file';
 
 export default function FileControl(props) {
   // eslint-disable-next-line react/prop-types
@@ -21,7 +27,11 @@ export default function FileControl(props) {
     textChanged,
     scaleChanged,
     addNote,
+    apiState,
+    dataApi,
   } = props;
+
+  const dispatch = useDispatch();
 
   const [open, setOpen] = React.useState(false);
 
@@ -31,7 +41,7 @@ export default function FileControl(props) {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
+    if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
@@ -40,6 +50,24 @@ export default function FileControl(props) {
   const style = {
     width: 100,
   };
+
+  const openLoginDialog = apiState !== 'ok';
+  const [loginFailed, setLoginFailed] = React.useState(false);
+
+  const handleLogin = async (user, pass) => {
+    const ok = await props.dataApi.Login(user, pass);
+    if (ok) {
+      console.log('saving user pass');
+      SetUserPass(user, pass);
+      dispatch({
+        type: SET_API_STATE,
+        apiState: 'ok',
+      });
+    }
+  };
+
+  const handleCloseLoginDialog = () => {};
+
   return (
     <Grid container spacing={2}>
       <Grid item>
@@ -91,14 +119,14 @@ export default function FileControl(props) {
       </Grid>
       <Snackbar
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
         ContentProps={{
-          "aria-describedby": "message-id",
+          'aria-describedby': 'message-id',
         }}
         message={<span id="message-id">Click on pdf to add note</span>}
         action={[
@@ -111,6 +139,12 @@ export default function FileControl(props) {
             <CloseIcon />
           </IconButton>,
         ]}
+      />
+      <LoginDialog
+        open={openLoginDialog}
+        handleClose={handleCloseLoginDialog}
+        handleLogin={handleLogin}
+        loginFailed={loginFailed}
       />
     </Grid>
   );

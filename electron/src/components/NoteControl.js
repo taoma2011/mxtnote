@@ -1,82 +1,30 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/prop-types */
-import React, { Component } from "react";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import { getTodoId } from "../utils/common";
+import React, { Component } from 'react';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import { getTodoId } from '../utils/common';
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
+import { callLogin } from '../utils/api';
+import { GetSettings, SetUserPass } from '../utils/db';
 
-import { callLogin } from "../utils/api";
-import { GetSettings, SetUserPass } from "../utils/db";
-
-const LoginDialog = ({ handleLogin, handleClose, open, loginFailed }) => {
-  const [user, setUser] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const handleChangeUser = (event) => {
-    setUser(event.target.value);
-  };
-  const handleChangePassword = (event) => {
-    setPassword(event.target.value);
-  };
-
-  return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="form-dialog-title"
-    >
-      <DialogTitle id="form-dialog-title">Login</DialogTitle>
-      <DialogContent>
-        <DialogContentText>Login to MxtNote server</DialogContentText>
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="User"
-          fullWidth
-          value={user}
-          onChange={handleChangeUser}
-        />
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Password"
-          fullWidth
-          value={password}
-          onChange={handleChangePassword}
-        />
-        {loginFailed && <p> login failed</p>}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={() => handleLogin(user, password)} color="primary">
-          Login
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+import { LoginDialog } from './LoginDialog';
 
 export default class NoteControl extends Component {
   constructor(props) {
     super(props);
-
+    this.dataApi = props.dataApi;
     this.state = {
-      afterLogin: "",
+      afterLogin: '',
       openLoginDialog: false,
       loginFailed: false,
     };
   }
+
   render() {
     // eslint-disable-next-line react/prop-types
     const {
@@ -110,7 +58,8 @@ export default class NoteControl extends Component {
     const doLogin = async () => {
       const settings = await GetSettings();
       if (settings && settings.user && settings.password) {
-        return await callLogin(settings.user, settings.password);
+        await callLogin(settings.user, settings.password);
+        return true;
       }
       return false;
     };
@@ -121,15 +70,15 @@ export default class NoteControl extends Component {
         this.setState((state) => {
           return {
             ...state,
-            afterLogin: "import-note",
+            afterLogin: 'import-note',
             openLoginDialog: true,
           };
         });
 
-        console.log("open login dialog");
+        console.log('open login dialog');
       } else {
-        console.log("auto login ok");
-        importNoteFromRemote();
+        console.log('auto login ok');
+        importNoteFromRemote(this.dataApi);
       }
     };
 
@@ -143,10 +92,10 @@ export default class NoteControl extends Component {
             openLoginDialog: false,
           };
         });
-        console.log("saving user pass");
+        console.log('saving user pass');
         SetUserPass(user, pass);
-        if (this.state.afterLogin == "import-note") {
-          importNoteFromRemote();
+        if (this.state.afterLogin === 'import-note') {
+          importNoteFromRemote(this.dataApi);
         }
       } else {
         this.setState((state) => {

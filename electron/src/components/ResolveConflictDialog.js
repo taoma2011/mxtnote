@@ -1,12 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/prop-types */
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 export default function ResolveConflictDialog(props) {
   // eslint-disable-next-line react/prop-types
@@ -19,6 +19,7 @@ export default function ResolveConflictDialog(props) {
     handleCancel,
     chooseLocal,
     chooseRemote,
+    dataApi,
   } = props;
 
   return (
@@ -37,13 +38,13 @@ export default function ResolveConflictDialog(props) {
         <DialogContentText>which side should I use?</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleCancel(remoteDb, currentIndex)}>
+        <Button onClick={() => handleCancel(dataApi, remoteDb, currentIndex)}>
           Cancel
         </Button>
-        <Button onClick={() => chooseLocal(remoteDb, currentIndex)}>
+        <Button onClick={() => chooseLocal(dataApi, remoteDb, currentIndex)}>
           Local
         </Button>
-        <Button onClick={() => chooseRemote(remoteDb, currentIndex)}>
+        <Button onClick={() => chooseRemote(dataApi, remoteDb, currentIndex)}>
           Remote
         </Button>
       </DialogActions>

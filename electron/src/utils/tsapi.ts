@@ -16,6 +16,7 @@ import {
   GetNoteByUuid,
   UpdateNotePromise,
 } from './db';
+import { ServerInitialize, ServerLogin } from './XtNoteServerApi';
 
 interface Document {
   createdData: string;
@@ -54,6 +55,8 @@ interface Todo {
 
 // TODO: implement 17 apis imported by reducers/file.js
 interface DataApi {
+  Initialize(): string;
+  Login(user: string, pass: string): void;
   GetAllActiveDocuments(handler: (doc: Document) => void): void;
   AddDocument(doc: Document): void;
   UpdateDocument(id: string, doc: Document): void;
@@ -77,6 +80,29 @@ function NeoDbGetAllActiveDocumts(handler: (doc: Document) => void) {
 }
 
 export const NeoDbDataApi: DataApi = {
+  Initialize: () => 'ok',
+  Login: () => {},
+  GetAllActiveDocuments,
+  AddDocument,
+  UpdateDocument,
+  DeleteDocumentByFileId: DeleteDocument,
+  DeleteAllDocuments,
+  DeleteAllNotes,
+  DeleteAllTodos,
+  UpdateTodo,
+  DeleteTodo,
+  UpdateNote,
+  DeleteNote,
+  GetAllDocumentsPromise,
+  GetAllNotesPromise,
+  GetAllTodosPromise,
+  GetNoteByUuid,
+  UpdateNotePromise,
+};
+
+export const XtNoteServerDataApi: DataApi = {
+  Initialize: ServerInitialize,
+  Login: ServerLogin,
   GetAllActiveDocuments,
   AddDocument,
   UpdateDocument,
@@ -96,5 +122,6 @@ export const NeoDbDataApi: DataApi = {
 };
 
 export function getDataApi(): DataApi {
-  return NeoDbDataApi;
+  // return NeoDbDataApi;
+  return XtNoteServerDataApi;
 }
