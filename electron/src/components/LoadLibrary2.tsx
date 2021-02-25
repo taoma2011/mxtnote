@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { NeoDbDataApi } from '../utils/tsapi';
+import { getDataApi } from '../utils/tsapi';
 
 export default function LoadLibrary(props: any) {
   // eslint-disable-next-line react/prop-types
@@ -10,7 +10,7 @@ export default function LoadLibrary(props: any) {
   };
   useEffect(() => {
     // console.log('loading db doc');
-    NeoDbDataApi.GetAllActiveDocuments(handleDoc);
+    getDataApi().GetAllActiveDocuments(handleDoc);
   });
 
   return <div />;

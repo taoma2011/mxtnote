@@ -1,3 +1,7 @@
+/* eslint-disable no-console */
+/* eslint-disable no-continue */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-await-in-loop */
 // @flow
 import {
   OPEN_GIVEN_FILE,
@@ -56,7 +60,10 @@ import {
   RESOLVE_DONE,
   SYNC_PROGRESS,
   SYNC_DONE,
-} from "../actions/file";
+} from '../actions/file';
+
+import { SetScale } from '../utils/db';
+/*
 import {
   AddDocument,
   UpdateDocument,
@@ -76,6 +83,9 @@ import {
   GetNoteByUuid,
   UpdateNotePromise,
 } from "../utils/db";
+*/
+
+import { getDataApi } from '../utils/tsapi';
 
 import {
   findFileById,
@@ -91,31 +101,33 @@ import {
   isNewNote,
   generateId,
   getElectron,
-} from "../utils/common";
+} from '../utils/common';
 
 import {
   login,
   callLogin,
   callImportRemoteDb,
   callExportRemoteDb,
-} from "../utils/api";
-import { mergeVersions, newNode } from "../version/version";
+} from '../utils/api';
+import { mergeVersions, newNode } from '../version/version';
+
+const dataApi = getDataApi();
 
 export async function doSync(dispatch) {
-  const currentDocs = await GetAllDocumentsPromise();
+  const currentDocs = await dataApi.GetAllDocumentsPromise();
   const remoteDb = await callImportRemoteDb(currentDocs);
-  //console.log("remote db: ", remoteDb);
+  // console.log("remote db: ", remoteDb);
 
   remoteDb.files.forEach((f) => {
     f._id = f.id;
-    UpdateDocument(f.id, f);
+    dataApi.UpdateDocument(f.id, f);
   });
 
   remoteDb.deletedFiles.forEach((f) => {
-    UpdateDocument(f._id, f);
+    dataApi.UpdateDocument(f._id, f);
   });
 
-  return await mergeAndExport(remoteDb, 0, null);
+  await mergeAndExport(remoteDb, 0, null);
 }
 
 //
@@ -127,17 +139,17 @@ export async function doSync(dispatch) {
 //
 export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
   const syncTime = new Date();
-  console.log("merging notes");
+  console.log('merging notes');
 
   let currentResolveResult = resolveResult;
-  for (let i = currentIndex; i < remoteDb.notes.length; i++) {
+  for (let i = currentIndex; i < remoteDb.notes.length; i += 1) {
     const n = remoteDb.notes[i];
     if (n.noteUuid) {
-      console.log("checking note uuid ", n.noteUuid);
-      const existingNote = await GetNoteByUuid(n.noteUuid);
+      console.log('checking note uuid ', n.noteUuid);
+      const existingNote = await dataApi.GetNoteByUuid(n.noteUuid);
       if (existingNote) {
-        console.log("found existing node with uuid ", n.noteUuid);
-        console.log("local sync record is ", existingNote.syncRecord);
+        console.log('found existing node with uuid ', n.noteUuid);
+        console.log('local sync record is ', existingNote.syncRecord);
         const localVersion = {
           lastModified: existingNote.lastModified,
           lastSynced: existingNote.lastSynced,
@@ -145,97 +157,97 @@ export async function mergeAndExport(remoteDb, currentIndex, resolveResult) {
             ? JSON.parse(existingNote.syncRecord)
             : null,
         };
-        console.log("remote sync record is ", n.syncRecord);
+        console.log('remote sync record is ', n.syncRecord);
         const remoteVersion = {
           lastModified: n.lastModifiedTime,
           lastSynced: n.lastSynced,
           tree: n.syncRecord ? JSON.parse(n.syncRecord) : null,
         };
-        console.log("merging ", n.noteUuid);
+        console.log('merging ', n.noteUuid);
         const res = mergeVersions(localVersion, remoteVersion);
-        console.log("merge result ", res);
-        if (res.status === "conflict") {
-          console.log("cannot merge");
+        console.log('merge result ', res);
+        if (res.status === 'conflict') {
+          console.log('cannot merge');
           // ask user to resolve conflict
           if (!currentResolveResult)
             return {
               type: RESOLVE_CONFLICT,
               localNote: existingNote,
               remoteNote: n,
-              remoteDb: remoteDb,
+              remoteDb,
               currentIndex: i,
             };
           const result = currentResolveResult;
           currentResolveResult = null;
-          console.log("result is ", result);
-          if (result === "local") {
+          console.log('result is ', result);
+          if (result === 'local') {
             existingNote.lastSynced = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
             continue;
-          } else if (result === "remote") {
+          } else if (result === 'remote') {
             Object.assign(existingNote, n);
-            console.log("after merging with remote: ", existingNote);
+            console.log('after merging with remote: ', existingNote);
             existingNote.lastSynced = syncTime;
             existingNote.lastModified = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
             continue;
           } else {
             existingNote.conflict = true;
-            await UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
             continue;
           }
         } else {
-          if (res.status === "local") {
+          if (res.status === 'local') {
             // keep local version, create
             existingNote.lastSynced = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
             continue;
           }
-          if (res.status === "remote") {
+          if (res.status === 'remote') {
             Object.assign(existingNote, n);
-            console.log("after merging with remote: ", existingNote);
+            console.log('after merging with remote: ', existingNote);
             existingNote.lastSynced = syncTime;
             existingNote.lastModified = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
             continue;
           }
         }
       }
     }
-    console.log("create new note ", n.id);
+    console.log('create new note ', n.id);
     n._id = n.id;
     n.lastSynced = syncTime;
     // convert to local field name/format
     n.lastModified = n.lastModifiedTime;
-    await UpdateNotePromise(n.id, n);
+    await dataApi.UpdateNotePromise(n.id, n);
   }
   remoteDb.todos.forEach((t) => {
     t._id = t.id;
-    UpdateTodo(t.id, t);
+    dataApi.UpdateTodo(t.id, t);
   });
 
   /* export to remote db */
-  const localFiles = await GetAllDocumentsPromise();
+  const localFiles = await dataApi.GetAllDocumentsPromise();
 
   // if there is no sync record, create one
-  const localNotes = await GetAllNotesPromise();
+  const localNotes = await dataApi.GetAllNotesPromise();
 
   localNotes.forEach(async (n) => {
     if (!n.syncRecord) {
       n.lastSynced = syncTime;
       n.syncRecord = JSON.stringify(newNode());
-      await UpdateNotePromise(n._id, n);
+      await dataApi.UpdateNotePromise(n._id, n);
     }
   });
 
   const db = {
     files: localFiles,
     notes: localNotes,
-    todos: await GetAllTodosPromise(),
+    todos: await dataApi.GetAllTodosPromise(),
   };
   await callExportRemoteDb(db);
 
@@ -257,7 +269,7 @@ function saveLastPageNumber(state) {
     ...f,
     lastPageNumber: state.pageNum,
   };
-  UpdateDocument(state.fileId, updatedFile);
+  dataApi.UpdateDocument(state.fileId, updatedFile);
 
   const updatedFiles = [...files];
   replaceFileById(updatedFiles, state.fileId, updatedFile);
@@ -293,9 +305,10 @@ function setEditingNid(state, editingNid) {
 }
 
 function exportStateToFile(state, f) {
-  const { remote } = require("electron");
-  const fs = remote.require("fs");
-  console.log("before write file");
+  // eslint-disable-next-line global-require
+  const { remote } = require('electron');
+  const fs = remote.require('fs');
+  console.log('before write file');
 
   // probaby add an option to save image files too
   const saveNotes = Object.values(state.notes).map((n) => ({
@@ -309,9 +322,9 @@ function exportStateToFile(state, f) {
     todos: state.todos,
   };
   try {
-    fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), "utf-8");
+    fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), 'utf-8');
   } catch (e) {
-    console.log("Failed to save the file: ", e);
+    console.log('Failed to save the file: ', e);
   }
 }
 
@@ -320,7 +333,7 @@ export default function file(state, action) {
     return {
       currentTab: 2,
       files: [],
-      fileName: "",
+      fileName: '',
       pageNum: 1,
       libraryLoaded: false,
       scale: 100,
@@ -328,7 +341,7 @@ export default function file(state, action) {
       openResetConfirmDialog: false,
     };
   }
-  //console.log("action is ", action);
+  // console.log("action is ", action);
   switch (action.type) {
     // user click on a document from library page
     case OPEN_GIVEN_FILE: {
@@ -391,7 +404,7 @@ export default function file(state, action) {
     case SET_PAGE_NUMBER: {
       const page = Number(action.page);
       if (page < 1 || page > state.numPages) {
-        console.log("invalid page ", page, state.pageNum);
+        console.log('invalid page ', page, state.pageNum);
         return state;
       }
       const newState = {
@@ -432,7 +445,7 @@ export default function file(state, action) {
         },
         100 / state.scale
       );
-      UpdateNote(state.editingNid, note);
+      dataApi.UpdateNote(state.editingNid, note);
       return {
         ...state,
         notes: {
@@ -469,7 +482,7 @@ export default function file(state, action) {
       let newNid = generateId();
       while (state.notes[newNid]) newNid = generateId;
 
-      console.log("adding new note ", newNid);
+      console.log('adding new note ', newNid);
 
       const now = new Date();
 
@@ -482,7 +495,7 @@ export default function file(state, action) {
         top: (action.y * 100) / state.scale,
         left: (action.x * 100) / state.scale,
         angle: 0,
-        text: "new note",
+        text: 'new note',
         todoDependency: [],
         scale: state.scale,
         image: null,
@@ -491,7 +504,7 @@ export default function file(state, action) {
         lastModified: now,
       };
 
-      UpdateNote(newNid, defaultNote);
+      dataApi.UpdateNote(newNid, defaultNote);
       return {
         ...state,
         notes: {
@@ -532,7 +545,7 @@ export default function file(state, action) {
     case GOTO_NOTE: {
       const n = state.notes[action.nid];
       if (!n) {
-        console.log("cannot find this note ", action.nid);
+        console.log('cannot find this note ', action.nid);
         return state;
       }
       if (n.fileId === state.fileId) {
@@ -554,7 +567,7 @@ export default function file(state, action) {
         }
       });
       if (!fileName) {
-        console.log("cannot find file name for file ", fileId);
+        console.log('cannot find file name for file ', fileId);
         return state;
       }
       return {
@@ -572,15 +585,15 @@ export default function file(state, action) {
     case IMAGE_FILE_READY: {
       const n = state.notes[action.noteId];
       if (!n) {
-        console.log("reducer: image file ready invalid noteId ", action.noteId);
+        console.log('reducer: image file ready invalid noteId ', action.noteId);
         return state;
       }
       const newNote = {
         ...n,
         imageFile: action.file,
       };
-      console.log("update image file: ", action.file);
-      UpdateNote(getNoteId(n), newNote);
+      console.log('update image file: ', action.file);
+      dataApi.UpdateNote(getNoteId(n), newNote);
       return {
         ...state,
         notes: {
@@ -592,7 +605,7 @@ export default function file(state, action) {
     case IMAGE_DATA_READY: {
       const n = state.notes[action.noteId];
       if (!n) {
-        console.log("reducer: image data ready invalid nodeId ", action.noteId);
+        console.log('reducer: image data ready invalid nodeId ', action.noteId);
         return state;
       }
       const newNote = {
@@ -608,7 +621,7 @@ export default function file(state, action) {
       };
     }
     case FINALIZE_NOTE: {
-      console.log("finialize ", state.editingNid);
+      console.log('finialize ', state.editingNid);
 
       const n = state.notes[state.editingNid];
       const newNote = {
@@ -618,7 +631,7 @@ export default function file(state, action) {
         imageFile: null,
       };
       // update db now so that previous imagefile is invalidated
-      UpdateNote(getNoteId(newNote), newNote);
+      dataApi.UpdateNote(getNoteId(newNote), newNote);
 
       return {
         ...state,
@@ -644,7 +657,7 @@ export default function file(state, action) {
         file: action.file,
         description: action.description,
       };
-      AddDocument(newFile);
+      dataApi.AddDocument(newFile);
       return {
         ...state,
         files: [],
@@ -652,7 +665,7 @@ export default function file(state, action) {
       };
     }
     case ADD_FILE_FROM_DB: {
-      console.log("get add file from db");
+      console.log('get add file from db');
       return {
         ...state,
         files: [...action.files],
@@ -660,7 +673,7 @@ export default function file(state, action) {
       };
     }
     case DELETE_FILE: {
-      DeleteDocument(action.fileId);
+      dataApi.DeleteDocument(action.fileId);
       return {
         ...state,
         files: [],
@@ -671,7 +684,7 @@ export default function file(state, action) {
       const newTodo = {
         description: action.description,
       };
-      UpdateTodo(null, newTodo);
+      dataApi.UpdateTodo(null, newTodo);
       return {
         ...state,
         todos: [],
@@ -679,7 +692,7 @@ export default function file(state, action) {
       };
     }
     case ADD_TODO_FROM_DB: {
-      //console.log("get add todo from db");
+      // console.log("get add todo from db");
 
       return {
         ...state,
@@ -689,7 +702,7 @@ export default function file(state, action) {
       };
     }
     case DELETE_TODO: {
-      DeleteTodo(action.todoId);
+      dataApi.DeleteTodo(action.todoId);
       return {
         ...state,
         todos: [],
@@ -705,7 +718,7 @@ export default function file(state, action) {
         ...todo,
         done: !todo.done,
       };
-      UpdateTodo(action.todoId, newTodo);
+      dataApi.UpdateTodo(action.todoId, newTodo);
       const newTodoList = replaceTodoById(state.todos, action.todoId, newTodo);
       return {
         ...state,
@@ -722,12 +735,12 @@ export default function file(state, action) {
       } else {
         newDependency.splice(i, 1);
       }
-      console.log("context is ", action.context);
-      console.log("new dependency ", newDependency);
+      console.log('context is ', action.context);
+      console.log('new dependency ', newDependency);
 
       const newNote = { ...note };
       newNote.todoDependency = newDependency;
-      UpdateNote(getNoteId(note), newNote);
+      dataApi.UpdateNote(getNoteId(note), newNote);
       return {
         ...state,
         notes: {
@@ -752,10 +765,10 @@ export default function file(state, action) {
       const newNote = {
         ...note,
         text: action.text,
-        //lastModified: Date.now(),
+        // lastModified: Date.now(),
         lastModified: new Date(),
       };
-      UpdateNote(state.editingNid, newNote);
+      dataApi.UpdateNote(state.editingNid, newNote);
       return {
         ...state,
         notes: {
@@ -765,7 +778,7 @@ export default function file(state, action) {
       };
     }
     case SCALE_CHANGED: {
-      console.log("setting scale to ", action.scale);
+      console.log('setting scale to ', action.scale);
       SetScale(action.scale);
 
       return {
@@ -856,12 +869,12 @@ export default function file(state, action) {
     }
     case CANCEL_DELETE_TODO: {
       const deletingTodo = findTodoById(state.todos, action.todoId);
-      console.log("handle cancel delete, ", deletingTodo);
+      console.log('handle cancel delete, ', deletingTodo);
       const newTodos = replaceTodoById(state.todos, action.todoId, {
         ...deletingTodo,
         deleting: false,
       });
-      console.log("new todos ", newTodos);
+      console.log('new todos ', newTodos);
       return {
         ...state,
         todos: newTodos,
@@ -880,12 +893,12 @@ export default function file(state, action) {
     }
     case CANCEL_DELETE_FILE: {
       const deletingFile = findFileById(state.files, action.fileId);
-      console.log("handle cancel delete file, ", deletingFile);
+      console.log('handle cancel delete file, ', deletingFile);
       const newFiles = replaceFileById(state.files, action.fileId, {
         ...deletingFile,
         deleting: false,
       });
-      console.log("new files ", newFiles);
+      console.log('new files ', newFiles);
       return {
         ...state,
         files: newFiles,
@@ -905,19 +918,19 @@ export default function file(state, action) {
     }
     case CANCEL_DELETE_NOTE: {
       const deletingNote = findNoteById(state.notes, action.noteId);
-      console.log("handle cancel delete file, ", deletingNote);
+      console.log('handle cancel delete file, ', deletingNote);
       const newNotes = replaceNoteById(state.notes, action.noteId, {
         ...deletingNote,
         deleting: false,
       });
-      console.log("new notes ", newNotes);
+      console.log('new notes ', newNotes);
       return {
         ...state,
         notes: newNotes,
       };
     }
     case DELETE_NOTE: {
-      DeleteNote(action.noteId);
+      dataApi.DeleteNote(action.noteId);
       return {
         ...state,
         editingNid: null,
@@ -928,16 +941,16 @@ export default function file(state, action) {
       };
     }
     case SET_NOTE_TODO_FILTER: {
-      const filterTodoId = action.todoId === "none" ? null : action.todoId;
+      const filterTodoId = action.todoId === 'none' ? null : action.todoId;
       return {
         ...state,
         noteTodoFilter: filterTodoId,
       };
     }
     case IMPORT_NOTE_FROM_REMOTE: {
-      console.log("contact remote");
+      console.log('contact remote');
 
-      //doImport();
+      // doImport();
       return {
         ...state,
         files: [],
@@ -949,22 +962,28 @@ export default function file(state, action) {
       };
     }
     case IMPORT_NOTE: {
-      console.log("export notes");
+      console.log('export notes');
       const remote = getElectron();
       const fileList = remote.dialog.showOpenDialogSync();
 
       if (fileList) {
         const f = fileList[0];
-        console.log("files is ", f);
-        const fs = remote.require("fs");
-        const content = fs.readFileSync(f, "utf-8");
+        console.log('files is ', f);
+        const fs = remote.require('fs');
+        const content = fs.readFileSync(f, 'utf-8');
         if (content) {
-          console.log("content is ", content);
+          console.log('content is ', content);
           try {
             const obj = JSON.parse(content);
-            obj.files.forEach((doc) => UpdateDocument(getFileId(doc), doc));
-            obj.notes.forEach((note) => UpdateNote(getNoteId(note), note));
-            obj.todos.forEach((todo) => UpdateTodo(getTodoId(todo), todo));
+            obj.files.forEach((doc) =>
+              dataApi.UpdateDocument(getFileId(doc), doc)
+            );
+            obj.notes.forEach((note) =>
+              dataApi.UpdateNote(getNoteId(note), note)
+            );
+            obj.todos.forEach((todo) =>
+              dataApi.UpdateTodo(getTodoId(todo), todo)
+            );
             return {
               ...state,
               files: [],
@@ -982,9 +1001,9 @@ export default function file(state, action) {
       return state;
     }
     case EXPORT_NOTE: {
-      console.log("export notes");
+      console.log('export notes');
       // eslint-disable-next-line global-require
-      const { remote } = require("electron");
+      const { remote } = require('electron');
       const f = remote.dialog.showSaveDialogSync();
 
       if (f) {
@@ -993,8 +1012,8 @@ export default function file(state, action) {
       return state;
     }
     case BACKUP_DB: {
-      console.log("backup db");
-      exportStateToFile(state, "db_backup.json");
+      console.log('backup db');
+      exportStateToFile(state, 'db_backup.json');
       return state;
     }
     case OPEN_RESET_CONFIRM_DIALOG: {
@@ -1005,10 +1024,10 @@ export default function file(state, action) {
     }
     case CLOSE_RESET_CONFIRM_DIALOG: {
       if (action.confirmed) {
-        DeleteAllDocuments();
-        DeleteAllNotes();
-        DeleteAllTodos();
-        DeleteSettings();
+        dataApi.DeleteAllDocuments();
+        dataApi.DeleteAllNotes();
+        dataApi.DeleteAllTodos();
+        dataApi.DeleteSettings();
         return {
           ...state,
           notes: {},
@@ -1020,12 +1039,11 @@ export default function file(state, action) {
           libraryLoaded: false,
           openResetConfirmDialog: false,
         };
-      } else {
-        return {
-          ...state,
-          openResetConfirmDialog: false,
-        };
       }
+      return {
+        ...state,
+        openResetConfirmDialog: false,
+      };
     }
     case CLOSE_NOTE_EDITOR: {
       return {
