@@ -71,3 +71,11 @@ export const ServerGetAllDocuments = (handleDoc: any) => {
       console.log('get all documents erropr ', e);
     });
 };
+
+export const ServerOpenDocument = async (f) => {
+  return {};
+};
+
+export const ServerGetPage = async (doc, pageNum) => {
+  return {};
+};

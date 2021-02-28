@@ -1,28 +1,30 @@
-import { Component } from 'react';
-import * as pdfjs from 'pdfjs-dist';
-//import {loadPdfFile } from '../utils/common';
+import React, { useEffect } from 'react';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
+import { selectApi, selectCurrentFile } from './selector';
+import { FILE_LOADED } from '../actions/file';
 
+export default function LoadFile() {
+  const { dataApi, apiState } = useSelector(selectApi, shallowEqual);
+  const { documentLoaded, currentFile } = useSelector(
+    selectCurrentFile,
+    shallowEqual
+  );
 
-pdfjs.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.entry.js");
+  const dispatch = useDispatch();
 
-export default class LoadFile extends Component {
-  render() {
-    // eslint-disable-next-line react/prop-types
-    const { pdfFile, documentLoaded } = this.props;
-
-    if (pdfFile) {
-      console.log('loading pdf ', pdfFile);
-      // eslint-disable-next-line promise/catch-or-return
-      pdfjs.getDocument(pdfFile).promise.then(pdfDoc => {
-        documentLoaded(pdfDoc);
-        return true;
-      });
-/*
-       loadPdfFile(pdfFile, (pdfDoc)=> {
-            documentLoaded(pdfDoc);
-       });
-*/
+  useEffect(() => {
+    if (apiState === 'ok' && !documentLoaded && currentFile !== null) {
+      dataApi
+        .OpenDocument(currentFile)
+        .then((doc) => {
+          dispatch({
+            type: FILE_LOADED,
+            doc,
+          });
+          return true;
+        })
+        .catch(() => {});
     }
-    return null;
-  }
+  }, [apiState, documentLoaded, currentFile]);
+  return null;
 }

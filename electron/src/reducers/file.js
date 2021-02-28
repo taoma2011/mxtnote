@@ -340,7 +340,7 @@ export default function file(state, action) {
     return {
       currentTab: 2,
       files: [],
-      fileName: '',
+      currentFile: null,
       pageNum: 1,
       libraryLoaded: false,
       scale: 100,
@@ -355,7 +355,10 @@ export default function file(state, action) {
   switch (action.type) {
     // user click on a document from library page
     case OPEN_GIVEN_FILE: {
-      if (action.file === state.fileName) {
+      if (
+        state.currentFile !== null &&
+        action.file === state.currentFile.fileName
+      ) {
         return {
           ...state,
           currentTab: 0,
@@ -371,7 +374,7 @@ export default function file(state, action) {
       return {
         ...state,
         docLoading: true,
-        fileName: action.file,
+        currentFile: action.file,
         fileId: action.fileId,
         pageNum,
         currentPageNum: pageNum,
@@ -570,20 +573,20 @@ export default function file(state, action) {
       }
       // find the file name
       const { fileId } = n;
-      let fileName = null;
+      let currentFile = null;
       state.files.forEach((f) => {
         if (getFileId(f) === fileId) {
-          fileName = f.file;
+          currentFile = f.file;
         }
       });
-      if (!fileName) {
+      if (!currentFile) {
         console.log('cannot find file name for file ', fileId);
         return state;
       }
       return {
         ...state,
         fileId,
-        fileName,
+        currentFile,
         docLoading: true,
         pageNum: n.page,
         currentPageNum: n.page,

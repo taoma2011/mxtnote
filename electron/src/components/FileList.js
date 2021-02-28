@@ -16,10 +16,10 @@ export default function FileList(props) {
   // eslint-disable-next-line react/prop-types
   const { files, gotoFile, editFile, deleteFile } = props;
 
-  const handleClickFile = index => {
+  const handleClickFile = (index) => {
     const file = files[index];
     // eslint-disable-next-line no-underscore-dangle
-    gotoFile(file.file, file._id);
+    gotoFile(file, file._id);
   };
 
   return (

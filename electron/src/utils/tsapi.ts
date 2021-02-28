@@ -16,10 +16,15 @@ import {
   GetNoteByUuid,
   UpdateNotePromise,
 } from './db';
+
+import { OpenPdfFile, GetPdfPage } from './pdfutils';
+
 import {
   ServerInitialize,
   ServerLogin,
   ServerGetAllDocuments,
+  ServerOpenDocument,
+  ServerGetPage,
 } from './XtNoteServerApi';
 
 interface Document {
@@ -62,6 +67,8 @@ interface DataApi {
   Initialize(): string;
   Login(user: string, pass: string): void;
   GetAllActiveDocuments(handler: (doc: Document) => void): void;
+  OpenDocument(doc: Document): Promise<any>;
+  GetDocumentPage(docHandle: any, pageNum: number): Promise<any>;
   AddDocument(doc: Document): void;
   UpdateDocument(id: string, doc: Document): void;
   DeleteDocumentByFileId(fileId: string): void;
@@ -87,6 +94,8 @@ export const NeoDbDataApi: DataApi = {
   Initialize: () => 'ok',
   Login: () => {},
   GetAllActiveDocuments,
+  OpenDocument: OpenPdfFile,
+  GetDocumentPage: GetPdfPage,
   AddDocument,
   UpdateDocument,
   DeleteDocumentByFileId: DeleteDocument,
@@ -108,6 +117,8 @@ export const XtNoteServerDataApi: DataApi = {
   Initialize: ServerInitialize,
   Login: ServerLogin,
   GetAllActiveDocuments: ServerGetAllDocuments,
+  OpenDocument: ServerOpenDocument,
+  GetDocumentPage: ServerGetPage,
   AddDocument,
   UpdateDocument,
   DeleteDocumentByFileId: DeleteDocument,
@@ -126,6 +137,6 @@ export const XtNoteServerDataApi: DataApi = {
 };
 
 export function getDataApi(): DataApi {
-  // return NeoDbDataApi;
-  return XtNoteServerDataApi;
+  return NeoDbDataApi;
+  // return XtNoteServerDataApi;
 }
