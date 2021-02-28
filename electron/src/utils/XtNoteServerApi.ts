@@ -43,6 +43,14 @@ export const ServerLogin = async (user: string, pass: string) => {
   width: 612
 */
 
+const remoteFileToLocal = (f: any) => {
+  return {
+    ...f,
+    file: 'remote',
+    description: f.filename,
+  };
+};
+
 export const ServerGetAllDocuments = (handleDoc: any) => {
   console.log('XXX token ', token);
   if (!token) {
@@ -55,7 +63,8 @@ export const ServerGetAllDocuments = (handleDoc: any) => {
       },
     })
     .then((res) => {
-      console.log('docuemnt ', res);
+      console.log('document ', res);
+      handleDoc(res.data.map((f: any) => remoteFileToLocal(f)));
       return true;
     })
     .catch((e) => {

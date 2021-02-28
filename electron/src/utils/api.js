@@ -2,23 +2,26 @@ import {
   GetNoteByUuid,
   UpdateNotePromise,
   GetDocumentByUuidPromise,
-} from "./db";
+} from './db';
 
-const { machineIdSync } = require("node-machine-id");
-const version = require("../version/version");
-const uuid = require("uuid");
-const BASE_URL = "https://note.mxtsoft.com:4001";
-const TEST_BASE_URL = "http://localhost:4001";
+const { machineIdSync } = require('node-machine-id');
+
+const uuid = require('uuid');
+
+const BASE_URL = 'https://note.mxtsoft.com:4001';
+const TEST_BASE_URL = 'http://localhost:4001';
 
 const getBaseUrl = () => {
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     return TEST_BASE_URL;
   }
   return BASE_URL;
 };
 
-const { ipcRenderer } = require("electron");
-var fs = require("fs");
+const { ipcRenderer } = require('electron');
+const fs = require('fs');
+
+const version = require('../version/version');
 
 let token = null;
 let remoteUserName = null;
@@ -26,27 +29,27 @@ let remoteUserId = null;
 
 export const login = (args) =>
   new Promise((resolve, reject) => {
-    console.log("in login");
-    const { net } = require("electron");
+    console.log('in login');
+    const { net } = require('electron');
     const postData = JSON.stringify(args);
-    console.log("post data ", postData);
+    console.log('post data ', postData);
     const request = net.request({
-      method: "POST",
-      url: getBaseUrl() + "/users/authenticate",
+      method: 'POST',
+      url: `${getBaseUrl()}/users/authenticate`,
     });
-    request.setHeader("Content-Type", "application/json");
-    request.on("response", (response) => {
-      //console.log("response is ", response);
-      if (response.statusCode != 200) {
-        reject("error");
+    request.setHeader('Content-Type', 'application/json');
+    request.on('response', (response) => {
+      // console.log("response is ", response);
+      if (response.statusCode !== 200) {
+        reject('error');
       }
-      response.on("data", (chunk) => {
+      response.on('data', (chunk) => {
         console.log(`BODY: ${chunk}`);
-        const res = JSON.parse(new TextDecoder("utf-8").decode(chunk));
+        const res = JSON.parse(new TextDecoder('utf-8').decode(chunk));
         token = res.token;
         remoteUserName = res.username;
         remoteUserId = res.id;
-        console.log("set token to ", token);
+        console.log('set token to ', token);
         resolve(true);
       });
     });
@@ -57,26 +60,26 @@ export const login = (args) =>
 
 export const secureGet = (url) =>
   new Promise((resolve, reject) => {
-    const { net } = require("electron");
-    let responseStr = "";
-    //console.log("111 url is ", url);
+    const { net } = require('electron');
+    let responseStr = '';
+    // console.log("111 url is ", url);
     const request = net.request({
-      url: url,
+      url,
     });
-    request.setHeader("Content-Type", "application/json");
-    request.setHeader("Authorization", "Bearer " + token);
+    request.setHeader('Content-Type', 'application/json');
+    request.setHeader('Authorization', `Bearer ${token}`);
 
-    request.on("response", (response) => {
-      //console.log("response is ", response);
-      if (response.statusCode != 200) {
-        reject("error");
+    request.on('response', (response) => {
+      // console.log("response is ", response);
+      if (response.statusCode !== 200) {
+        reject('error');
       }
-      response.on("data", (chunk) => {
-        //console.log(`BODY: ${chunk}`);
-        responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
+      response.on('data', (chunk) => {
+        // console.log(`BODY: ${chunk}`);
+        responseStr = responseStr + new TextDecoder('utf-8').decode(chunk);
       });
-      response.on("end", () => {
-        //console.log("response end");
+      response.on('end', () => {
+        // console.log("response end");
         resolve(JSON.parse(responseStr));
       });
     });
@@ -86,27 +89,27 @@ export const secureGet = (url) =>
 
 export const securePost = (url, body) =>
   new Promise((resolve, reject) => {
-    const { net } = require("electron");
+    const { net } = require('electron');
     const postData = JSON.stringify(body);
     const request = net.request({
-      method: "POST",
-      url: url,
+      method: 'POST',
+      url,
     });
-    let responseStr = "";
-    request.setHeader("Content-Type", "application/json");
-    request.setHeader("Authorization", "Bearer " + token);
-    request.on("response", (response) => {
-      //console.log("response is ", response);
+    let responseStr = '';
+    request.setHeader('Content-Type', 'application/json');
+    request.setHeader('Authorization', 'Bearer ' + token);
+    request.on('response', (response) => {
+      // console.log("response is ", response);
       if (response.statusCode != 200) {
         console.log(`got error for ${url}: ${response.statusCode}`);
-        //console.log("error response ", response);
-        //reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        // console.log("error response ", response);
+        // reject(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
       }
-      response.on("data", (chunk) => {
-        responseStr = responseStr + new TextDecoder("utf-8").decode(chunk);
+      response.on('data', (chunk) => {
+        responseStr += new TextDecoder('utf-8').decode(chunk);
       });
-      response.on("end", () => {
-        //console.log("response end");
+      response.on('end', () => {
+        // console.log("response end");
         const parsedResult = JSON.parse(responseStr);
         if (response.statusCode == 200) resolve(parsedResult);
         else reject(parsedResult);
@@ -118,28 +121,25 @@ export const securePost = (url, body) =>
 
 export const secureUploadFile = (url, id, description, fileData) =>
   new Promise((resolve, reject) => {
-    const { net } = require("electron");
+    const { net } = require('electron');
 
     const request = net.request({
-      method: "POST",
-      url: url,
+      method: 'POST',
+      url,
     });
 
-    const FormData = require("form-data");
+    const FormData = require('form-data');
 
-    //var form = new FormData({ maxDataSize: 20971520 });
     const form = new FormData();
-    form.append("id", id);
-    //form.append("uploadFile", fileData, description);
-    form.append("uploadFile", fileData, {
-      contentType: "application/pdf",
+    form.append('id', id);
+
+    form.append('uploadFile', fileData, {
+      contentType: 'application/pdf',
       filename: description,
     });
-    //const blob = new Blob([fileData], { type: "application/pdf" });
-    //form.append("uploadFile", blob);
 
-    request.setHeader("Authorization", "Bearer " + token);
-    //console.log("form headers: ", form.getHeaders());
+    request.setHeader('Authorization', 'Bearer ' + token);
+    // console.log("form headers: ", form.getHeaders());
     const fh = form.getHeaders();
     Object.keys(fh).forEach((k) => {
       request.setHeader(k, fh[k]);
@@ -147,37 +147,37 @@ export const secureUploadFile = (url, id, description, fileData) =>
 
     request.writable = true;
 
-    request.on("response", (response) => {
-      console.log("upload response is ", response);
+    request.on('response', (response) => {
+      console.log('upload response is ', response);
       if (response.statusCode != 200) {
-        reject("error");
+        reject('error');
       }
-      response.on("data", (chunk) => {
+      response.on('data', (chunk) => {
         console.log(`upload response BODY: ${chunk}`);
-        resolve(JSON.parse(new TextDecoder("utf-8").decode(chunk)));
+        resolve(JSON.parse(new TextDecoder('utf-8').decode(chunk)));
       });
     });
     form.pipe(request);
-    console.log("sent form");
+    console.log('sent form');
     request.end();
   });
 
 export const secureDownloadFile = (url, file) =>
   new Promise((resolve, reject) => {
-    const { net } = require("electron");
+    const { net } = require('electron');
 
     const request = net.request({
-      url: url,
+      url,
     });
-    request.setHeader("Content-Type", "application/json");
-    request.setHeader("Authorization", "Bearer " + token);
-    request.on("response", (response) => {
-      //console.log("response is ", response);
+    request.setHeader('Content-Type', 'application/json');
+    request.setHeader('Authorization', 'Bearer ' + token);
+    request.on('response', (response) => {
+      // console.log("response is ", response);
       if (response.statusCode != 200) {
-        reject("error");
+        reject('error');
       }
       response.pipe(file);
-      response.on("end", () => {
+      response.on('end', () => {
         resolve(true);
       });
     });
@@ -222,7 +222,7 @@ const setLocalFileDeleted = (f) => {
 };
 
 export const updateSender = (event, command, msg) => {
-  if (process.env.NODE_ENV === "test") {
+  if (process.env.NODE_ENV === 'test') {
     return;
   }
 
@@ -232,16 +232,16 @@ export const updateSender = (event, command, msg) => {
 };
 
 export const importRemoteDb = async (event, localDocs) => {
-  const result = await secureGet(getBaseUrl() + "/db");
-  //console.log("DEBUG local is ", localDocs);
-  console.log("DEBUG remote db: ", result);
+  const result = await secureGet(getBaseUrl() + '/db');
+  // console.log("DEBUG local is ", localDocs);
+  console.log('DEBUG remote db: ', result);
   const newFiles = [];
   const fileMap = {};
   const tagMap = {};
   const newTags = [];
   const deletedFiles = [];
 
-  updateSender(event, "sync-progress", "Download remote files");
+  updateSender(event, 'sync-progress', 'Download remote files');
 
   for (let i = 0; i < result.files.length; i++) {
     const f = result.files[i];
@@ -260,26 +260,24 @@ export const importRemoteDb = async (event, localDocs) => {
       }
       updateSender(
         event,
-        "sync-progress",
+        'sync-progress',
         `Download file ${result.files[i].filename} ${i + 1}/${
           result.files.length
         }`
       );
-      console.log("download remote file ", result.files[i]);
+      console.log('download remote file ', result.files[i]);
       const newFile = await remoteFileToLocalFile(result.files[i]);
       newFiles.push(newFile);
       fileMap[f.id] = newFile;
     }
-    //UpdateDocument(newFile.id, newFile);
   }
 
-  for (let i = 0; i < result.tags.length; i++) {
+  for (let i = 0; i < result.tags.length; i += 1) {
     const oldTag = result.tags[i];
     const newTag = {
       ...oldTag,
       description: oldTag.name,
     };
-    //UpdateTodo(newTag.id, newTag);
     newTags.push(newTag);
     tagMap[newTag.description] = newTag;
   }
@@ -288,18 +286,18 @@ export const importRemoteDb = async (event, localDocs) => {
   for (let i = 0; i < result.notes.length; i++) {
     updateSender(
       event,
-      "sync-progress",
+      'sync-progress',
       `Download note ${i + 1}/${result.notes.length}`
     );
 
     const oldNote = result.notes[i];
     const noteFile = fileMap[oldNote.fileId];
     if (!noteFile || !noteFile.width || !noteFile.height) {
-      console.log("ignore note without file width");
+      console.log('ignore note without file width');
       continue;
     }
     if (!oldNote.pageX || !oldNote.pageY || !oldNote.width || !oldNote.height) {
-      console.log("ignore without pageX,Y");
+      console.log('ignore without pageX,Y');
       continue;
     }
     const newRect = centerWHToRect(
@@ -317,7 +315,7 @@ export const importRemoteDb = async (event, localDocs) => {
     const oldTags = oldNote.tags;
     const noteTags = [];
     if (oldTags) {
-      for (var k = 0; k < oldTags.length; k++) {
+      for (let k = 0; k < oldTags.length; k += 1) {
         const t = oldTags[k];
         const existingTag = tagMap[t];
         if (existingTag) {
@@ -357,7 +355,6 @@ export const importRemoteDb = async (event, localDocs) => {
     }
 
     newNotes.push(newNote);
-    //UpdateNote(newNote.id, newNote);
   }
   // mobile version has tags which is not separate record
 
@@ -387,11 +384,11 @@ export const exportRemoteDb = async (event, db) => {
   const tagMap = {};
   const newTags = [];
 
-  const myId = machineIdSync() + ":mxtnote-electron";
-  for (var i = 0; i < localFiles.length; i++) {
+  const myId = machineIdSync() + ':mxtnote-electron';
+  for (let i = 0; i < localFiles.length; i += 1) {
     const localFile = localFiles[i];
     event.sender.send(
-      "sync-progress",
+      'sync-progress',
       `Upload file ${localFile.description} ${i + 1}/${localFiles.length}`
     );
 
@@ -408,9 +405,9 @@ export const exportRemoteDb = async (event, db) => {
       }
       continue;
     }
-    console.log("originalDeviceId is ", localFile.originalDevice);
-    console.log("myid is ", myId);
-    console.log("calling create remote file ", i);
+    console.log('originalDeviceId is ', localFile.originalDevice);
+    console.log('myid is ', myId);
+    console.log('calling create remote file ', i);
     const newRemoteFile = await localFileToRemoteFile(localFile);
 
     fileMap[localFile._id] = newRemoteFile;
@@ -420,7 +417,7 @@ export const exportRemoteDb = async (event, db) => {
     //UpdateDocument(localFile.id, localFile);
   }
 
-  for (var i = 0; i < localTodos.length; i++) {
+  for (let i = 0; i < localTodos.length; i += 1) {
     const localTodo = localTodos[i];
 
     const newTag = {
@@ -433,7 +430,7 @@ export const exportRemoteDb = async (event, db) => {
   for (var i = 0; i < localNotes.length; i++) {
     const localNote = localNotes[i];
     event.sender.send(
-      "sync-progress",
+      'sync-progress',
       `Upload note ${i + 1}/${localNotes.length}`
     );
     if (!localNote.originalDevice) {
@@ -448,7 +445,7 @@ export const exportRemoteDb = async (event, db) => {
     */
 
     if (localNote.conflict) {
-      console.log("skip conflict note");
+      console.log('skip conflict note');
       continue;
     }
 
@@ -471,7 +468,7 @@ export const exportRemoteDb = async (event, db) => {
     const localNoteTags = localNote.todoDependency;
     const noteTags = [];
     if (localNoteTags) {
-      for (var k = 0; k < localNoteTags.length; k++) {
+      for (let k = 0; k < localNoteTags.length; k += 1) {
         const t = localNoteTags[k];
         const existingTag = tagMap[t];
         if (existingTag) {
@@ -495,7 +492,7 @@ export const exportRemoteDb = async (event, db) => {
 
     createRemoteNote(newNote);
   }
-  event.sender.send("sync-progress", `done`);
+  event.sender.send('sync-progress', `done`);
 };
 
 const createRemoteTag = async (tag) => {
@@ -511,28 +508,28 @@ const createRemoteNote = async (note) => {
     };
     delete n._id;
 
-    const res = await securePost(getBaseUrl() + "/notes/sync", n);
+    const res = await securePost(getBaseUrl() + '/notes/sync', n);
     return res;
   } catch (e) {
-    console.log("create note error ", e);
+    console.log('create note error ', e);
     return null;
   }
 };
 
 export const startIpcMain = () => {
-  const { ipcMain } = require("electron");
-  ipcMain.handle("login-api", async (event, args) => {
+  const { ipcMain } = require('electron');
+  ipcMain.handle('login-api', async (event, args) => {
     console.log(args);
     const response = await login(args);
     return response;
   });
-  ipcMain.handle("import-db-api", async (event, args) => {
+  ipcMain.handle('import-db-api', async (event, args) => {
     //console.log(args);
     const response = await importRemoteDb(event, args);
     //console.log("get remote db ", response);
     return response;
   });
-  ipcMain.handle("export-db-api", async (event, args) => {
+  ipcMain.handle('export-db-api', async (event, args) => {
     //console.log(args);
     const response = await exportRemoteDb(event, args);
     //console.log("export remote db ", response);
@@ -541,7 +538,7 @@ export const startIpcMain = () => {
 };
 
 export const startIpcRender = () => {
-  ipcRenderer.on("sync-progress", (event, arg) => {
+  ipcRenderer.on('sync-progress', (event, arg) => {
     console.log(arg);
   });
 };
@@ -549,21 +546,21 @@ export const startIpcRender = () => {
 export const callImportRemoteDb = async (arg) => {
   try {
     //console.log("before calling import remote db");
-    const result = await ipcRenderer.invoke("import-db-api", arg);
+    const result = await ipcRenderer.invoke('import-db-api', arg);
     //console.log("call import got result: ", result);
     return result;
   } catch (e) {
-    console.log("exception ", e);
+    console.log('exception ', e);
     return null;
   }
 };
 
 export const callExportRemoteDb = async (db) => {
   try {
-    const result = await ipcRenderer.invoke("export-db-api", db);
+    const result = await ipcRenderer.invoke('export-db-api', db);
     return result;
   } catch (e) {
-    console.log("exception ", e);
+    console.log('exception ', e);
     return null;
   }
 };
@@ -571,7 +568,7 @@ export const callExportRemoteDb = async (db) => {
 export const callLogin = async (username, password) => {
   //const { ipcRenderer } = require("electron");
   try {
-    const result = await ipcRenderer.invoke("login-api", {
+    const result = await ipcRenderer.invoke('login-api', {
       username: username,
       password: password,
     });
@@ -582,8 +579,8 @@ export const callLogin = async (username, password) => {
 };
 
 const remoteFileDirectory = () => {
-  const app = require("electron").app;
-  const retPath = app.getPath("appData") + "/remote_files/";
+  const app = require('electron').app;
+  const retPath = app.getPath('appData') + '/remote_files/';
   //console.log("remote file path = ", retPath);
   return retPath;
 };
@@ -600,14 +597,14 @@ const ensureRemoteFileDirectory = () => {
 };
 
 export async function downloadRemoteFile(remoteFile) {
-  const http = require("http");
-  const fs = require("fs");
+  const http = require('http');
+  const fs = require('fs');
   ensureRemoteFileDirectory();
   const localFile = fs.createWriteStream(
     getLocalFileNameForRemoteFile(remoteFile)
   );
   await secureDownloadFile(
-    getBaseUrl() + "/files/download/" + remoteFile.id,
+    getBaseUrl() + '/files/download/' + remoteFile.id,
     localFile
   );
   localFile.close();
@@ -626,12 +623,12 @@ export async function notifylocalFileDelete(localFile) {
   // is localFile._id aways uuid?
   try {
     // XXX need to implement this api
-    const res = await securePost(getBaseUrl() + "/files/notify", {
+    const res = await securePost(getBaseUrl() + '/files/notify', {
       fileUuid: localFile._id,
-      action: "delete",
+      action: 'delete',
     });
   } catch (e) {
-    console.log("notify local file delete error ", e);
+    console.log('notify local file delete error ', e);
     return null;
   }
 }
@@ -640,7 +637,7 @@ export async function localFileToRemoteFile(localFile) {
   try {
     let id = null;
     try {
-      const res = await securePost(getBaseUrl() + "/files/create", {
+      const res = await securePost(getBaseUrl() + '/files/create', {
         username: remoteUserName,
         filename: localFile.description,
         fileUuid: localFile._id,
@@ -651,7 +648,7 @@ export async function localFileToRemoteFile(localFile) {
         // this could be the file already exist in remote
         // for now we still upload the file again
         id = e.id;
-        console.log("remote file already exist ", id);
+        console.log('remote file already exist ', id);
         return {
           id: id,
           width: e.width,
@@ -665,19 +662,19 @@ export async function localFileToRemoteFile(localFile) {
     // now upload the file
     const fileData = fs.readFileSync(localFile.file);
     const uploadRes = await secureUploadFile(
-      getBaseUrl() + "/files/upload",
+      getBaseUrl() + '/files/upload',
       id,
       localFile.description,
       fileData
     );
-    console.log("upload file return ", uploadRes);
+    console.log('upload file return ', uploadRes);
     return {
       id: id,
       width: uploadRes.width,
       height: uploadRes.height,
     };
   } catch (e) {
-    console.log("create remote file error ", e);
+    console.log('create remote file error ', e);
     return null;
   }
 }
