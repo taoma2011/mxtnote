@@ -16,7 +16,11 @@ import {
   GetNoteByUuid,
   UpdateNotePromise,
 } from './db';
-import { ServerInitialize, ServerLogin } from './XtNoteServerApi';
+import {
+  ServerInitialize,
+  ServerLogin,
+  ServerGetAllDocuments,
+} from './XtNoteServerApi';
 
 interface Document {
   createdData: string;
@@ -103,7 +107,7 @@ export const NeoDbDataApi: DataApi = {
 export const XtNoteServerDataApi: DataApi = {
   Initialize: ServerInitialize,
   Login: ServerLogin,
-  GetAllActiveDocuments,
+  GetAllActiveDocuments: ServerGetAllDocuments,
   AddDocument,
   UpdateDocument,
   DeleteDocumentByFileId: DeleteDocument,

@@ -63,7 +63,7 @@ import {
   SET_API_STATE,
 } from '../actions/file';
 
-import { SetScale } from '../utils/db';
+import { SetScale, GetSettings } from '../utils/db';
 /*
 import {
   AddDocument,
@@ -336,6 +336,7 @@ export default function file(state, action) {
   if (!state) {
     const dataApi = getDataApi();
     const apiState = dataApi.Initialize();
+
     return {
       currentTab: 2,
       files: [],

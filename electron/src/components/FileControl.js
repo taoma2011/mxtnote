@@ -31,8 +31,6 @@ export default function FileControl(props) {
     dataApi,
   } = props;
 
-  const dispatch = useDispatch();
-
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -50,23 +48,6 @@ export default function FileControl(props) {
   const style = {
     width: 100,
   };
-
-  const openLoginDialog = apiState !== 'ok';
-  const [loginFailed, setLoginFailed] = React.useState(false);
-
-  const handleLogin = async (user, pass) => {
-    const ok = await props.dataApi.Login(user, pass);
-    if (ok) {
-      console.log('saving user pass');
-      SetUserPass(user, pass);
-      dispatch({
-        type: SET_API_STATE,
-        apiState: 'ok',
-      });
-    }
-  };
-
-  const handleCloseLoginDialog = () => {};
 
   return (
     <Grid container spacing={2}>
@@ -139,12 +120,6 @@ export default function FileControl(props) {
             <CloseIcon />
           </IconButton>,
         ]}
-      />
-      <LoginDialog
-        open={openLoginDialog}
-        handleClose={handleCloseLoginDialog}
-        handleLogin={handleLogin}
-        loginFailed={loginFailed}
       />
     </Grid>
   );
