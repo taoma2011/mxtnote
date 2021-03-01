@@ -11,7 +11,7 @@ import { SearchResult } from './SearchResult';
 import DeleteNoteDialog from '../containers/DeleteNoteDialog';
 import { PageWrapper } from './PageWrapper';
 import LoadNote from '../containers/LoadNote';
-import { LoadFile } from './LoadFile';
+import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
 import { selectSearchText } from '../features/search/searchSlice';

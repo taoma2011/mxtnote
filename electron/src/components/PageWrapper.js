@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PdfPage from '../containers/PdfPage';
 import SelectRect from '../containers/SelectRect';
@@ -7,9 +8,12 @@ import StaticRect from '../containers/StaticRect';
 import { SearchMatchRect } from './SearchMatchRect';
 import { scaleRect } from '../utils/common';
 
+import { selectApi } from './selector';
+
 export const PageWrapper = (props) => {
   const [page, setPage] = React.useState(null);
 
+  const { dataApi, apiState } = useSelector(selectApi);
   const {
     pdfDoc,
     pageNum,
@@ -22,9 +26,8 @@ export const PageWrapper = (props) => {
   } = props;
   React.useEffect(() => {
     console.log(`loading ${pageNum}`);
-    pdfDoc
-      // eslint-disable-next-line react/prop-types
-      .getPage(pageNum)
+    dataApi
+      .GetDocumentPage(pdfDoc, pageNum)
       .then((p) => {
         // pageLoaded(page);
         console.log(`page ${pageNum} is loaded`);
@@ -32,7 +35,7 @@ export const PageWrapper = (props) => {
         return true;
       })
       .catch(() => null);
-  });
+  }, [dataApi, apiState]);
   const items = [];
   if (notes) {
     Object.keys(notes).forEach((key) => {

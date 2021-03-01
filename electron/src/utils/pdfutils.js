@@ -3,7 +3,7 @@ import * as pdfjs from 'pdfjs-dist';
 pdfjs.GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.entry.js');
 
 export const OpenPdfFile = async (f) => {
-  const pdfFile = f.fileName;
+  const pdfFile = f.file;
   const pdfDoc = await pdfjs.getDocument(pdfFile).promise;
   return pdfDoc;
 };

@@ -23,7 +23,9 @@ export default function LoadFile() {
           });
           return true;
         })
-        .catch(() => {});
+        .catch((e) => {
+          console.log('load doc error: ', e);
+        });
     }
   }, [apiState, documentLoaded, currentFile]);
   return null;
