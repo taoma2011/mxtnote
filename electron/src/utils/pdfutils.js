@@ -12,3 +12,8 @@ export const GetPdfPage = async (pdfDoc, pageNum) => {
   const page = await pdfDoc.getPage(pageNum);
   return page;
 };
+
+export const OpenPdfData = async (d) => {
+  const pdfDoc = await pdfjs.getDocument({ data: d }).promise;
+  return pdfDoc;
+};

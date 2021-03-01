@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { OpenPdfData, GetPdfPage } from '../utils/pdfutils';
 
 const BASE_URL = 'https://note.mxtsoft.com:4001';
 const TEST_BASE_URL = 'http://localhost:4001';
@@ -72,10 +73,42 @@ export const ServerGetAllDocuments = (handleDoc: any) => {
     });
 };
 
-export const ServerOpenDocument = async (f) => {
-  return {};
+interface XtDocument {
+  file: any;
+  numPages: number;
+  pages: { [pageNumber: string]: any };
+}
+
+export const ServerOpenDocument = async (f: any): Promise<XtDocument> => {
+  // make a structure to manage each page
+  const doc: XtDocument = { file: f, numPages: f.numPages, pages: {} };
+  return doc;
 };
 
-export const ServerGetPage = async (doc, pageNum) => {
-  return {};
+export const ServerGetPage = async (doc: any, pageNum: number) => {
+  const xd = doc as XtDocument;
+  const page = xd.pages[pageNum];
+  if (page) {
+    return page;
+  }
+  try {
+    const res = await axios.get(
+      // xtnote server page number start with 0
+      `${getBaseUrl()}/files/page-pdf/${xd.file.id}/${pageNum - 1}`,
+      {
+        responseType: 'arraybuffer',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log('page pdf return ', res);
+    const pdfDoc = await OpenPdfData(res.data);
+    const pdfPage = await GetPdfPage(pdfDoc, 1);
+    xd.pages[pageNum] = pdfPage;
+    return pdfPage;
+  } catch (e) {
+    console.log('server get page exception ', e);
+  }
+  return null;
 };

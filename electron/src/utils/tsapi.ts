@@ -1,3 +1,4 @@
+import { Runtime } from 'inspector';
 import {
   GetAllActiveDocuments,
   AddDocument,
@@ -27,6 +28,7 @@ import {
   ServerGetPage,
 } from './XtNoteServerApi';
 
+// this is the current nedb format
 interface Document {
   createdData: string;
   description: string;
@@ -39,6 +41,10 @@ interface Document {
   username: string;
   originalDevice: string;
   id: string; // same as _id in actual db
+}
+
+interface RuntimeDocument {
+  numPages: number;
 }
 
 interface Note {
@@ -67,7 +73,7 @@ interface DataApi {
   Initialize(): string;
   Login(user: string, pass: string): void;
   GetAllActiveDocuments(handler: (doc: Document) => void): void;
-  OpenDocument(doc: Document): Promise<any>;
+  OpenDocument(doc: Document): Promise<RuntimeDocument>;
   GetDocumentPage(docHandle: any, pageNum: number): Promise<any>;
   AddDocument(doc: Document): void;
   UpdateDocument(id: string, doc: Document): void;
@@ -137,6 +143,6 @@ export const XtNoteServerDataApi: DataApi = {
 };
 
 export function getDataApi(): DataApi {
-  return NeoDbDataApi;
-  // return XtNoteServerDataApi;
+  // return NeoDbDataApi;
+  return XtNoteServerDataApi;
 }
