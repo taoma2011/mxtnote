@@ -1,5 +1,8 @@
 import axios from 'axios';
-import { OpenPdfData, GetPdfPage } from '../utils/pdfutils';
+import { OpenPdfData, GetPdfPage, getImageFromPdfPage } from './pdfutils';
+import { GetAllActiveDocuments } from './db';
+import { Document, Note, RuntimeDocument, Todo } from './interface';
+import { remoteNoteToLocalNote } from './api';
 
 const BASE_URL = 'https://note.mxtsoft.com:4001';
 const TEST_BASE_URL = 'http://localhost:4001';
@@ -15,6 +18,26 @@ export const ServerInitialize = () => {
   return 'login-needed';
 };
 
+const getDocumentById = (id: string): Document | null => {
+  let res = null;
+  fileCache.forEach((f: Document) => {
+    if (f.id === id) {
+      res = f;
+    }
+  });
+  return res;
+};
+
+const getNoteById = (id: string): Note | null => {
+  let res = null;
+  noteCache.forEach((n: Note) => {
+    if (n.id === id) {
+      res = n;
+    }
+  });
+  return res;
+};
+
 export const ServerLogin = async (user: string, pass: string) => {
   try {
     const res = await axios.post(`${getBaseUrl()}/users/authenticate`, {
@@ -23,6 +46,7 @@ export const ServerLogin = async (user: string, pass: string) => {
     });
     console.log('login get ', res);
     token = res.data.token;
+    // await afterLogin();
     return true;
   } catch (e) {
     console.log('log in error ', e);
@@ -52,25 +76,28 @@ const remoteFileToLocal = (f: any) => {
   };
 };
 
-export const ServerGetAllDocuments = (handleDoc: any) => {
-  console.log('XXX token ', token);
+export const ServerGetAllDocuments = async (): Promise<Document[]> => {
+  console.log('server get all documents');
   if (!token) {
-    return;
+    return [];
   }
-  axios
-    .get(`${getBaseUrl()}/files`, {
+  try {
+    const res = await axios.get(`${getBaseUrl()}/files`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    })
-    .then((res) => {
-      console.log('document ', res);
-      handleDoc(res.data.map((f: any) => remoteFileToLocal(f)));
-      return true;
-    })
-    .catch((e) => {
-      console.log('get all documents erropr ', e);
     });
+
+    console.log('document ', res);
+    return res.data.map((f: any) => remoteFileToLocal(f));
+  } catch (e) {
+    console.log('get all documents erropr ', e);
+    return [];
+  }
+};
+
+export const ServerGetAllDocumentsCached = async (): Promise<Document[]> => {
+  return fileCache;
 };
 
 interface XtDocument {
@@ -111,4 +138,73 @@ export const ServerGetPage = async (doc: any, pageNum: number) => {
     console.log('server get page exception ', e);
   }
   return null;
+};
+
+export const ServerLoadNoteImage = async (noteId: string) => {
+  const n = getNoteById(noteId);
+  if (!n) {
+    return null;
+  }
+  const f = getDocumentById(n.fileId);
+  if (!f) {
+    return null;
+  }
+  const pdfFile = await ServerOpenDocument(f);
+  const pdfPage = await ServerGetPage(pdfFile, n.page);
+  const image = await getImageFromPdfPage(n, pdfPage);
+  return image;
+};
+
+/*
+ * example note from server:
+ *
+  createdDate: "2020-07-19T06:18:26.497Z"
+  detail: "fffg↵hhh"
+  fileId: "5ef8603500d4e368b5b3eba5"
+  height: 0.05891443132745299
+  id: "5f13e5b2c06ccd6587b3e76b"
+  lastModifiedTime: "2021-02-14T03:14:35.435Z"
+  lastSynced: "2021-02-14T03:14:35.435Z"
+  noteUuid: "5f13e5b2c06ccd6587b3e76b"
+  originalDevice: "962f496a15ebae6bffb3b52414def99c3ec2f7fac587c4e18700cc486e54c323:xtserver"
+  page: 2
+  pageX: 0.4966998052230545
+  pageY: 0.8628248876335339
+  sketchBase64: "AQBiALYAYgC1AGIAtQBkALQAZgCyAGkAsABvAK4AdgCqAH0ApQCEAKAAjACbAJQAlgCbAJIAogCOAKoAigCwAIgAtgCGALwAhADBAIQAxQCEAMoAhQDOAIYA0QCHANQAiQDXAIwA2QCPANsAkgDdAJcA3gCcAN4AowDdAKoA3ACyANoAuQDXAMEA1ADJANEA0ADNANcAyQDdAMUA4wDBAOgAvQDrALkA7gC1APEAsQDzAK4A9QCrAPYAqAD4AKYA+ACiAPkAoAD5AJ4A+QCcAPgAmgD4AJkA9wCYAPYAlwD2AJcA9QCXAPQAlwD0AJgA8wCZAPIAmQDxAJoA8ACcAO8AngDuAKAA7QCiAOsApADpAKYA6ACoAOYAqgDkAKwA4gCvAOAAsQDeALMA3AC1ANoAuADYALoA1wC8ANYAvQDVAL4A1AC/ANQAwADUAMEA1ADCANUAwgDWAMMA1wDDANgAxADaAMUA3ADGAN4AxwDgAMgA4QDJAOMAygDlAMsA5wDMAOkAzgDrAM8A7QDPAPAA0ADyANEA9QDRAPgA0QD6ANEA/gDRAAEB0QAFAdEACAHPAAwBzgAPAc0AEwHLABYByQAZAcYAHQHDACABwQAiAb4AJAG6ACYBtwAoAbQAKQGxACsBrQArAakALAGmAC0BogAtAZ4ALQGaAC0BlgAsAZMAKwGPACoBjAApAYkAJwGGACYBgwAkAYEAIgF/ACABfQAeAXwAGwF6ABkBegAYAXoAFwF6ABYBfAAUAX0AEwF/ABIBggARAYQAEQGHABEBigARAY4AEQGSABIBAAAAAA=="
+  syncRecord: "{"id":"6fedeb43-d790-4977-bbe2-d3a000bb3158","children":[{"id":"ac2cdc9e-8657-4a63-8787-a3099018b87c"}]}"
+  tags: []
+  userId: "5ef8603500d4e368b5b3eba4"
+  width: 0.3527480507596744
+*/
+export const ServerGetAllNotes = async (): Promise<Note[]> => {
+  if (!token) {
+    return [];
+  }
+
+  try {
+    const res = await axios.get(`${getBaseUrl()}/notes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('notes ', res);
+    return res.data
+      .map((remoteNote: any) => {
+        const f = getDocumentById(remoteNote.fileId);
+        // somehow some file doesnt have width, older version?
+        if (!f || !f.width) {
+          return null;
+        }
+        return remoteNoteToLocalNote(f, remoteNote);
+      })
+      .filter((n: any) => n !== null);
+  } catch (e) {
+    console.log('get all notes error ', e);
+  }
+  return [];
+};
+
+export const ServerGetAllNotesCached = async (): Promise<Note[]> => {
+  return noteCache;
 };

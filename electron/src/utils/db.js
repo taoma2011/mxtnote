@@ -5,27 +5,44 @@ let noteDb;
 let todoDb;
 let settingsDb;
 
+// promise version
+let docDbP;
+let noteDbP;
+let todoDbP;
+
 export const InitDb = () => {
   // eslint-disable-next-line global-require
-  const Datastore = require("nedb");
-  docDb = new Datastore({ filename: "doc.db", autoload: true });
-  noteDb = new Datastore({ filename: "note.db", autoload: true });
-  todoDb = new Datastore({ filename: "todo.db", autoload: true });
-  settingsDb = new Datastore({ filename: "settings.db", autoload: true });
+  const Datastore = require('nedb');
+  // eslint-disable-next-line global-require
+  const DatastorePromises = require('nedb-promises');
+  docDb = new Datastore({ filename: 'doc.db', autoload: true });
+  docDbP = DatastorePromises.create('doc.db');
+  noteDb = new Datastore({ filename: 'note.db', autoload: true });
+  noteDbP = DatastorePromises.create('note.db');
+  todoDb = new Datastore({ filename: 'todo.db', autoload: true });
+  settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
 };
 
 export const TestInitDb = () => {
   // eslint-disable-next-line global-require
-  const Datastore = require("nedb");
-  docDb = new Datastore({ filename: "test-doc.db", autoload: true });
-  noteDb = new Datastore({ filename: "test-note.db", autoload: true });
-  todoDb = new Datastore({ filename: "test-todo.db", autoload: true });
-  settingsDb = new Datastore({ filename: "test-settings.db", autoload: true });
+  const Datastore = require('nedb');
+  docDb = new Datastore({ filename: 'test-doc.db', autoload: true });
+  noteDb = new Datastore({ filename: 'test-note.db', autoload: true });
+  todoDb = new Datastore({ filename: 'test-todo.db', autoload: true });
+  settingsDb = new Datastore({ filename: 'test-settings.db', autoload: true });
+};
+
+export const GetDocById = (id) => {
+  return docDbP.find({ _id: id });
+};
+
+export const GetNoteById = (id) => {
+  return noteDbP.find({ _id: id });
 };
 
 export const GetNoteByUuid = (uuid) => {
-  return new Promise(function(resolve, reject) {
-    noteDb.find({ noteUuid: uuid }, function(err, doc) {
+  return new Promise(function (resolve, reject) {
+    noteDb.find({ noteUuid: uuid }, function (err, doc) {
       if (err) {
         reject(err);
       } else {
@@ -36,8 +53,8 @@ export const GetNoteByUuid = (uuid) => {
 };
 
 export const GetSettings = () => {
-  return new Promise(function(resolve, reject) {
-    settingsDb.find({ scope: "global" }, function(err, doc) {
+  return new Promise(function (resolve, reject) {
+    settingsDb.find({ scope: 'global' }, function (err, doc) {
       if (err) {
         reject(err);
       } else {
@@ -52,24 +69,24 @@ export const DeleteSettings = () => {
 };
 
 export const SetScale = (s) => {
-  console.log("begin set scale ", s);
+  console.log('begin set scale ', s);
   settingsDb.update(
-    { scope: "global" },
-    { scope: "global", scale: s },
+    { scope: 'global' },
+    { scope: 'global', scale: s },
     { upsert: true },
     (err) => {
-      console.log("set scale error ", err);
+      console.log('set scale error ', err);
     }
   );
 };
 
 export const SetUserPass = (user, password) => {
   settingsDb.update(
-    { scope: "global" },
-    { scope: "global", user: user, password: password },
+    { scope: 'global' },
+    { scope: 'global', user: user, password: password },
     { upsert: true },
     (err) => {
-      console.log("set user pass error ", err);
+      console.log('set user pass error ', err);
     }
   );
 };
@@ -98,13 +115,8 @@ export const GetAllDocuments = (handleDoc) => {
   });
 };
 
-export const GetAllActiveDocuments = (handleDoc) => {
-  docDb.find({ deleted: { $ne: true } }, (err, doc) => {
-    if (!err) {
-      handleDoc(doc);
-    }
-  });
-};
+export const GetAllActiveDocuments = () =>
+  docDbP.find({ deleted: { $ne: true } });
 
 export const GetAllDocumentsPromise = () =>
   new Promise((resolve, reject) => {
@@ -139,7 +151,7 @@ export const UpdateNotePromise = (id, note) =>
       ...note,
       image: null,
     };
-    noteDb.update({ _id: id }, dbNote, { upsert: true }, function(err, doc) {
+    noteDb.update({ _id: id }, dbNote, { upsert: true }, function (err, doc) {
       if (!err) {
         resolve(doc);
       } else {
@@ -158,7 +170,7 @@ export const UpdateNote = (id, note, cb) => {
     // eslint-disable-next-line no-underscore-dangle
     noteDb.update({ _id: id }, dbNote, { upsert: true });
   } else {
-    noteDb.insert(dbNote, function(err, doc) {
+    noteDb.insert(dbNote, function (err, doc) {
       if (cb) {
         cb({
           ...doc,
@@ -209,7 +221,7 @@ export const UpdateTodo = (id, todo) => {
 
 export const NewTodo = (todo) =>
   new Promise((resolve, reject) => {
-    todoDb.insert(todo, function(err, doc) {
+    todoDb.insert(todo, function (err, doc) {
       if (err) {
         reject(err);
       } else {

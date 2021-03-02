@@ -1,19 +1,19 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-import Paper from "@material-ui/core/Paper";
-import NotePanel from "../containers/NotePanel";
-import LoadNote from "../containers/LoadNote";
-import NoteControl from "../containers/NoteControl";
-import NoteEditorDialog from "../containers/NoteEditorDialog";
-import ResetConfirmDialog from "../containers/ResetConfirmDialog";
-import ResolveConflictDialog from "../containers/ResolveConflictDialog";
-import SyncProgressDialog from "../containers/SyncProgressDialog";
-import BackupDb from "../containers/BackupDb";
+import React from 'react';
+import Paper from '@material-ui/core/Paper';
+import NotePanel from './NotePanel';
+import LoadNote from './LoadNote';
+import NoteControl from '../containers/NoteControl';
+import NoteEditorDialog from '../containers/NoteEditorDialog';
+import ResetConfirmDialog from '../containers/ResetConfirmDialog';
+import ResolveConflictDialog from '../containers/ResolveConflictDialog';
+import SyncProgressDialog from '../containers/SyncProgressDialog';
+import BackupDb from '../containers/BackupDb';
 
-import { getNoteId } from "../utils/common";
+import { getNoteId } from '../utils/common';
 
-import { VariableSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { VariableSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 const checkEqual = (prevProp, nextProp) => {
   if (prevProp.noteLoaded != nextProp.noteLoaded) return false;
@@ -94,11 +94,10 @@ export const NotePage = React.memo(function NotePage(props) {
     );
     */
   return (
-    <div style={{ height: "100%" }}>
-      {!noteLoaded && <LoadNote />}
+    <div style={{ height: '100%' }}>
       <BackupDb />
       <NoteControl />
-      <Paper height="100%" style={{ height: "100%" }}>
+      <Paper height="100%" style={{ height: '100%' }}>
         <AutoSizer>
           {({ height, width }) => (
             <List

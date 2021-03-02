@@ -10,7 +10,7 @@ import { SearchControl } from './SearchControl';
 import { SearchResult } from './SearchResult';
 import DeleteNoteDialog from '../containers/DeleteNoteDialog';
 import { PageWrapper } from './PageWrapper';
-import LoadNote from '../containers/LoadNote';
+import LoadNote from './LoadNote';
 import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
@@ -153,7 +153,6 @@ export const FilePage = (props) => {
       </div>
       <div style={{ height: viewPortHeight }}>
         <Paper height="100%" style={{ height: '100%' }}>
-          {!noteLoaded && <LoadNote />}
           {!settingsLoaded && <LoadSettings />}
           {docLoading && <LoadFile />}
           <BackupDb />

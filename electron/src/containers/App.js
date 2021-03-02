@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect, useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -30,6 +30,7 @@ import { getElectron } from '../utils/common';
 import { LoginDialog } from '../components/LoginDialog';
 import { AutoLogin } from '../components/AutoLogin';
 import { SetUserPass } from '../utils/db';
+import { CreateCache } from '../utils/cache';
 
 /* this should be moved to the component directory */
 const drawerWidth = 240;
@@ -125,7 +126,24 @@ function App() {
     setTab(TODO_TAB);
   };
 
-  const openLoginDialog = apiState !== 'ok';
+  useEffect(() => {
+    if (apiState === 'initialized') {
+      CreateCache(dataApi)
+        .then((newApi) => {
+          dispatch({
+            type: SET_API_STATE,
+            apiState: 'ok',
+            dataApi: newApi,
+          });
+          return true;
+        })
+        .catch((e) => {
+          console.log('create cache error: ', e);
+        });
+    }
+  }, [apiState]);
+
+  const openLoginDialog = apiState === 'login-needed';
   const [loginFailed, setLoginFailed] = React.useState(false);
 
   const handleLogin = async (user, pass) => {
@@ -136,7 +154,7 @@ function App() {
       SetUserPass(user, pass);
       dispatch({
         type: SET_API_STATE,
-        apiState: 'ok',
+        apiState: 'initialize',
       });
     }
   };
@@ -147,8 +165,7 @@ function App() {
     <div className={classes.root}>
       <CssBaseline />
       <AutoLogin />
-      <LoadLibrary />
-      {!todoLoaded && <LoadTodo />}
+
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography

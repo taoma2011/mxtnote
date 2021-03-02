@@ -5,10 +5,11 @@ import {
   GOTO_NOTE,
   START_DELETE_NOTE,
   OPEN_NOTE_EDITOR,
-  CLOSE_NOTE_EDITOR
+  CLOSE_NOTE_EDITOR,
 } from '../actions/file';
 import { findFileById } from '../utils/common';
 
+// obsolete
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state, ownProp) {
   const { file } = state;
@@ -34,22 +35,22 @@ function mapDispatchToProps(dispatch, ownProp) {
       dispatch({
         type: GOTO_NOTE,
         // TODO change to noteId
-        nid: ownProp.nid
+        nid: ownProp.nid,
       }),
     startDeleteNote: () =>
       dispatch({
         type: START_DELETE_NOTE,
-        noteId: ownProp.nid
+        noteId: ownProp.nid,
       }),
-    openNoteEditor: noteId =>
+    openNoteEditor: (noteId) =>
       dispatch({
         type: OPEN_NOTE_EDITOR,
-        noteId
+        noteId,
       }),
     closeNoteEditor: () =>
       dispatch({
-        type: CLOSE_NOTE_EDITOR
-      })
+        type: CLOSE_NOTE_EDITOR,
+      }),
   };
 }
 

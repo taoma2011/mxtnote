@@ -31,7 +31,15 @@ export default function LoadLibrary() {
   useEffect(() => {
     // console.log('loading db doc');
     if (apiState === 'ok' && !libraryLoaded) {
-      dataApi.GetAllActiveDocuments(handleDoc);
+      dataApi
+        .GetAllActiveDocuments()
+        .then((docs: any) => {
+          handleDoc(docs);
+          return true;
+        })
+        .catch((e: any) => {
+          console.log('get all document error: ', e);
+        });
     }
   }, [libraryLoaded, apiState]);
 

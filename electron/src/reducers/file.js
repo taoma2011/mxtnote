@@ -1101,10 +1101,14 @@ export default function file(state, action) {
       };
     }
     case SET_API_STATE: {
-      return {
+      const newState = {
         ...state,
         apiState: action.apiState,
       };
+      if (action.dataApi) {
+        newState.dataApi = action.dataApi;
+      }
+      return newState;
     }
     default:
       return state;

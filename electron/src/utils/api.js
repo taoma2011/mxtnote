@@ -231,6 +231,45 @@ export const updateSender = (event, command, msg) => {
   }
 };
 
+export const remoteNoteToLocalNote = (noteFile, oldNote) => {
+  const newRect = centerWHToRect(
+    oldNote.pageX,
+    oldNote.pageY,
+    oldNote.width,
+    oldNote.height,
+    noteFile.width,
+    noteFile.height
+  );
+
+  const newWH = {
+    width: oldNote.width * noteFile.width,
+    height: oldNote.height * noteFile.height,
+  };
+  const newNote = {
+    ...oldNote,
+    ...newRect,
+    ...newWH,
+    // mobile version page number start with 0
+    // desktop version start with 1
+    page: oldNote.page + 1,
+    scale: 100,
+    text: oldNote.detail,
+    //todoDependency: noteTags,
+    todoDependency: [],
+    created: oldNote.createdDate
+      ? Number(Date.parse(oldNote.createdDate))
+      : null,
+    visible: true,
+  };
+
+  // if the remote note doesn't have sync record, create one,
+  // later it will be pushed back to remote
+  if (!newNote.syncRecord) {
+    newNote.syncRecord = JSON.stringify(version.newNode());
+  }
+  return newNote;
+};
+
 export const importRemoteDb = async (event, localDocs) => {
   const result = await secureGet(getBaseUrl() + '/db');
   // console.log("DEBUG local is ", localDocs);

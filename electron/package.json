@@ -259,6 +259,7 @@
     "electron-updater": "^4.3.4",
     "history": "^5.0.0",
     "nedb": "^1.8.0",
+    "nedb-promises": "^4.1.1",
     "node-machine-id": "^1.1.12",
     "pdfjs-dist": "^2.6.347",
     "react": "^17.0.1",
