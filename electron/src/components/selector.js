@@ -5,6 +5,14 @@ export const selectApi = (state) => {
   };
 };
 
+export const selectFiles = (state) => {
+  const { dataApi, apiState } = state.file;
+  if (apiState === 'ok') {
+    return dataApi.GetCachedDocuments();
+  }
+  return [];
+};
+
 export const selectCurrentFile = (state) => {
   return {
     currentFile: state.file.currentFile,

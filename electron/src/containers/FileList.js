@@ -6,6 +6,7 @@ import {
   START_EDIT_LIBRARY,
 } from '../actions/file';
 
+// obsolete
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state, ownProp) {
   const { file } = state;

@@ -24,16 +24,14 @@ import {
   ServerInitialize,
   ServerLogin,
   ServerGetAllDocuments,
-  ServerGetAllDocumentsCached,
   ServerOpenDocument,
   ServerGetPage,
   ServerGetAllNotes,
-  ServerGetAllNotesCached,
   ServerLoadNoteImage,
 } from './XtNoteServerApi';
 
-
 export const NeoDbDataApi: DataApi = {
+  cache: null,
   Initialize: () => 'initialized',
   Login: () => {},
   GetAllActiveDocuments,
@@ -58,9 +56,10 @@ export const NeoDbDataApi: DataApi = {
 };
 
 export const XtNoteServerDataApi: DataApi = {
+  cache: null,
   Initialize: ServerInitialize,
   Login: ServerLogin,
-  GetAllActiveDocuments: ServerGetAllDocumentsCached,
+  GetAllActiveDocuments: ServerGetAllDocuments,
   OpenDocument: ServerOpenDocument,
   GetDocumentPage: ServerGetPage,
   AddDocument,
@@ -75,31 +74,7 @@ export const XtNoteServerDataApi: DataApi = {
   UpdateNote,
   DeleteNote,
   GetAllDocumentsPromise,
-  GetAllActiveNotes: ServerGetAllNotesCached,
-  GetAllTodosPromise,
-  GetNoteByUuid,
-  UpdateNotePromise,
-};
-
-export const CachedDataApi: DataApi = {
-  Initialize: CacheInitialize,
-  Login: ()=>{}
-  GetAllActiveDocuments: GetAllDocumentsCached,
-  OpenDocument: ServerOpenDocument,
-  GetDocumentPage: ServerGetPage,
-  AddDocument,
-  UpdateDocument,
-  DeleteDocumentByFileId: DeleteDocument,
-  DeleteAllDocuments,
-  DeleteAllNotes,
-  DeleteAllTodos,
-  UpdateTodo,
-  DeleteTodo,
-  LoadNoteImage: ServerLoadNoteImage,
-  UpdateNote,
-  DeleteNote,
-  GetAllDocumentsPromise,
-  GetAllActiveNotes: ServerGetAllNotesCached,
+  GetAllActiveNotes: () => ServerGetAllNotes(XtNoteServerDataApi.cache),
   GetAllTodosPromise,
   GetNoteByUuid,
   UpdateNotePromise,

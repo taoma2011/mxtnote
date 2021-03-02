@@ -154,17 +154,35 @@ function App() {
       SetUserPass(user, pass);
       dispatch({
         type: SET_API_STATE,
-        apiState: 'initialize',
+        apiState: 'initialized',
       });
     }
   };
 
   const handleCloseLoginDialog = () => {};
+
   const { app } = getElectron();
+
+  if (apiState === 'login-needed') {
+    return (
+      <div>
+        <AutoLogin />
+        <LoginDialog
+          open={openLoginDialog}
+          handleClose={handleCloseLoginDialog}
+          handleLogin={handleLogin}
+          loginFailed={loginFailed}
+        />
+      </div>
+    );
+  }
+  if (apiState !== 'ok') {
+    return <div />;
+  }
+
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AutoLogin />
 
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
@@ -237,12 +255,6 @@ function App() {
           <TabPanel value={currentTab} index={3}>
             <TodoPage />
           </TabPanel>
-          <LoginDialog
-            open={openLoginDialog}
-            handleClose={handleCloseLoginDialog}
-            handleLogin={handleLogin}
-            loginFailed={loginFailed}
-          />
         </div>
       </main>
     </div>

@@ -18,26 +18,6 @@ export const ServerInitialize = () => {
   return 'login-needed';
 };
 
-const getDocumentById = (id: string): Document | null => {
-  let res = null;
-  fileCache.forEach((f: Document) => {
-    if (f.id === id) {
-      res = f;
-    }
-  });
-  return res;
-};
-
-const getNoteById = (id: string): Note | null => {
-  let res = null;
-  noteCache.forEach((n: Note) => {
-    if (n.id === id) {
-      res = n;
-    }
-  });
-  return res;
-};
-
 export const ServerLogin = async (user: string, pass: string) => {
   try {
     const res = await axios.post(`${getBaseUrl()}/users/authenticate`, {
@@ -96,10 +76,6 @@ export const ServerGetAllDocuments = async (): Promise<Document[]> => {
   }
 };
 
-export const ServerGetAllDocumentsCached = async (): Promise<Document[]> => {
-  return fileCache;
-};
-
 interface XtDocument {
   file: any;
   numPages: number;
@@ -141,18 +117,7 @@ export const ServerGetPage = async (doc: any, pageNum: number) => {
 };
 
 export const ServerLoadNoteImage = async (noteId: string) => {
-  const n = getNoteById(noteId);
-  if (!n) {
-    return null;
-  }
-  const f = getDocumentById(n.fileId);
-  if (!f) {
-    return null;
-  }
-  const pdfFile = await ServerOpenDocument(f);
-  const pdfPage = await ServerGetPage(pdfFile, n.page);
-  const image = await getImageFromPdfPage(n, pdfPage);
-  return image;
+  return null;
 };
 
 /*
@@ -176,7 +141,7 @@ export const ServerLoadNoteImage = async (noteId: string) => {
   userId: "5ef8603500d4e368b5b3eba4"
   width: 0.3527480507596744
 */
-export const ServerGetAllNotes = async (): Promise<Note[]> => {
+export const ServerGetAllNotes = async (cache: any): Promise<Note[]> => {
   if (!token) {
     return [];
   }
@@ -191,7 +156,7 @@ export const ServerGetAllNotes = async (): Promise<Note[]> => {
     console.log('notes ', res);
     return res.data
       .map((remoteNote: any) => {
-        const f = getDocumentById(remoteNote.fileId);
+        const f = cache.GetDocumentById(remoteNote.fileId);
         // somehow some file doesnt have width, older version?
         if (!f || !f.width) {
           return null;
@@ -203,8 +168,4 @@ export const ServerGetAllNotes = async (): Promise<Note[]> => {
     console.log('get all notes error ', e);
   }
   return [];
-};
-
-export const ServerGetAllNotesCached = async (): Promise<Note[]> => {
-  return noteCache;
 };

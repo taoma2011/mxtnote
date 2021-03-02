@@ -29,7 +29,7 @@ export const AutoLogin = () => {
           if (ret) {
             dispatch({
               type: SET_API_STATE,
-              apiState: 'ok',
+              apiState: 'initialized',
             });
           }
           return true;

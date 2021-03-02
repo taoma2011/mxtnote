@@ -58,9 +58,11 @@ export default function NotePanel(props) {
   const { dataApi, apiState } = useSelector(selectApi);
 
   const [image, setImage] = React.useState(null);
+  const [note, setNote] = React.useState(null);
 
   useEffect(() => {
     if (apiState === 'ok') {
+      setNote(dataApi.GetNoteById(noteId));
       dataApi
         .LoadNoteImage(noteId)
         .then((im) => {
@@ -73,12 +75,8 @@ export default function NotePanel(props) {
     }
   }, [apiState]);
 
-  let note;
   useEffect(() => {
-    if (apiState === 'ok') {
-      note = dataApi.GetNoteById(noteId);
-      if (!note) return;
-    } else {
+    if (!note) {
       return;
     }
     const scaledWidth = (note.width || 0) * (note.scale / 100);
@@ -99,7 +97,7 @@ export default function NotePanel(props) {
         console.log(err);
       }
     }
-  }, [image, apiState]);
+  }, [image, note]);
 
   if (!note) return null;
   const style = {

@@ -1,14 +1,15 @@
 import { Document, Note, RuntimeDocument, Todo, DataApi } from './interface';
+import { getImageFromPdfPage } from './pdfutils';
 
 let fileCache: Document[] = [];
 let noteCache: Note[] = [];
 let bApi: DataApi;
 
-export const CacheGetAllDocument = async (): Promise<Document[]> => {
+export const CacheGetAllDocument = (): Document[] => {
   return fileCache;
 };
 
-export const CacheGetAllNotes = async (): Promise<Note[]> => {
+export const CacheGetAllNotes = (): Note[] => {
   return noteCache;
 };
 
@@ -34,14 +35,35 @@ const getNoteById = (id: string): Note | null => {
 
 export const CreateCache = async (backendApi: any): Promise<DataApi> => {
   bApi = backendApi;
-  fileCache = await bApi.GetAllActiveDocuments();
-  noteCache = await bApi.GetAllActiveNotes();
-  console.log('note cache is ', noteCache);
-  return {
+  const cache = {
     ...backendApi,
-    GetAllActiveDocuments: CacheGetAllDocument,
-    GetAllActiveNotes: CacheGetAllNotes,
+    GetCachedDocuments: CacheGetAllDocument,
+    GetCachedNotes: CacheGetAllNotes,
     GetDocumentById: getDocumentById,
     GetNoteById: getNoteById,
   };
+
+  // make the Get...ById api available to backend
+  backendApi.cache = cache;
+
+  fileCache = await bApi.GetAllActiveDocuments();
+  noteCache = await bApi.GetAllActiveNotes();
+  console.log('note cache is ', noteCache);
+
+  return cache;
+};
+
+export const CacheLoadNoteImage = async (noteId: string) => {
+  const n = getNoteById(noteId);
+  if (!n) {
+    return null;
+  }
+  const f = getDocumentById(n.fileId);
+  if (!f) {
+    return null;
+  }
+  const pdfFile = await bApi.OpenDocument(f);
+  const pdfPage = await bApi.GetDocumentPage(pdfFile, n.page);
+  const image = await getImageFromPdfPage(n, pdfPage);
+  return image;
 };

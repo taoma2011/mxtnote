@@ -1105,7 +1105,7 @@ export default function file(state, action) {
         ...state,
         apiState: action.apiState,
       };
-      if (action.dataApi) {
+      if (action.apiState === 'ok') {
         newState.dataApi = action.dataApi;
       }
       return newState;
