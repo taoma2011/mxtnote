@@ -39,6 +39,7 @@ export const CreateCache = async (backendApi: any): Promise<DataApi> => {
     ...backendApi,
     GetCachedDocuments: CacheGetAllDocument,
     GetCachedNotes: CacheGetAllNotes,
+    LoadNoteImage: CacheLoadNoteImage,
     GetDocumentById: getDocumentById,
     GetNoteById: getNoteById,
   };

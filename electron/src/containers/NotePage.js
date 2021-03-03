@@ -1,10 +1,11 @@
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 // eslint-disable-next-line no-unused-vars
-import { sizing } from "@material-ui/system";
-import { NotePage } from "../components/NotePage";
-import * as FileActions from "../actions/file";
+import { sizing } from '@material-ui/system';
+import { NotePage } from '../components/NotePage';
+import * as FileActions from '../actions/file';
 
+// obsolete, moved to selector
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
   const { file } = state;
@@ -23,7 +24,7 @@ function mapStateToProps(state) {
       })
     : noteArray;
   //console.log("notes after filter ", noteArrayFiltered);
-  const noteArraySorted = noteArrayFiltered.sort(function(n1, n2) {
+  const noteArraySorted = noteArrayFiltered.sort(function (n1, n2) {
     const t1 = n1.lastModified ? Date.parse(n1.lastModified) : 0;
     const t2 = n2.lastModified ? Date.parse(n2.lastModified) : 0;
     return t2 - t1;

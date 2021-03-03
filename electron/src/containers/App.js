@@ -14,7 +14,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Box from '@material-ui/core/Box';
 import FilePage from './FilePage';
-import NotePage from './NotePage';
+import NotePage from '../components/NotePage';
 import LoadLibrary from '../components/LoadLibrary2';
 import LoadTodo from './LoadTodo';
 import LibraryPage from './LibraryPage';

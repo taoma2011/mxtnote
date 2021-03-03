@@ -63,9 +63,11 @@ export default function NotePanel(props) {
   useEffect(() => {
     if (apiState === 'ok') {
       setNote(dataApi.GetNoteById(noteId));
+      console.log('loading image for note ', noteId);
       dataApi
         .LoadNoteImage(noteId)
         .then((im) => {
+          console.log('got loaded image ', noteId);
           setImage(im);
           return true;
         })
@@ -82,8 +84,16 @@ export default function NotePanel(props) {
     const scaledWidth = (note.width || 0) * (note.scale / 100);
     const scaledHeight = (note.height || 0) * (note.scale / 100);
 
+    console.log(
+      'notepanel repaint for ',
+      noteId,
+      image,
+      scaledWidth,
+      scaledHeight
+    );
+
     if (canvasRef.current && image && scaledWidth && scaledHeight) {
-      // console.log('notepanel repaint for ', text);
+      console.log('notepanel repaint for ', noteId);
       canvasRef.current.width = scaledWidth;
       canvasRef.current.height = scaledHeight;
       const ctx = canvasRef.current.getContext('2d');
