@@ -366,14 +366,19 @@ export default function file(state, action) {
       }
       // see if there is a saved page number
       const { files } = state;
-      const f = findFileById(files, action.fileId);
-      let pageNum = 1;
+      // const f = findFileById(files, action.fileId);
+      const pageNum = 1;
+
+      // need to save it locally
+      /*
       if (f && f.lastPageNumber) {
         pageNum = f.lastPageNumber;
       }
+      */
+
       return {
         ...state,
-        docLoading: true,
+        documentLoaded: false,
         currentFile: action.file,
         fileId: action.fileId,
         pageNum,
@@ -384,7 +389,7 @@ export default function file(state, action) {
     case FILE_LOADED: {
       return {
         ...state,
-        docLoading: false,
+        documentLoaded: true,
         doc: action.doc,
         numPages: action.doc.numPages,
         // page width/height will be known after one page is loaded
@@ -556,12 +561,11 @@ export default function file(state, action) {
       };
     }
     case GOTO_NOTE: {
-      const n = state.notes[action.nid];
-      if (!n) {
-        console.log('cannot find this note ', action.nid);
-        return state;
-      }
-      if (n.fileId === state.fileId) {
+      const n = action.note;
+      if (
+        state.currentFile !== null &&
+        action.file.id === state.currentFile.id
+      ) {
         // just go to page for now
         return {
           ...state,
@@ -571,23 +575,11 @@ export default function file(state, action) {
           currentTab: 0,
         };
       }
-      // find the file name
-      const { fileId } = n;
-      let currentFile = null;
-      state.files.forEach((f) => {
-        if (getFileId(f) === fileId) {
-          currentFile = f.file;
-        }
-      });
-      if (!currentFile) {
-        console.log('cannot find file name for file ', fileId);
-        return state;
-      }
+
       return {
         ...state,
-        fileId,
-        currentFile,
-        docLoading: true,
+        currentFile: action.file,
+        documentLoaded: false,
         pageNum: n.page,
         currentPageNum: n.page,
         // goto file tab

@@ -20,6 +20,22 @@ export const selectCurrentFile = (state) => {
   };
 };
 
+export const selectScale = (state) => {
+  return state.file.scale;
+};
+
+// get all notes
+export const selectNotes = (state) => {
+  const { file } = state;
+  const { apiState, dataApi } = file || {};
+  let noteArray = [];
+
+  if (apiState === 'ok') {
+    noteArray = dataApi.GetCachedNotes();
+  }
+  return noteArray;
+};
+
 // used by notes tab
 export const selectFilteredNotes = (state) => {
   const { file } = state;

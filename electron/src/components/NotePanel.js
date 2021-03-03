@@ -32,12 +32,24 @@ export default function NotePanel(props) {
   const { noteId } = props;
 
   const dispatch = useDispatch();
-  const gotoNote = () =>
+
+  const canvasRef = React.createRef();
+
+  const { dataApi, apiState } = useSelector(selectApi);
+
+  const [image, setImage] = React.useState(null);
+  const [note, setNote] = React.useState(null);
+
+  const gotoNote = async () => {
+    const file = await dataApi.GetDocumentById(note.fileId);
+    console.log('goto note with file ', file);
     dispatch({
       type: GOTO_NOTE,
       // TODO change to noteId
-      nid: noteId,
+      note,
+      file,
     });
+  };
   const startDeleteNote = () =>
     dispatch({
       type: START_DELETE_NOTE,
@@ -52,13 +64,6 @@ export default function NotePanel(props) {
     dispatch({
       type: CLOSE_NOTE_EDITOR,
     });
-
-  const canvasRef = React.createRef();
-
-  const { dataApi, apiState } = useSelector(selectApi);
-
-  const [image, setImage] = React.useState(null);
-  const [note, setNote] = React.useState(null);
 
   useEffect(() => {
     if (apiState === 'ok') {

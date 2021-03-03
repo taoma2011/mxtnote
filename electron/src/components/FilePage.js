@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useRef, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, shallowEqual } from 'react-redux';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import { FixedSizeList as List } from 'react-window';
@@ -15,6 +15,7 @@ import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
 import { selectSearchText } from '../features/search/searchSlice';
+import { selectNotes, selectCurrentFile } from './selector';
 
 export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
@@ -24,10 +25,8 @@ export const FilePage = (props) => {
     doc,
     pageNum,
     numPages,
-    fileId,
     docLoading,
     noteLoaded,
-    notes,
     scale,
     searchResults,
     settingsLoaded,
@@ -36,6 +35,8 @@ export const FilePage = (props) => {
     updatePageScroll,
   } = props;
 
+  const notes = useSelector(selectNotes, shallowEqual);
+  const { currentFile } = useSelector(selectCurrentFile, shallowEqual);
   /*
   const pageDivStyle = {
     position: "relative",
@@ -55,7 +56,7 @@ export const FilePage = (props) => {
           searchResults={searchResults}
           pdfDoc={doc}
           key={domKey}
-          fileId={fileId}
+          fileId={currentFile.id}
           pageWidth={pageWidth}
           pageHeight={pageHeight}
         />
@@ -119,7 +120,7 @@ export const FilePage = (props) => {
           notes={notes}
           pdfDoc={doc}
           key="test-page"
-          fileId={fileId}
+          fileId={currentFile.id}
           pageWidth={0}
           pageHeight={0}
         />
@@ -154,7 +155,7 @@ export const FilePage = (props) => {
       <div style={{ height: viewPortHeight }}>
         <Paper height="100%" style={{ height: '100%' }}>
           {!settingsLoaded && <LoadSettings />}
-          {docLoading && <LoadFile />}
+          <LoadFile />
           <BackupDb />
           <DeleteNoteDialog />
           {searchText ? (

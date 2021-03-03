@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PdfPage from '../containers/PdfPage';
 import SelectRect from '../containers/SelectRect';
-import StaticRect from '../containers/StaticRect';
+import StaticRect from './StaticRect';
 import { SearchMatchRect } from './SearchMatchRect';
 import { scaleRect } from '../utils/common';
 
@@ -37,12 +37,14 @@ export const PageWrapper = (props) => {
       .catch(() => null);
   }, [dataApi, apiState]);
   const items = [];
+
+  console.log('page wrapper get notes: ', fileId);
   if (notes) {
-    Object.keys(notes).forEach((key) => {
-      const n = notes[key];
+    notes.forEach((n) => {
       // eslint-disable-next-line react/prop-types
       if (n.page === pageNum && n.fileId === fileId) {
-        items.push(<StaticRect nid={key} key={key} />);
+        console.log('found note in the page ', pageNum);
+        items.push(<StaticRect noteId={n.id} key={n.id} />);
       }
     });
   }
