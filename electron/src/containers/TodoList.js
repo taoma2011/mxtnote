@@ -4,9 +4,10 @@ import {
   GOTO_TODO,
   START_DELETE_TODO,
   START_EDIT_TODO,
-  TOGGLE_TODO_DONE
+  TOGGLE_TODO_DONE,
 } from '../actions/file';
 
+// obsolete, use component directory
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state, ownProp) {
   const { file } = state;
@@ -14,32 +15,32 @@ function mapStateToProps(state, ownProp) {
 
   return {
     hasEditDelete: true,
-    todos: todos || []
+    todos: todos || [],
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    gotoTodo: todoId =>
+    gotoTodo: (todoId) =>
       dispatch({
         type: GOTO_TODO,
-        todoId
+        todoId,
       }),
-    editTodo: todoId =>
+    editTodo: (todoId) =>
       dispatch({
         type: START_EDIT_TODO,
-        todoId
+        todoId,
       }),
-    deleteTodo: todoId =>
+    deleteTodo: (todoId) =>
       dispatch({
         type: START_DELETE_TODO,
-        todoId
+        todoId,
       }),
-    toggleTodoDone: todoId =>
+    toggleTodoDone: (todoId) =>
       dispatch({
         type: TOGGLE_TODO_DONE,
-        todoId
-      })
+        todoId,
+      }),
   };
 }
 

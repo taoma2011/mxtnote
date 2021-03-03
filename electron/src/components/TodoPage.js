@@ -4,7 +4,7 @@ import React from 'react';
 import Paper from '@material-ui/core/Paper';
 
 import TodoControl from '../containers/TodoControl';
-import TodoList from '../containers/TodoList';
+import TodoList from './TodoList';
 
 export default function TodoPage() {
   return (

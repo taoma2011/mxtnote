@@ -231,7 +231,7 @@ export const updateSender = (event, command, msg) => {
   }
 };
 
-export const remoteNoteToLocalNote = (noteFile, oldNote) => {
+export const remoteNoteToLocalNote = (cache, noteFile, oldNote) => {
   const newRect = centerWHToRect(
     oldNote.pageX,
     oldNote.pageY,
@@ -245,6 +245,19 @@ export const remoteNoteToLocalNote = (noteFile, oldNote) => {
     width: oldNote.width * noteFile.width,
     height: oldNote.height * noteFile.height,
   };
+  const oldTags = oldNote.tags;
+  const noteTags = [];
+  if (oldTags) {
+    for (let k = 0; k < oldTags.length; k += 1) {
+      const t = oldTags[k];
+      const existingTag = cache.GetTodoByDescription(t);
+
+      if (existingTag) {
+        noteTags.push(existingTag.id);
+      }
+    }
+  }
+
   const newNote = {
     ...oldNote,
     ...newRect,
@@ -254,8 +267,8 @@ export const remoteNoteToLocalNote = (noteFile, oldNote) => {
     page: oldNote.page + 1,
     scale: 100,
     text: oldNote.detail,
-    //todoDependency: noteTags,
-    todoDependency: [],
+    todoDependency: noteTags,
+
     created: oldNote.createdDate
       ? Number(Date.parse(oldNote.createdDate))
       : null,

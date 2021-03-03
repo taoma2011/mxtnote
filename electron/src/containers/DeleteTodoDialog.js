@@ -3,6 +3,7 @@ import { CANCEL_DELETE_TODO, DELETE_TODO } from '../actions/file';
 import DeleteTodoDialog from '../components/DeleteTodoDialog';
 import { findTodoById } from '../utils/common';
 
+// obsolete
 function mapStateToProps(state, ownProps) {
   const { file } = state;
   const { todos } = file || {};
@@ -11,7 +12,7 @@ function mapStateToProps(state, ownProps) {
   const deleting = Boolean(deletingTodo.deleting);
   return {
     deleting,
-    description: deletingTodo.description
+    description: deletingTodo.description,
   };
 }
 
@@ -20,15 +21,15 @@ function mapDispatchToProps(dispatch, ownProps) {
     handleClose: () => {
       return dispatch({
         type: CANCEL_DELETE_TODO,
-        todoId: ownProps.context
+        todoId: ownProps.context,
       });
     },
     deleteTodo: () => {
       return dispatch({
         type: DELETE_TODO,
-        todoId: ownProps.context
+        todoId: ownProps.context,
       });
-    }
+    },
   };
 }
 

@@ -28,6 +28,7 @@ import {
   ServerGetPage,
   ServerGetAllNotes,
   ServerLoadNoteImage,
+  ServerGetAllTodos,
 } from './XtNoteServerApi';
 
 export const NeoDbDataApi: DataApi = {
@@ -50,7 +51,7 @@ export const NeoDbDataApi: DataApi = {
   DeleteNote,
   GetAllDocumentsPromise,
   GetAllActiveNotes: GetAllNotesPromise,
-  GetAllTodosPromise,
+  GetAllTodos: GetAllTodosPromise,
   GetNoteByUuid,
   UpdateNotePromise,
 };
@@ -75,7 +76,7 @@ export const XtNoteServerDataApi: DataApi = {
   DeleteNote,
   GetAllDocumentsPromise,
   GetAllActiveNotes: () => ServerGetAllNotes(XtNoteServerDataApi.cache),
-  GetAllTodosPromise,
+  GetAllTodos: ServerGetAllTodos,
   GetNoteByUuid,
   UpdateNotePromise,
 };

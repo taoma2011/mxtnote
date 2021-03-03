@@ -36,12 +36,15 @@ export interface Note {
 }
 
 export interface Todo {
+  id: string;
   description: string;
 }
 
 export interface CacheApi {
   GetDocumentById(id: string): Document;
   GetNoteById(id: string): Note;
+  GetTodoByDescription(desc: string): Todo | null;
+  GetTodoById(id: string): Todo | null;
 }
 
 // TODO: implement 17 apis imported by reducers/file.js
@@ -65,12 +68,14 @@ export interface DataApi {
   DeleteNote(id: string): void;
   GetAllDocumentsPromise(): Promise<Document>;
   GetAllActiveNotes(): Promise<any>;
-  GetAllTodosPromise(): Promise<Todo>;
+  GetAllTodos(): Promise<Todo[]>;
   GetNoteByUuid(id: string): Promise<Note>;
   UpdateNotePromise(id: string, note: Note): Promise<Note>;
 
   GetCachedDocuments?(): Document[];
   GetCachedNotes?(): Note[];
+  GetCachedTodos?(): Todo[];
   GetDocumentById?(id: string): Document;
   GetNoteById?(id: string): Note;
+  GetTodoById?(id: string): Todo | null;
 }

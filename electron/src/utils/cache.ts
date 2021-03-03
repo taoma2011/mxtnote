@@ -3,6 +3,7 @@ import { getImageFromPdfPage } from './pdfutils';
 
 let fileCache: Document[] = [];
 let noteCache: Note[] = [];
+let todoCache: Todo[] = [];
 let bApi: DataApi;
 
 export const CacheGetAllDocument = (): Document[] => {
@@ -11,6 +12,10 @@ export const CacheGetAllDocument = (): Document[] => {
 
 export const CacheGetAllNotes = (): Note[] => {
   return noteCache;
+};
+
+export const CacheGetAllTodos = (): Todo[] => {
+  return todoCache;
 };
 
 const getDocumentById = (id: string): Document | null => {
@@ -33,23 +38,47 @@ const getNoteById = (id: string): Note | null => {
   return res;
 };
 
+const getTodoByDescription = (desc: string): Todo | null => {
+  let res = null;
+  todoCache.forEach((t: Todo) => {
+    if (t.description === desc) {
+      res = t;
+    }
+  });
+  return res;
+};
+
+const getTodoById = (id: string): Todo | null => {
+  let res = null;
+  todoCache.forEach((t: Todo) => {
+    if (t.id === id) {
+      res = t;
+    }
+  });
+  return res;
+};
+
 export const CreateCache = async (backendApi: any): Promise<DataApi> => {
   bApi = backendApi;
   const cache = {
     ...backendApi,
     GetCachedDocuments: CacheGetAllDocument,
     GetCachedNotes: CacheGetAllNotes,
+    GetCachedTodos: CacheGetAllTodos,
     LoadNoteImage: CacheLoadNoteImage,
     GetDocumentById: getDocumentById,
     GetNoteById: getNoteById,
+    GetTodoByDescription: getTodoByDescription,
+    GetTodoById: getTodoById,
   };
 
   // make the Get...ById api available to backend
   backendApi.cache = cache;
 
   fileCache = await bApi.GetAllActiveDocuments();
+  todoCache = await bApi.GetAllTodos();
   noteCache = await bApi.GetAllActiveNotes();
-  console.log('note cache is ', noteCache);
+  console.log('todo cache is ', todoCache);
 
   return cache;
 };

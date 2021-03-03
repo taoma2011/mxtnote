@@ -4,6 +4,8 @@ import { GetAllActiveDocuments } from './db';
 import { Document, Note, RuntimeDocument, Todo } from './interface';
 import { remoteNoteToLocalNote } from './api';
 
+const uuid = require('uuid');
+
 const BASE_URL = 'https://note.mxtsoft.com:4001';
 const TEST_BASE_URL = 'http://localhost:4001';
 
@@ -161,11 +163,36 @@ export const ServerGetAllNotes = async (cache: any): Promise<Note[]> => {
         if (!f || !f.width) {
           return null;
         }
-        return remoteNoteToLocalNote(f, remoteNote);
+        return remoteNoteToLocalNote(cache, f, remoteNote);
       })
       .filter((n: any) => n !== null);
   } catch (e) {
     console.log('get all notes error ', e);
+  }
+  return [];
+};
+
+export const ServerGetAllTodos = async (): Promise<Todo[]> => {
+  if (!token) {
+    return [];
+  }
+
+  try {
+    const res = await axios.get(`${getBaseUrl()}/tags`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('todos ', res);
+    return res.data.map((t: any) => {
+      return {
+        id: t.id ? t.id : uuid.v4(),
+        description: t.name,
+      };
+    });
+  } catch (e) {
+    console.log('get all todos error ', e);
   }
   return [];
 };

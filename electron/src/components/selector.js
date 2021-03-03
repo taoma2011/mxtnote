@@ -54,3 +54,11 @@ export const selectFilteredNotes = (state) => {
   });
   return { notes: noteSummaryArray };
 };
+
+export const selectTodos = (state) => {
+  const { dataApi, apiState } = state.file;
+  if (apiState === 'ok') {
+    return dataApi.GetCachedTodos();
+  }
+  return [];
+};
