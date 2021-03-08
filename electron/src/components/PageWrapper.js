@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PdfPage from '../containers/PdfPage';
-import SelectRect from '../containers/SelectRect';
+import SelectRect from './SelectRect';
 import StaticRect from './StaticRect';
 import { SearchMatchRect } from './SearchMatchRect';
 import { scaleRect } from '../utils/common';

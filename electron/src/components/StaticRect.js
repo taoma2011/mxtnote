@@ -9,7 +9,7 @@ import { EDIT_NOTE } from '../actions/file';
 import { scaleRect } from '../utils/common';
 import * as ActionCreators from '../actions/ActionCreators';
 
-export const StaticRect = (props) => {
+export default function StaticRect(props) {
   const { noteId } = props;
   const { dataApi } = useSelector(selectApi);
   const { visible, disableClick } = useSelector(selectNoteUiState(noteId));
@@ -38,6 +38,4 @@ export const StaticRect = (props) => {
 
   if (disableClick) return <div style={style} />;
   return <div role="button" style={style} onClick={editNote} />;
-};
-
-export default StaticRect;
+}

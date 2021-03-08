@@ -1,3 +1,5 @@
+import { scaleRect } from '../utils/common';
+
 export const selectApi = (state) => {
   return {
     dataApi: state.file.dataApi,
@@ -84,6 +86,15 @@ export const selectDeletingNote = (state) => {
   return { deletingNoteId: deletingNid };
 };
 
+export const selectNoteById = (noteId) => (state) => {
+  const { dataApi, apiState } = state.file;
+  if (apiState !== 'ok') {
+    return null;
+  }
+
+  return dataApi.GetNoteById(noteId);
+};
+
 export const selectNoteUiState = (noteId) => (state) => {
   const { editingNid } = state.file;
   return {
@@ -91,4 +102,19 @@ export const selectNoteUiState = (noteId) => (state) => {
     visible: editingNid !== noteId,
     disableClick: Boolean(editingNid),
   };
+};
+
+export const selectSelectRect = (state) => {
+  const { showSelection, rect, scale } = state.file;
+  const scaledRect = rect
+    ? scaleRect(rect, scale / 100)
+    : {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        angle: 0,
+      };
+
+  return { showSelection, scaledRect };
 };

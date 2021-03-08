@@ -17,8 +17,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import { selectApi } from './selector';
 
 import LoadImage from '../containers/LoadImage';
-import DeleteNoteDialog from '../containers/DeleteNoteDialog';
-import DependencyChips from '../containers/DependencyChips';
+import DeleteNoteDialog from './DeleteNoteDialog';
+import DependencyChips from './DependencyChips';
 
 import { GOTO_NOTE } from '../actions/file';
 
@@ -48,19 +48,11 @@ export default function NotePanel(props) {
     });
   };
   const startDeleteNote = () =>
-    dispatch({
-      type: START_DELETE_NOTE,
-      noteId,
-    });
+    dispatch(ActionCreators.OpenDeleteNoteDialog(noteId));
   const openNoteEditor = () =>
-    dispatch({
-      type: OPEN_NOTE_EDITOR,
-      noteId,
-    });
+    dispatch(ActionCreators.OpenEditNoteDialog(noteId));
   const closeNoteEditor = () =>
-    dispatch({
-      type: CLOSE_NOTE_EDITOR,
-    });
+    dispatch(ActionCreators.CloseEditNoteDialog(noteId));
 
   useEffect(() => {
     if (apiState === 'ok') {
@@ -130,7 +122,7 @@ export default function NotePanel(props) {
               <Box flexGrow={1}>
                 <label>{noteContext}</label>
               </Box>
-              <DependencyChips context={noteId} />
+              <DependencyChips noteId={noteId} />
               <Box>
                 <IconButton
                   onClick={() => openNoteEditor(noteId)}
@@ -183,7 +175,7 @@ export default function NotePanel(props) {
           </Box>
         </CardContent>
       </Card>
-      <DeleteNoteDialog context={noteId} />
+      <DeleteNoteDialog />
     </Box>
   );
 }

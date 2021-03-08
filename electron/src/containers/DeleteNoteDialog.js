@@ -1,8 +1,9 @@
-import { connect } from "react-redux";
-import { CANCEL_DELETE_NOTE, DELETE_NOTE } from "../actions/file";
-import DeleteNoteDialog from "../components/DeleteNoteDialog";
-import { findNoteById } from "../utils/common";
+import { connect } from 'react-redux';
+import { CANCEL_DELETE_NOTE, DELETE_NOTE } from '../actions/file';
+import DeleteNoteDialog from '../components/DeleteNoteDialog';
+import { findNoteById } from '../utils/common';
 
+// obsolete
 function mapStateToProps(state, ownProps) {
   const { file } = state;
   const { notes } = file || {};

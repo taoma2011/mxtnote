@@ -286,24 +286,13 @@ function saveLastPageNumber(dataApi, state) {
 // return new state to indicate whether we are editing a note
 // if editingNid is null, we are not editing anything
 function setEditingNid(state, editingNid) {
-  // first make the current editing note visible
-  let newNotes = { ...state.notes };
   if (state.editingNid) {
-    newNotes = {
-      ...newNotes,
-      [state.editingNid]: { ...state.notes[state.editingNid], visible: true },
-    };
+    // TODO need to commit the current change
   }
-  if (editingNid) {
-    newNotes = {
-      ...newNotes,
-      [editingNid]: { ...state.notes[editingNid], visible: false },
-    };
-  }
+
   return {
     ...state,
     editingNid,
-    notes: newNotes,
     showSelection: !!editingNid,
   };
 }
@@ -453,7 +442,7 @@ export default function file(state, action) {
       };
     }
     case SET_RECT_STATE: {
-      const note = state.notes[state.editingNid];
+      const note = dataApi.GetNoteById(state.editingNid);
       const newRect = scaleRect(
         {
           top: action.top,
@@ -463,16 +452,10 @@ export default function file(state, action) {
         },
         100 / state.scale
       );
-      dataApi.UpdateNote(state.editingNid, note);
+      // dataApi.UpdateNote(state.editingNid, note);
       return {
         ...state,
-        notes: {
-          ...state.notes,
-          [state.editingNid]: {
-            ...note,
-            ...newRect,
-          },
-        },
+        rect: newRect,
       };
     }
 
