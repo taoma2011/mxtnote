@@ -4,29 +4,24 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectApi, selectScale } from './selector';
+import { selectApi, selectScale, selectNoteUiState } from './selector';
 import { EDIT_NOTE } from '../actions/file';
 import { scaleRect } from '../utils/common';
+import * as ActionCreators from '../actions/ActionCreators';
 
 export const StaticRect = (props) => {
   const { noteId } = props;
   const { dataApi } = useSelector(selectApi);
-
+  const { visible, disableClick } = useSelector(selectNoteUiState(noteId));
   const note = dataApi.GetNoteById(noteId);
   const scale = useSelector(selectScale);
 
   const scaledRect = scaleRect(note, scale / 100);
   const { top, left, width, height } = scaledRect;
 
-  const visible = true;
-
-  const disableClick = true;
   const dispatch = useDispatch();
   const editNote = () => {
-    dispatch({
-      type: EDIT_NOTE,
-      nid: noteId,
-    });
+    dispatch(ActionCreators.EditNote(noteId));
   };
 
   const style = {

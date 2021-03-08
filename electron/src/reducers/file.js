@@ -477,6 +477,7 @@ export default function file(state, action) {
     }
 
     case ADD_NOTE_FROM_DB: {
+      // here we store the ui state of the note
       const noteMap = {};
       if (!action.notes) {
         return state;
@@ -535,17 +536,13 @@ export default function file(state, action) {
     }
     case EDIT_NOTE: {
       // start to edit a note
-      const n = state.notes[action.nid];
+      const n = dataApi.GetNoteById(action.nid);
+
       if (!n) {
+        console.log('cannot get editing note: ', action.nid);
         return state;
       }
-      const newNotes = {
-        ...state.notes,
-      };
-      newNotes[action.nid] = {
-        ...n,
-        visible: false,
-      };
+
       return {
         ...state,
         rect: {
@@ -557,7 +554,6 @@ export default function file(state, action) {
         },
         showSelection: true,
         editingNid: action.nid,
-        notes: newNotes,
       };
     }
     case GOTO_NOTE: {

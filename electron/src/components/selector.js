@@ -78,3 +78,17 @@ export const selectTodos = (state) => {
   }
   return [];
 };
+
+export const selectDeletingNote = (state) => {
+  const { deletingNid } = state.file;
+  return { deletingNoteId: deletingNid };
+};
+
+export const selectNoteUiState = (noteId) => (state) => {
+  const { editingNid } = state.file;
+  return {
+    // if editing this note, only show selection box, not the static box
+    visible: editingNid !== noteId,
+    disableClick: Boolean(editingNid),
+  };
+};

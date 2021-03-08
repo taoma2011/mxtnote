@@ -7,30 +7,20 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { selectApi } from './selector';
-import { DELETE_NOTE } from '../actions/file';
+import { selectApi, selectDeletingNote } from './selector';
+import * as ActionCreators from '../actions/ActionCreators';
 
 export default function DeleteNoteDialog(props) {
-  const { noteId, onClose } = props;
+  const { deletingNoteId } = useSelector(selectDeletingNote);
   const { dataApi } = useSelector(selectApi);
   const dispatch = useDispatch();
 
-  const deleteNote = () => {
-    dispatch({
-      type: DELETE_NOTE,
-      noteId,
-    });
-  };
-
-  if (!noteId) {
-    return null;
-  }
-  const note = dataApi.GetNoteById(noteId);
+  // const note = dataApi.GetNoteById(deletingNoteId);
 
   return (
     <Dialog
-      open={noteId !== null}
-      onClose={onClose}
+      open={!!deletingNoteId}
+      onClose={() => dispatch(ActionCreators.CloseDeleteNoteDialog())}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -41,10 +31,17 @@ export default function DeleteNoteDialog(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button
+          onClick={() => dispatch(ActionCreators.CloseDeleteNoteDialog())}
+          color="primary"
+        >
           Cancel
         </Button>
-        <Button onClick={deleteNote} color="primary" autoFocus>
+        <Button
+          onClick={() => dispatch(ActionCreators.DeleteNote(deletingNoteId))}
+          color="primary"
+          autoFocus
+        >
           Ok
         </Button>
       </DialogActions>

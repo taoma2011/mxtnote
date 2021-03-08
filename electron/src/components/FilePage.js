@@ -8,7 +8,7 @@ import SplitPane from 'react-split-pane';
 import FileControl from '../containers/FileControl';
 import { SearchControl } from './SearchControl';
 import { SearchResult } from './SearchResult';
-import DeleteNoteDialog from '../containers/DeleteNoteDialog';
+import DeleteNoteDialog from './DeleteNoteDialog';
 import { PageWrapper } from './PageWrapper';
 import LoadNote from './LoadNote';
 import LoadFile from './LoadFile';
@@ -156,7 +156,6 @@ export const FilePage = (props) => {
         <Paper height="100%" style={{ height: '100%' }}>
           {!settingsLoaded && <LoadSettings />}
           <LoadFile />
-          <BackupDb />
           <DeleteNoteDialog />
           {searchText ? (
             <SplitPane

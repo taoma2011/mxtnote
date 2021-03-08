@@ -20,12 +20,9 @@ import LoadImage from '../containers/LoadImage';
 import DeleteNoteDialog from '../containers/DeleteNoteDialog';
 import DependencyChips from '../containers/DependencyChips';
 
-import {
-  GOTO_NOTE,
-  START_DELETE_NOTE,
-  OPEN_NOTE_EDITOR,
-  CLOSE_NOTE_EDITOR,
-} from '../actions/file';
+import { GOTO_NOTE } from '../actions/file';
+
+import * as ActionCreators from '../actions/ActionCreators';
 
 export default function NotePanel(props) {
   // eslint-disable-next-line react/prop-types
