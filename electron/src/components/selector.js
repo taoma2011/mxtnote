@@ -81,6 +81,20 @@ export const selectTodos = (state) => {
   return [];
 };
 
+export const selectEditingNote = (state) => {
+  const { editingNid, apiState, dataApi } = state.file;
+  if (apiState !== 'ok') {
+    return {
+      editingNoteId: editingNid,
+      editingNote: null,
+    };
+  }
+  return {
+    editingNoteId: editingNid,
+    editingNote: dataApi.GetNoteById(editingNid),
+  };
+};
+
 export const selectDeletingNote = (state) => {
   const { deletingNid } = state.file;
   return { deletingNoteId: deletingNid };

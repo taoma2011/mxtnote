@@ -39,6 +39,12 @@ export const CloseEditNoteDialog = () => {
   };
 };
 
+export const TodoDependencyChange = (todoId) => {
+  return {
+    type: FileActions.TODO_DEPENDENCY_CHANGE,
+    todoId,
+  };
+};
 export const setRectState = (rect) => {
   const { top, left, width, height, angle } = rect;
   return {

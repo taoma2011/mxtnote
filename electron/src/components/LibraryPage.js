@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import LibraryControl from '../containers/LibraryControl';
 import LoadNote from './LoadNote';
 import LoadSettings from '../containers/LoadSettings';
-import FileList from '../containers/FileList';
+import FileList from './FileList';
 import BackupDb from '../containers/BackupDb';
 
 export default function LibraryPage(props) {

@@ -2,12 +2,18 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 // import TextField from '@material-ui/core/TextField';
+import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import TodoDependency from '../containers/TodoDependency';
+import TodoDependency from './TodoDependency';
+import * as ActionCreators from '../actions/ActionCreators';
+import { selectNoteById } from './selector';
 
-export default function NoteEditor2(props) {
-  const { text, noteId, handleTextChange } = props;
+export default function NoteEditor(props) {
+  const { noteId } = props;
+  const note = useSelector(selectNoteById(noteId));
+
+  const handleTextChange = (e) => {};
   return (
     <Grid container>
       <Grid item xs={12} style={{ display: 'flex' }}>
@@ -16,7 +22,7 @@ export default function NoteEditor2(props) {
           m={2}
           id="standard-multiline-flexible"
           label="Note"
-          value={text}
+          value={note.text}
           onChange={handleTextChange}
         />
       </Grid>

@@ -1,16 +1,22 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Checkbox from '@material-ui/core/Checkbox';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import { selectTodos, selectEditingNote } from './selector';
+import * as ActionCreators from '../actions/ActionCreators';
 
 export default function TodoDependency(props) {
-  // eslint-disable-next-line react/prop-types
-  const { todos, checked, todoDependencyChanged } = props;
-  console.log('checked is ', checked);
+  const todos = useSelector(selectTodos);
+  const { editingNid, editingNote } = useSelector(selectEditingNote);
+  const dispatch = useDispatch();
+  if (!editingNote) {
+    return null;
+  }
   return (
     <List>
       {todos.map((todo, index) => {
@@ -21,10 +27,12 @@ export default function TodoDependency(props) {
             <ListItemIcon>
               <Checkbox
                 edge="start"
-                checked={checked.indexOf(todo._id) !== -1}
+                checked={editingNote.todoDependency.indexOf(todo.id) !== -1}
                 tabIndex={-1}
                 disableRipple
-                onClick={() => todoDependencyChanged(todo._id)}
+                onClick={() =>
+                  dispatch(ActionCreators.todoDependencyChange(todo.id))
+                }
                 inputProps={{ 'aria-labelledby': checkboxLabel }}
               />
             </ListItemIcon>
