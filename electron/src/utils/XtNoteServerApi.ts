@@ -2,7 +2,7 @@ import axios from 'axios';
 import { OpenPdfData, GetPdfPage, getImageFromPdfPage } from './pdfutils';
 import { GetAllActiveDocuments } from './db';
 import { Document, Note, RuntimeDocument, Todo } from './interface';
-import { remoteNoteToLocalNote } from './api';
+import { localNoteToRemoteNote, remoteNoteToLocalNote } from './api';
 
 const uuid = require('uuid');
 
@@ -170,6 +170,33 @@ export const ServerGetAllNotes = async (cache: any): Promise<Note[]> => {
     console.log('get all notes error ', e);
   }
   return [];
+};
+
+export const ServerUpdateNote = (cache: any) => async (
+  id: string,
+  note: Note
+): Promise<boolean> => {
+  if (!token) {
+    return false;
+  }
+
+  console.log('updating ', note);
+  const remoteNote = localNoteToRemoteNote(cache, note);
+
+  try {
+    const res = await axios.post(`${getBaseUrl()}/notes/${id}`, remoteNote, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+    cache.SetNoteById(id, note);
+    return true;
+  } catch (e) {
+    console.log('get all notes error ', e);
+  }
+  return false;
 };
 
 export const ServerGetAllTodos = async (): Promise<Todo[]> => {

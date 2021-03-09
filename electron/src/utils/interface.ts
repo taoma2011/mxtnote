@@ -45,6 +45,7 @@ export interface CacheApi {
   GetNoteById(id: string): Note;
   GetTodoByDescription(desc: string): Todo | null;
   GetTodoById(id: string): Todo | null;
+  SetNoteById(id: string, note: Note): void;
 }
 
 // TODO: implement 17 apis imported by reducers/file.js
@@ -64,13 +65,13 @@ export interface DataApi {
   LoadNoteImage(noteId: string): Promise<any>;
   UpdateTodo(id: string, todo: Todo): void;
   DeleteTodo(id: string): void;
-  UpdateNote(id: string, note: Note, cb: any): void;
+  UpdateNote(id: string, note: Note): Promise<boolean>;
   DeleteNote(id: string): void;
   GetAllDocumentsPromise(): Promise<Document>;
   GetAllActiveNotes(): Promise<any>;
   GetAllTodos(): Promise<Todo[]>;
   GetNoteByUuid(id: string): Promise<Note>;
-  UpdateNotePromise(id: string, note: Note): Promise<Note>;
+  // UpdateNotePromise(id: string, note: Note): Promise<Note>;
 
   GetCachedDocuments?(): Document[];
   GetCachedNotes?(): Note[];
@@ -78,4 +79,5 @@ export interface DataApi {
   GetDocumentById?(id: string): Document;
   GetNoteById?(id: string): Note;
   GetTodoById?(id: string): Todo | null;
+  SetNoteById?(id: string, note: Note): void;
 }

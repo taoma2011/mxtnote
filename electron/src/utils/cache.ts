@@ -58,6 +58,15 @@ const getTodoById = (id: string): Todo | null => {
   return res;
 };
 
+const setNoteById = (id: string, note: Note): void => {
+  for (let i = 0; i < noteCache.length; i += 1) {
+    if (noteCache[i].id === id) {
+      noteCache.splice(i, 1, note);
+      return;
+    }
+  }
+};
+
 export const CreateCache = async (backendApi: any): Promise<DataApi> => {
   bApi = backendApi;
   const cache = {
@@ -70,6 +79,7 @@ export const CreateCache = async (backendApi: any): Promise<DataApi> => {
     GetNoteById: getNoteById,
     GetTodoByDescription: getTodoByDescription,
     GetTodoById: getTodoById,
+    SetNoteById: setNoteById,
   };
 
   // make the Get...ById api available to backend

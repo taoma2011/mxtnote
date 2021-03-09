@@ -31,7 +31,7 @@ export default function TodoDependency(props) {
                 tabIndex={-1}
                 disableRipple
                 onClick={() =>
-                  dispatch(ActionCreators.todoDependencyChange(todo.id))
+                  dispatch(ActionCreators.TodoDependencyChange(todo.id))
                 }
                 inputProps={{ 'aria-labelledby': checkboxLabel }}
               />

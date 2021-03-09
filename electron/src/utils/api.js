@@ -231,6 +231,48 @@ export const updateSender = (event, command, msg) => {
   }
 };
 
+export const localNoteToRemoteNote = (cache, localNote) => {
+  const noteFile = cache.GetDocumentById(localNote.fileId);
+
+  const center = rectToCenter(
+    localNote.left,
+    localNote.top,
+    localNote.left + localNote.width,
+    localNote.top + localNote.height,
+
+    noteFile.width,
+    noteFile.height
+  );
+  const newWH = {
+    width: localNote.width / noteFile.width,
+    height: localNote.height / noteFile.height,
+  };
+  const localNoteTags = localNote.todoDependency;
+  const noteTags = [];
+  if (localNoteTags) {
+    for (let k = 0; k < localNoteTags.length; k += 1) {
+      const t = localNoteTags[k];
+      const existingTag = cache.GetTodoById(t);
+      if (existingTag) {
+        noteTags.push(existingTag.name);
+      }
+    }
+  }
+  const newNote = {
+    ...localNote,
+    pageX: center.x,
+    pageY: center.y,
+
+    // mobile versin page start with 1
+    page: localNote.page - 1,
+    ...newWH,
+    detail: localNote.text,
+    tags: noteTags,
+    createdDate: localNote.created ? Date.parse(localNote.created) : null,
+  };
+  return newNote;
+};
+
 export const remoteNoteToLocalNote = (cache, noteFile, oldNote) => {
   const newRect = centerWHToRect(
     oldNote.pageX,

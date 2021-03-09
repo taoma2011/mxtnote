@@ -710,7 +710,8 @@ export default function file(state, action) {
       };
     }
     case TODO_DEPENDENCY_CHANGE: {
-      const note = state.notes[state.editingNid];
+      const note = dataApi.GetNoteById(state.editingNid);
+      console.log('todo dependency change: original note is ', note);
       const newDependency = note.todoDependency ? [...note.todoDependency] : [];
 
       const i = newDependency.indexOf(action.todoId);
@@ -719,7 +720,7 @@ export default function file(state, action) {
       } else {
         newDependency.splice(i, 1);
       }
-      console.log('context is ', action.context);
+
       console.log('new dependency ', newDependency);
 
       const newNote = { ...note };

@@ -153,7 +153,7 @@ export const UpdateNotePromise = (id, note) =>
     };
     noteDb.update({ _id: id }, dbNote, { upsert: true }, function (err, doc) {
       if (!err) {
-        resolve(doc);
+        resolve(true);
       } else {
         reject(err);
       }
