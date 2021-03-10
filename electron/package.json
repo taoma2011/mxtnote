@@ -1,5 +1,6 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "mxtnote",
+  "version": "0.1.0",
   "productName": "ElectronReact",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
   "scripts": {
