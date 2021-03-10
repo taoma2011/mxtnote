@@ -7,16 +7,29 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { selectTodos, selectEditingNote } from './selector';
+import { selectTodos, selectEditingNote, selectApi } from './selector';
 import * as ActionCreators from '../actions/ActionCreators';
+import { toggleTodoDependency } from '../utils/common';
+import { updateNote } from '../features/backend/backendSlice';
 
 export default function TodoDependency(props) {
   const todos = useSelector(selectTodos);
-  const { editingNid, editingNote } = useSelector(selectEditingNote);
+  const { dataApi } = useSelector(selectApi);
+  const { editingNoteId, editingNote } = useSelector(selectEditingNote);
   const dispatch = useDispatch();
   if (!editingNote) {
     return null;
   }
+  const handleDependencyChange = (todoId) => {
+    const newNote = toggleTodoDependency(dataApi, editingNoteId, todoId);
+    dispatch(
+      updateNote({
+        dataApi,
+        noteId: editingNoteId,
+        note: newNote,
+      })
+    );
+  };
   return (
     <List>
       {todos.map((todo, index) => {
@@ -30,9 +43,7 @@ export default function TodoDependency(props) {
                 checked={editingNote.todoDependency.indexOf(todo.id) !== -1}
                 tabIndex={-1}
                 disableRipple
-                onClick={() =>
-                  dispatch(ActionCreators.TodoDependencyChange(todo.id))
-                }
+                onClick={() => handleDependencyChange(todo.id)}
                 inputProps={{ 'aria-labelledby': checkboxLabel }}
               />
             </ListItemIcon>

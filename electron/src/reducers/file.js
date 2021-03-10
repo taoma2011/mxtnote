@@ -63,6 +63,8 @@ import {
   SET_API_STATE,
 } from '../actions/file';
 
+import { updateNote } from '../actions/ActionCreators';
+
 import { SetScale, GetSettings } from '../utils/db';
 /*
 import {
@@ -1082,6 +1084,7 @@ export default function file(state, action) {
       }
       return newState;
     }
+
     default:
       return state;
   }

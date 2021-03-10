@@ -152,3 +152,22 @@ export function generateId() {
     Math.random().toString(36).substring(2, 15)
   );
 }
+
+export function toggleTodoDependency(dataApi, noteId, todoId) {
+  const note = dataApi.GetNoteById(noteId);
+  console.log('todo dependency change: original note is ', note);
+  const newDependency = note.todoDependency ? [...note.todoDependency] : [];
+
+  const i = newDependency.indexOf(todoId);
+  if (i === -1) {
+    newDependency.push(todoId);
+  } else {
+    newDependency.splice(i, 1);
+  }
+
+  console.log('new dependency ', newDependency);
+
+  const newNote = { ...note };
+  newNote.todoDependency = newDependency;
+  return newNote;
+}

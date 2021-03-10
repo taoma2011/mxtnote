@@ -253,8 +253,9 @@ export const localNoteToRemoteNote = (cache, localNote) => {
     for (let k = 0; k < localNoteTags.length; k += 1) {
       const t = localNoteTags[k];
       const existingTag = cache.GetTodoById(t);
+      console.log(`checking ${t} got ${existingTag.description}`);
       if (existingTag) {
-        noteTags.push(existingTag.name);
+        noteTags.push(existingTag.description);
       }
     }
   }
