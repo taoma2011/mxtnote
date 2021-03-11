@@ -3,8 +3,13 @@ import { GetDocById, GetNoteById } from './db';
 import { scaleRect } from './common';
 
 const path = require('path');
-const fsPromises = require('fs').promises;
-const { remote } = require('electron');
+
+// TODO
+// const fsPromises = require('fs').promises;
+const fsPromises = null;
+
+// TODO
+// const { remote } = require('electron');
 
 pdfjs.GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.entry.js');
 

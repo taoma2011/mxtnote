@@ -8,7 +8,7 @@ import {
 } from '../actions/file';
 import NoteControl from '../components/NoteControl';
 import { doSync, mergeAndExport } from '../reducers/file';
-import { exportRemoteDb } from '../utils/api';
+// import { exportRemoteDb } from '../utils/api';
 
 function mapStateToProps(state) {
   const { file } = state;

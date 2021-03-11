@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
-import React, { useEffect } from "react";
-import { loadImageFromPdf } from "../utils/common";
+import React, { useEffect } from 'react';
+import { loadImageFromPdf } from '../utils/common';
 
 export default function LoadImage(props) {
   // eslint-disable-next-line react/prop-types
@@ -15,6 +15,7 @@ export default function LoadImage(props) {
   } = props;
 
   useEffect(() => {
+    /* TODO
     const { remote } = require("electron");
     const fs = remote.require("fs");
 
@@ -43,6 +44,7 @@ export default function LoadImage(props) {
         }
       });
     }
+    */
   }, [image, imageFile]);
 
   return null;

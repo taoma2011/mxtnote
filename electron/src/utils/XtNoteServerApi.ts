@@ -2,7 +2,7 @@ import axios from 'axios';
 import { OpenPdfData, GetPdfPage, getImageFromPdfPage } from './pdfutils';
 import { GetAllActiveDocuments } from './db';
 import { Document, Note, RuntimeDocument, Todo } from './interface';
-import { localNoteToRemoteNote, remoteNoteToLocalNote } from './api';
+import { localNoteToRemoteNote, remoteNoteToLocalNote } from './remoteMapping';
 
 const uuid = require('uuid');
 

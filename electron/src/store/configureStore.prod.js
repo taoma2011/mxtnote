@@ -5,17 +5,13 @@ import { createHashHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 
-const history = createHashHistory();
-const rootReducer = createRootReducer(history);
-const router = routerMiddleware(history);
+//const history = createHashHistory();
+const rootReducer = createRootReducer();
+const router = routerMiddleware();
 const enhancer = applyMiddleware(thunk, router);
 
 function configureStore(initialState) {
-  return createStore(
-    rootReducer,
-    initialState,
-    enhancer
-  );
+  return createStore(rootReducer, initialState, enhancer);
 }
 
-export default { configureStore, history };
+export default { configureStore };

@@ -26,7 +26,7 @@ import {
   TODO_TAB,
   SET_API_STATE,
 } from '../actions/file';
-import { getElectron } from '../utils/common';
+// import { getElectron } from '../utils/common';
 import { LoginDialog } from '../components/LoginDialog';
 import { AutoLogin } from '../components/AutoLogin';
 import { SetUserPass } from '../utils/db';
@@ -161,7 +161,7 @@ function App() {
 
   const handleCloseLoginDialog = () => {};
 
-  const { app } = getElectron();
+  // const { app } = getElectron();
 
   if (apiState === 'login-needed') {
     return (
@@ -193,7 +193,6 @@ function App() {
           >
             MxtNote
           </Typography>
-          <Typography>{app.getVersion()}</Typography>
 
           <Tabs
             value={currentTab}

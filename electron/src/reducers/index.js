@@ -7,7 +7,7 @@ import backend from '../features/backend/backendSlice';
 
 export default function createRootReducer(history) {
   return combineReducers({
-    router: connectRouter(history),
+    // router: connectRouter(history),
     file,
     search,
     backend,

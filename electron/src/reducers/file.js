@@ -103,15 +103,17 @@ import {
   scaleRect,
   isNewNote,
   generateId,
-  getElectron,
+  // getElectron,
 } from '../utils/common';
 
+/* TODO
 import {
   login,
   callLogin,
   callImportRemoteDb,
   callExportRemoteDb,
 } from '../utils/api';
+*/
 import { mergeVersions, newNode } from '../version/version';
 
 export async function doSync(dataApi) {
@@ -301,6 +303,7 @@ function setEditingNid(state, editingNid) {
 
 function exportStateToFile(state, f) {
   // eslint-disable-next-line global-require
+  /* TODO
   const { remote } = require('electron');
   const fs = remote.require('fs');
   console.log('before write file');
@@ -321,6 +324,7 @@ function exportStateToFile(state, f) {
   } catch (e) {
     console.log('Failed to save the file: ', e);
   }
+  */
 }
 
 export default function file(state, action) {
@@ -949,6 +953,7 @@ export default function file(state, action) {
       };
     }
     case IMPORT_NOTE: {
+      /* TODO
       console.log('export notes');
       const remote = getElectron();
       const fileList = remote.dialog.showOpenDialogSync();
@@ -985,9 +990,11 @@ export default function file(state, action) {
           }
         }
       }
+      */
       return state;
     }
     case EXPORT_NOTE: {
+      /* TODO
       console.log('export notes');
       // eslint-disable-next-line global-require
       const { remote } = require('electron');
@@ -996,6 +1003,7 @@ export default function file(state, action) {
       if (f) {
         exportStateToFile(state, f);
       }
+      */
       return state;
     }
     case BACKUP_DB: {

@@ -9,7 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import { getTodoId } from '../utils/common';
 
-import { callLogin } from '../utils/api';
+//import { callLogin } from '../utils/api';
 import { GetSettings, SetUserPass } from '../utils/db';
 
 import { LoginDialog } from './LoginDialog';
@@ -58,7 +58,8 @@ export default class NoteControl extends Component {
     const doLogin = async () => {
       const settings = await GetSettings();
       if (settings && settings.user && settings.password) {
-        await callLogin(settings.user, settings.password);
+        // TODO
+        // await callLogin(settings.user, settings.password);
         return true;
       }
       return false;

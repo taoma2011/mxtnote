@@ -27,6 +27,7 @@ export default function LibraryControl(props) {
 
   const handleSelect = () => {
     // eslint-disable-next-line global-require
+    /* TODO
     const { dialog } = require('electron').remote;
     const files = dialog.showOpenDialogSync();
     // const files = window.electron.dialog.showOpenDialogSync();
@@ -35,9 +36,10 @@ export default function LibraryControl(props) {
       console.log('open file ', files[0]);
       setFileName(files[0]);
     }
+    */
   };
 
-  const handleDescriptionChange = e => {
+  const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
