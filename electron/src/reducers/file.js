@@ -810,44 +810,34 @@ export default function file(state, action) {
       };
     }
     case IMPORT_NOTE: {
-      /* TODO
-      console.log('export notes');
-      const remote = getElectron();
-      const fileList = remote.dialog.showOpenDialogSync();
-
-      if (fileList) {
-        const f = fileList[0];
-        console.log('files is ', f);
-        const fs = remote.require('fs');
-        const content = fs.readFileSync(f, 'utf-8');
-        if (content) {
-          console.log('content is ', content);
-          try {
-            const obj = JSON.parse(content);
-            obj.files.forEach((doc) =>
-              dataApi.UpdateDocument(getFileId(doc), doc)
-            );
-            obj.notes.forEach((note) =>
-              dataApi.UpdateNote(getNoteId(note), note)
-            );
-            obj.todos.forEach((todo) =>
-              dataApi.UpdateTodo(getTodoId(todo), todo)
-            );
-            return {
-              ...state,
-              files: [],
-              libraryLoaded: false,
-              notes: {},
-              noteLoaded: false,
-              todos: [],
-              todoLoaded: false,
-            };
-          } catch (err) {
-            console.log(err);
-          }
+      const { content } = action;
+      if (content) {
+        console.log('content is ', content);
+        try {
+          const obj = JSON.parse(content);
+          obj.files.forEach((doc) =>
+            dataApi.UpdateDocument(getFileId(doc), doc)
+          );
+          obj.notes.forEach((note) =>
+            dataApi.UpdateNote(getNoteId(note), note)
+          );
+          obj.todos.forEach((todo) =>
+            dataApi.UpdateTodo(getTodoId(todo), todo)
+          );
+          return {
+            ...state,
+            files: [],
+            libraryLoaded: false,
+            notes: {},
+            noteLoaded: false,
+            todos: [],
+            todoLoaded: false,
+          };
+        } catch (err) {
+          console.log(err);
         }
       }
-      */
+
       return state;
     }
     case EXPORT_NOTE: {

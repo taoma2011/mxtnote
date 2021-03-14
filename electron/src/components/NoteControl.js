@@ -12,7 +12,7 @@ import { getTodoId } from '../utils/common';
 
 import { callLogin } from '../utils/api';
 import { GetSettings, SetUserPass } from '../utils/db';
-
+import { ElectronFileInputButton } from './ElectronFileInputButton';
 import { LoginDialog } from './LoginDialog';
 import { syncRemoteThunk } from '../utils/remote';
 
@@ -23,7 +23,12 @@ import {
   EXPORT_NOTE,
   OPEN_RESET_CONFIRM_DIALOG,
 } from '../actions/file';
-import { selectTodos, selectDataApi, selectNoteTodoFilter } from './selector';
+import {
+  selectTodos,
+  selectApi,
+  selectNoteTodoFilter,
+  selectIsWeb,
+} from './selector';
 
 export default function NoteControl(props) {
   const [afterLogin, setAfterLogin] = useState('');
@@ -35,7 +40,8 @@ export default function NoteControl(props) {
     noteTodoFilter = 'none';
   }
   const todos = useSelector(selectTodos);
-  const { dataApi } = useSelector(selectDataApi);
+  const { dataApi } = useSelector(selectApi);
+  const isWeb = useSelector(selectIsWeb);
   const dispatch = useDispatch();
   const filterChanged = (e) =>
     dispatch({ type: SET_NOTE_TODO_FILTER, todoId: e.target.value });
@@ -106,6 +112,10 @@ export default function NoteControl(props) {
     setOpenLoginDialog(false);
   };
 
+  const fileSelected = (name, content) => {
+    dispatch({ type: IMPORT_NOTE, content });
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item>
@@ -133,9 +143,7 @@ export default function NoteControl(props) {
       </Grid>
 
       <Grid item>
-        <Button variant="contained" color="primary" onClick={importNote}>
-          Import
-        </Button>
+        <ElectronFileInputButton label="Import" onFileSelected={fileSelected} />
       </Grid>
       <Grid item>
         <Button variant="contained" color="primary" onClick={exportNote}>

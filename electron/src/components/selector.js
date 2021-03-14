@@ -138,3 +138,5 @@ export const selectSelectRect = (state) => {
 
   return { showSelection, scaledRect };
 };
+
+export const selectIsWeb = (state) => state.file.isWeb;
