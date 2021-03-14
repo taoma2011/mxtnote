@@ -19,9 +19,6 @@ const getBaseUrl = () => {
   return BASE_URL;
 };
 
-const { ipcRenderer } = require('electron');
-const fs = require('fs');
-
 const version = require('../version/version');
 
 let token = null;
@@ -539,12 +536,14 @@ export const startIpcMain = () => {
 };
 
 export const startIpcRender = () => {
+  const { ipcRenderer } = require('electron');
   ipcRenderer.on('sync-progress', (event, arg) => {
     console.log(arg);
   });
 };
 
 export const callImportRemoteDb = async (arg) => {
+  const { ipcRenderer } = require('electron');
   try {
     //console.log("before calling import remote db");
     const result = await ipcRenderer.invoke('import-db-api', arg);
@@ -557,6 +556,7 @@ export const callImportRemoteDb = async (arg) => {
 };
 
 export const callExportRemoteDb = async (db) => {
+  const { ipcRenderer } = require('electron');
   try {
     const result = await ipcRenderer.invoke('export-db-api', db);
     return result;
@@ -567,7 +567,7 @@ export const callExportRemoteDb = async (db) => {
 };
 
 export const callLogin = async (username, password) => {
-  //const { ipcRenderer } = require("electron");
+  const { ipcRenderer } = require('electron');
   try {
     const result = await ipcRenderer.invoke('login-api', {
       username: username,
@@ -592,6 +592,7 @@ export function getLocalFileNameForRemoteFile(remoteFile) {
 const ensureRemoteFileDirectory = () => {
   var dir = remoteFileDirectory();
 
+  const fs = require('fs');
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }

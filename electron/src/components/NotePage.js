@@ -6,7 +6,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList as List } from 'react-window';
 import NotePanel from './NotePanel';
 import LoadNote from './LoadNote';
-import NoteControl from '../containers/NoteControl';
+import NoteControl from './NoteControl';
 import NoteEditorDialog from '../containers/NoteEditorDialog';
 import ResetConfirmDialog from '../containers/ResetConfirmDialog';
 import ResolveConflictDialog from '../containers/ResolveConflictDialog';

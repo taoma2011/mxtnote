@@ -34,6 +34,7 @@ import {
 
 export const NeoDbDataApi: DataApi = {
   cache: null,
+  IsLocal: () => true,
   Initialize: () => 'initialized',
   Login: () => {},
   GetAllActiveDocuments,
@@ -59,6 +60,7 @@ export const NeoDbDataApi: DataApi = {
 
 export const XtNoteServerDataApi: DataApi = {
   cache: null,
+  IsLocal: () => false,
   Initialize: ServerInitialize,
   Login: ServerLogin,
   GetAllActiveDocuments: ServerGetAllDocuments,
@@ -83,7 +85,7 @@ export const XtNoteServerDataApi: DataApi = {
   // UpdateNotePromise,
 };
 
-export function getDataApi(): DataApi {
-  //return NeoDbDataApi;
+export function getDataApi(isLocal: boolean): DataApi {
+  if (isLocal) return NeoDbDataApi;
   return XtNoteServerDataApi;
 }

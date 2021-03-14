@@ -52,6 +52,7 @@ export interface CacheApi {
 export interface DataApi {
   cache: CacheApi | null;
   Initialize(): string;
+  IsLocal(): boolean;
   Login(user: string, pass: string): void;
   GetAllActiveDocuments(): Promise<Document[]>;
   OpenDocument(doc: Document): Promise<RuntimeDocument>;

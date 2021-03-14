@@ -10,6 +10,7 @@ import NoteControl from '../components/NoteControl';
 import { doSync, mergeAndExport } from '../reducers/file';
 // import { exportRemoteDb } from '../utils/api';
 
+// obsolete
 function mapStateToProps(state) {
   const { file } = state;
   const { todos } = file || {};
@@ -19,15 +20,6 @@ function mapStateToProps(state) {
     dataApi: file.dataApi,
     noteTodoFilter: noteTodoFilter || 'none',
     todos,
-  };
-}
-
-function syncRemoteThunk(dataApi) {
-  return function (dispatch) {
-    return doSync(dataApi).then((result) => {
-      dispatch(result);
-      return true;
-    });
   };
 }
 

@@ -73,6 +73,12 @@ export const selectFilteredNotes = (state) => {
   return { notes: noteSummaryArray };
 };
 
+export const selectNoteTodoFilter = (state) => {
+  const { file } = state;
+  const { noteTodoFilter } = file || {};
+  return noteTodoFilter;
+};
+
 export const selectTodos = (state) => {
   const { dataApi, apiState } = state.file;
   if (apiState === 'ok') {
