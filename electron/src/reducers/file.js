@@ -170,8 +170,8 @@ function exportStateToFile(state, f) {
 }
 
 let useLocalDataApi = false;
-export function setDataApiType(isLocal) {
-  useLocalDataApi = isLocal;
+export function setUseLocalDataApi(b) {
+  useLocalDataApi = b;
 }
 
 let isWeb = false;

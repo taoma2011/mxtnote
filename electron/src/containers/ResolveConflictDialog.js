@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 // import { isNewNote } from '../utils/common';
 import ResolveConflictDialog from '../components/ResolveConflictDialog';
-import { doSync, mergeAndExport } from '../reducers/file';
+// import { doSync, mergeAndExport } from '../utils/remote';
 import { RESOLVE_DONE } from '../actions/file';
 
 function mapStateToProps(state) {

@@ -142,8 +142,12 @@ export function scaleRect(rect, decimalScale0) {
 }
 
 export function getElectron() {
+  /* WEB-INT */
+  /*
   const { remote } = require('electron');
   return remote;
+  */
+  return null;
 }
 
 export function generateId() {

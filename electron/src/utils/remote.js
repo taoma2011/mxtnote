@@ -7,7 +7,7 @@ import {
 
 import { mergeVersions, newNode } from '../version/version';
 
-function syncRemoteThunk(dataApi) {
+export function syncRemoteThunk(dataApi) {
   return function (dispatch) {
     return doSync(dataApi).then((result) => {
       dispatch(result);

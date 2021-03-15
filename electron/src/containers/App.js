@@ -31,6 +31,7 @@ import { LoginDialog } from '../components/LoginDialog';
 import { AutoLogin } from '../components/AutoLogin';
 import { SetUserPass } from '../utils/db';
 import { CreateCache } from '../utils/cache';
+import { selectIsWeb } from '../components/selector';
 
 /* this should be moved to the component directory */
 const drawerWidth = 240;
@@ -48,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: `#663399`,
   },
   drawerPaper: {
+    marginTop: '70px', // XXX
     width: drawerWidth,
   },
   content: {
@@ -99,6 +101,9 @@ function App() {
     selectProps,
     shallowEqual
   );
+
+  const isWeb = useSelector(selectIsWeb);
+  console.log('is web: ', isWeb);
 
   console.log('current tab = ', currentTab);
 
@@ -184,23 +189,31 @@ function App() {
     <div className={classes.root}>
       <CssBaseline />
 
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography
-            style={{ flex: 1 }}
-            variant="h6"
-            className={classes.title}
-          >
-            MxtNote
-          </Typography>
+      {isWeb ? (
+        <Tabs
+          value={currentTab}
+          onChange={handleChange}
+          aria-label="simple tabs example"
+        />
+      ) : (
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <Typography
+              style={{ flex: 1 }}
+              variant="h6"
+              className={classes.title}
+            >
+              MxtNote
+            </Typography>
 
-          <Tabs
-            value={currentTab}
-            onChange={handleChange}
-            aria-label="simple tabs example"
-          />
-        </Toolbar>
-      </AppBar>
+            <Tabs
+              value={currentTab}
+              onChange={handleChange}
+              aria-label="simple tabs example"
+            />
+          </Toolbar>
+        </AppBar>
+      )}
       <Drawer
         className={classes.drawer}
         variant="permanent"
