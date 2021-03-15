@@ -95,8 +95,18 @@ export const DeleteAllDocuments = () => {
   docDb.remove({}, { multi: true });
 };
 
-export const AddDocument = (doc) => {
-  docDb.insert(doc);
+export const AddDocument = async (doc) => {
+  let newDoc;
+  // local version don't need to save content
+  delete doc.content;
+  try {
+    newDoc = docDbP.insert(doc);
+  } catch (e) {
+    console.log('insert error: ', e);
+    return '';
+  }
+  // eslint-disable-next-line no-underscore-dangle
+  return newDoc._id;
 };
 
 export const UpdateDocument = (id, doc) => {

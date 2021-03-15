@@ -71,7 +71,7 @@ export default function FileList() {
                 <IconButton
                   edge="end"
                   aria-label="delete"
-                  onClick={() => deleteFile(getFileId(file))}
+                  onClick={() => setDeletingFileId(file.id)}
                 >
                   <DeleteIcon />
                 </IconButton>

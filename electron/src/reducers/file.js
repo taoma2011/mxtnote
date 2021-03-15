@@ -500,11 +500,14 @@ export default function file(state, action) {
       return newState;
     }
     case ADD_FILE: {
+      /*
       const newFile = {
         file: action.file,
         description: action.description,
+        content: action.content,
       };
       dataApi.AddDocument(newFile);
+      */
       return {
         ...state,
         files: [],
@@ -520,12 +523,8 @@ export default function file(state, action) {
       };
     }
     case DELETE_FILE: {
-      dataApi.DeleteDocument(action.fileId);
-      return {
-        ...state,
-        files: [],
-        libraryLoaded: false,
-      };
+      // dataApi.DeleteDocumentByFileId(action.fileId);
+      return state;
     }
     case ADD_TODO: {
       const newTodo = {

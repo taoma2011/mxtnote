@@ -30,6 +30,8 @@ import {
   ServerLoadNoteImage,
   ServerGetAllTodos,
   ServerUpdateNote,
+  ServerAddDocument,
+  ServerDeleteDocument,
 } from './XtNoteServerApi';
 
 export const NeoDbDataApi: DataApi = {
@@ -66,9 +68,11 @@ export const XtNoteServerDataApi: DataApi = {
   GetAllActiveDocuments: ServerGetAllDocuments,
   OpenDocument: ServerOpenDocument,
   GetDocumentPage: ServerGetPage,
-  AddDocument,
+  AddDocument: (file: any) =>
+    ServerAddDocument(XtNoteServerDataApi.cache)(file),
   UpdateDocument,
-  DeleteDocumentByFileId: DeleteDocument,
+  DeleteDocumentByFileId: (fileId: string) =>
+    ServerDeleteDocument(XtNoteServerDataApi.cache)(fileId),
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,

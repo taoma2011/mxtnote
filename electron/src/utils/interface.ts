@@ -46,6 +46,8 @@ export interface CacheApi {
   GetTodoByDescription(desc: string): Todo | null;
   GetTodoById(id: string): Todo | null;
   SetNoteById(id: string, note: Note): void;
+
+  FillFileCache(): void;
 }
 
 // TODO: implement 17 apis imported by reducers/file.js
@@ -57,7 +59,7 @@ export interface DataApi {
   GetAllActiveDocuments(): Promise<Document[]>;
   OpenDocument(doc: Document): Promise<RuntimeDocument>;
   GetDocumentPage(docHandle: any, pageNum: number): Promise<any>;
-  AddDocument(doc: Document): void;
+  AddDocument(doc: Document): Promise<string>;
   UpdateDocument(id: string, doc: Document): void;
   DeleteDocumentByFileId(fileId: string): void;
   DeleteAllDocuments(): void;

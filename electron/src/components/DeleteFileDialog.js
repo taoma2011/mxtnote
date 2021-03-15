@@ -15,13 +15,17 @@ export default function DeleteFileDialog(props) {
   const { dataApi } = useSelector(selectApi);
   const dispatch = useDispatch();
 
+  console.log('deleting file id is ', fileId);
   if (!fileId) {
     return null;
   }
   const file = dataApi.GetDocumentById(fileId);
   const { description } = file;
 
-  const deleteFile = () => {
+  const deleteFile = async () => {
+    await dataApi.DeleteDocumentByFileId(fileId);
+
+    onClose();
     dispatch({
       type: DELETE_FILE,
       fileId,

@@ -4,7 +4,7 @@ import React from 'react';
 
 import Paper from '@material-ui/core/Paper';
 
-import LibraryControl from '../containers/LibraryControl';
+import LibraryControl from './LibraryControl';
 import LoadNote from './LoadNote';
 import LoadSettings from '../containers/LoadSettings';
 import FileList from './FileList';

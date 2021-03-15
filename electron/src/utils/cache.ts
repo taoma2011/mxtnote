@@ -67,6 +67,11 @@ const setNoteById = (id: string, note: Note): void => {
   }
 };
 
+export const FillFileCache = async () => {
+  fileCache = await bApi.GetAllActiveDocuments();
+  console.log('file cache is refilled');
+};
+
 export const CreateCache = async (backendApi: any): Promise<DataApi> => {
   bApi = backendApi;
   const cache = {
@@ -80,12 +85,15 @@ export const CreateCache = async (backendApi: any): Promise<DataApi> => {
     GetTodoByDescription: getTodoByDescription,
     GetTodoById: getTodoById,
     SetNoteById: setNoteById,
+
+    FillFileCache,
   };
 
   // make the Get...ById api available to backend
   backendApi.cache = cache;
 
-  fileCache = await bApi.GetAllActiveDocuments();
+  await FillFileCache();
+
   todoCache = await bApi.GetAllTodos();
   noteCache = await bApi.GetAllActiveNotes();
   console.log('todo cache is ', todoCache);

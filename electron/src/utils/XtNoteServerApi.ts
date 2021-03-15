@@ -122,6 +122,109 @@ export const ServerLoadNoteImage = async (noteId: string) => {
   return null;
 };
 
+function getContentType(file: string) {
+  const extension = file.split('.').pop();
+  if (extension === 'pdf') {
+    return 'application/pdf';
+  }
+  if (extension === 'mobi') {
+    return 'application/x-mobipocket-ebook';
+  }
+  if (extension === 'djvu') {
+    return 'image/vnd.djvu';
+  }
+  return null;
+}
+
+export const ServerAddDocument = (cache: any) => async (
+  file: any
+): Promise<string> => {
+  const contentType = getContentType(file.file);
+  if (contentType == null) {
+    console.log('unsupported content type: ', file.file);
+    return '';
+  }
+  console.log('content type is ', contentType);
+  let newFileId;
+  try {
+    const res = await axios.get(`${getBaseUrl()}/notes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const createResult = await axios.post(
+      `${getBaseUrl()}/files/create`,
+      {
+        filename: file.description,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log('create result ', createResult);
+    newFileId = createResult.data.id;
+  } catch (e) {
+    console.log('file create error: ', e);
+    if (e.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(e.response.data);
+    }
+    return '';
+  }
+  const formData = new FormData();
+  try {
+    //console.log('content is ', file.content);
+    if (file.content instanceof File) {
+      formData.append('uploadFile', file.content);
+    } else {
+      const blob = new Blob([file.content], {
+        type: contentType,
+      });
+      formData.append('uploadFile', blob, file.description);
+    }
+    formData.set('id', newFileId);
+    // some platform doesnt set mime type in the file
+    formData.set('contentType', contentType);
+    const res = await axios.post(`${getBaseUrl()}/files/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('upload res: ', res);
+  } catch (e) {
+    console.log('file upload err', e);
+    if (e.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(e.response.data);
+    }
+    return '';
+  }
+  await cache.FillFileCache();
+  return newFileId;
+};
+
+export const ServerDeleteDocument = (cache: any) => async (
+  fileId: string
+): Promise<void> => {
+  console.log('server deleting file ', fileId);
+  try {
+    const deleteResult = await axios.delete(`${getBaseUrl()}/files/${fileId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    await cache.FillFileCache();
+  } catch (e) {
+    console.log('delete file error ', e);
+  }
+};
 /*
  * example note from server:
  *
