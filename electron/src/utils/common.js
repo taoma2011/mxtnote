@@ -2,6 +2,8 @@
 /* eslint-disable promise/catch-or-return */
 import * as pdfjs from 'pdfjs-dist';
 
+import { isWebApp } from './env';
+
 export function findFileById(files, id) {
   for (let i = 0; i < files.length; i += 1) {
     // eslint-disable-next-line no-underscore-dangle
@@ -143,11 +145,13 @@ export function scaleRect(rect, decimalScale0) {
 
 export function getElectron() {
   /* WEB-INT */
-  /*
-  const { remote } = require('electron');
+  if (isWebApp()) {
+    return null;
+  }
+  // this is so that it works for next.js
+  const { remote } = eval("require('electron')");
   return remote;
-  */
-  return null;
+
 }
 
 export function generateId() {

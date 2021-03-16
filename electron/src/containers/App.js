@@ -59,6 +59,30 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
 }));
 
+const useStylesWeb = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+    backgroundColor: `#663399`,
+  },
+  drawerPaper: {
+    marginTop: '70px',
+    width: drawerWidth,
+  },
+  content: {
+    // marginTop: 30,
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  toolbar: theme.mixins.toolbar,
+}));
+
 function TabPanel(props) {
   // eslint-disable-next-line react/prop-types
   const { children, value, index, ...other } = props;
@@ -94,19 +118,15 @@ function selectProps(state) {
   return { apiState, dataApi, libraryLoaded, todoLoaded, currentTab, setTab };
 }
 function App() {
-  const classes = useStyles();
+  const isWeb = useSelector(selectIsWeb);
+  console.log('is web: ', isWeb);
+  const classes = isWeb? useStylesWeb():useStyles();
 
   const { apiState, dataApi, todoLoaded, currentTab } = useSelector(
     selectProps,
     shallowEqual
   );
 
-  const isWeb = useSelector(selectIsWeb);
-  console.log('is web: ', isWeb);
-
-  if (isWeb) {
-    classes.drawerPaper.marginTop = '70px';
-  }
 
   console.log('current tab = ', currentTab);
 
