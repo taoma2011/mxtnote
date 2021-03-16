@@ -6,7 +6,7 @@ export const ElectronFileInputButton = (props) => {
   // eslint-disable-next-line react/prop-types
   const { label, onFileSelected } = props;
   const electronOpenFile = () => {
-    const remote = getElectron();
+    const { remote }  = getElectron();
     const fileList = remote.dialog.showOpenDialogSync();
     if (fileList) {
       const f = fileList[0];

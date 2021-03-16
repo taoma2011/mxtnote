@@ -53,9 +53,10 @@ export interface CacheApi {
 // TODO: implement 17 apis imported by reducers/file.js
 export interface DataApi {
   cache: CacheApi | null;
-  Initialize(): string;
+  Initialize(data: any): string;
   IsLocal(): boolean;
   Login(user: string, pass: string): void;
+  LoginWithToken(token: string): void;
   GetAllActiveDocuments(): Promise<Document[]>;
   OpenDocument(doc: Document): Promise<RuntimeDocument>;
   GetDocumentPage(docHandle: any, pageNum: number): Promise<any>;

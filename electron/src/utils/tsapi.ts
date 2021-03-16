@@ -23,6 +23,7 @@ import { Document, Note, RuntimeDocument, Todo, DataApi } from './interface';
 import {
   ServerInitialize,
   ServerLogin,
+  ServerLoginWithToken,
   ServerGetAllDocuments,
   ServerOpenDocument,
   ServerGetPage,
@@ -39,6 +40,7 @@ export const NeoDbDataApi: DataApi = {
   IsLocal: () => true,
   Initialize: () => 'initialized',
   Login: () => {},
+  LoginWithToken: ()=>{},
   GetAllActiveDocuments,
   OpenDocument: OpenPdfFile,
   GetDocumentPage: GetPdfPage,
@@ -65,6 +67,7 @@ export const XtNoteServerDataApi: DataApi = {
   IsLocal: () => false,
   Initialize: ServerInitialize,
   Login: ServerLogin,
+  LoginWithToken: ServerLoginWithToken,
   GetAllActiveDocuments: ServerGetAllDocuments,
   OpenDocument: ServerOpenDocument,
   GetDocumentPage: ServerGetPage,

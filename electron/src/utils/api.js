@@ -4,6 +4,10 @@ import {
   GetDocumentByUuidPromise,
 } from './db';
 
+import {
+  getElectron
+} from './common';
+
 // TODO
 // const { machineIdSync } = require('node-machine-id');
 
@@ -28,7 +32,7 @@ let remoteUserId = null;
 export const login = (args) =>
   new Promise((resolve, reject) => {
     console.log('in login');
-    const { net } = require('electron');
+    const { net } = getElectron();
     const postData = JSON.stringify(args);
     console.log('post data ', postData);
     const request = net.request({
@@ -58,7 +62,7 @@ export const login = (args) =>
 
 export const secureGet = (url) =>
   new Promise((resolve, reject) => {
-    const { net } = require('electron');
+    const { net } = getElectron();
     let responseStr = '';
     // console.log("111 url is ", url);
     const request = net.request({
@@ -87,7 +91,7 @@ export const secureGet = (url) =>
 
 export const securePost = (url, body) =>
   new Promise((resolve, reject) => {
-    const { net } = require('electron');
+    const { net } = getElectron();
     const postData = JSON.stringify(body);
     const request = net.request({
       method: 'POST',
@@ -119,14 +123,14 @@ export const securePost = (url, body) =>
 
 export const secureUploadFile = (url, id, description, fileData) =>
   new Promise((resolve, reject) => {
-    const { net } = require('electron');
+    const { net } = getElectron();
 
     const request = net.request({
       method: 'POST',
       url,
     });
 
-    const FormData = require('form-data');
+    const FormData = eval("require('form-data')");
 
     const form = new FormData();
     form.append('id', id);
@@ -162,7 +166,7 @@ export const secureUploadFile = (url, id, description, fileData) =>
 
 export const secureDownloadFile = (url, file) =>
   new Promise((resolve, reject) => {
-    const { net } = require('electron');
+    const { net } = getElectron();
 
     const request = net.request({
       url,
@@ -515,7 +519,7 @@ const createRemoteNote = async (note) => {
 };
 
 export const startIpcMain = () => {
-  const { ipcMain } = require('electron');
+  const { ipcMain } = getElectron();
   ipcMain.handle('login-api', async (event, args) => {
     console.log(args);
     const response = await login(args);
@@ -536,14 +540,14 @@ export const startIpcMain = () => {
 };
 
 export const startIpcRender = () => {
-  const { ipcRenderer } = require('electron');
+  const { ipcRenderer } = getElectron();
   ipcRenderer.on('sync-progress', (event, arg) => {
     console.log(arg);
   });
 };
 
 export const callImportRemoteDb = async (arg) => {
-  const { ipcRenderer } = require('electron');
+  const { ipcRenderer } = getElectron();
   try {
     //console.log("before calling import remote db");
     const result = await ipcRenderer.invoke('import-db-api', arg);
@@ -556,7 +560,7 @@ export const callImportRemoteDb = async (arg) => {
 };
 
 export const callExportRemoteDb = async (db) => {
-  const { ipcRenderer } = require('electron');
+  const { ipcRenderer } = getElectron();
   try {
     const result = await ipcRenderer.invoke('export-db-api', db);
     return result;
@@ -567,7 +571,7 @@ export const callExportRemoteDb = async (db) => {
 };
 
 export const callLogin = async (username, password) => {
-  const { ipcRenderer } = require('electron');
+  const { ipcRenderer } = getElectron();
   try {
     const result = await ipcRenderer.invoke('login-api', {
       username: username,
@@ -580,7 +584,7 @@ export const callLogin = async (username, password) => {
 };
 
 const remoteFileDirectory = () => {
-  const app = require('electron').app;
+  const app = getElectron().app;
   const retPath = app.getPath('appData') + '/remote_files/';
   //console.log("remote file path = ", retPath);
   return retPath;
@@ -592,7 +596,7 @@ export function getLocalFileNameForRemoteFile(remoteFile) {
 const ensureRemoteFileDirectory = () => {
   var dir = remoteFileDirectory();
 
-  const fs = require('fs');
+  const fs = eval("require('fs')");
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -600,7 +604,7 @@ const ensureRemoteFileDirectory = () => {
 
 export async function downloadRemoteFile(remoteFile) {
   const http = require('http');
-  const fs = require('fs');
+  const fs = eval("require('fs')");
   ensureRemoteFileDirectory();
   const localFile = fs.createWriteStream(
     getLocalFileNameForRemoteFile(remoteFile)

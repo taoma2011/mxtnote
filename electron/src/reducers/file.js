@@ -89,7 +89,7 @@ import {
 */
 
 import { getDataApi } from '../utils/tsapi';
-import { isWebApp, isUseLocalDataApi } from '../utils/env';
+import { isWebApp, isUseLocalDataApi, getInitialToken } from '../utils/env';
 import {
   findFileById,
   replaceFileById,
@@ -171,7 +171,7 @@ function exportStateToFile(state, f) {
 
 export function getInitialState() {
   const dataApi = getDataApi(isUseLocalDataApi());
-  const apiState = dataApi.Initialize();
+  const apiState = dataApi.Initialize(getInitialToken());
 
   return {
     currentTab: 2,

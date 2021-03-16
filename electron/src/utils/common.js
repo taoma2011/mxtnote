@@ -143,14 +143,14 @@ export function scaleRect(rect, decimalScale0) {
   };
 }
 
+
 export function getElectron() {
   /* WEB-INT */
   if (isWebApp()) {
     return null;
   }
   // this is so that it works for next.js
-  const { remote } = eval("require('electron')");
-  return remote;
+  return eval("require('electron')");
 
 }
 

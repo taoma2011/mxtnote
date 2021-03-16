@@ -15,9 +15,21 @@ const getBaseUrl = () => {
 
 let token: any;
 
-export const ServerInitialize = () => {
+
+export const ServerInitialize = (initialToken: string) => {
   // check if we have saved token
+  console.log("initial token is ", initialToken);
+  if (initialToken) {
+    token = initialToken;
+    return 'initialized';
+  }
   return 'login-needed';
+};
+
+
+export const ServerLoginWithToken =  (t: string) => {
+  // should verify the token
+  token = t;
 };
 
 export const ServerLogin = async (user: string, pass: string) => {

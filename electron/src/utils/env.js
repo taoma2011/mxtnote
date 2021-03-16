@@ -12,3 +12,11 @@ export function setWebApp(b) {
 export function isWebApp() {
   return isWeb;
 }
+
+let initialToken;
+export function setInitialToken(t) {
+  initialToken = t;
+}
+export function getInitialToken() {
+  return initialToken;
+}

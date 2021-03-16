@@ -10,11 +10,11 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import { getTodoId } from '../utils/common';
 
-// import { callLogin } from '../utils/api';
+import { callLogin } from '../utils/api';
 import { GetSettings, SetUserPass } from '../utils/db';
 import { ElectronFileInputButton } from './ElectronFileInputButton';
 import { LoginDialog } from './LoginDialog';
-// import { syncRemoteThunk } from '../utils/remote';
+import { syncRemoteThunk } from '../utils/remote';
 
 import {
   SET_NOTE_TODO_FILTER,
@@ -72,16 +72,15 @@ export default function NoteControl(props) {
   const doLogin = async () => {
     const settings = await GetSettings();
     if (settings && settings.user && settings.password) {
-      // TODO
-      // await callLogin(settings.user, settings.password);
+
+      await callLogin(settings.user, settings.password);
       return true;
     }
     return false;
   };
 
   const doImportNoteFromRemote = async () => {
-    /* WEB-INT */
-    /*
+
     const ok = await doLogin();
     if (!ok) {
       setAfterLogin('import-note');
@@ -92,12 +91,11 @@ export default function NoteControl(props) {
       console.log('auto login ok');
       importNoteFromRemote(dataApi);
     }
-    */
+
   };
 
   const loginWithNewUserPass = async (user, pass) => {
-    /* WEB-INT */
-    /*
+
     const ok = await callLogin(user, pass);
     if (ok) {
       setLoginFailed(false);
@@ -111,7 +109,7 @@ export default function NoteControl(props) {
     } else {
       setLoginFailed(true);
     }
-    */
+
   };
 
   const handleClose = () => {
@@ -138,6 +136,8 @@ export default function NoteControl(props) {
         </FormControl>
       </Grid>
 
+     { isWeb ||
+     <>
       <Grid item>
         <Button
           variant="contained"
@@ -162,6 +162,8 @@ export default function NoteControl(props) {
           Reset Db
         </Button>
       </Grid>
+      </>
+}
       <LoginDialog
         open={openLoginDialog}
         loginFailed={loginFailed}

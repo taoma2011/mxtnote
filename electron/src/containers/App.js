@@ -117,7 +117,7 @@ function selectProps(state) {
   } = state.file;
   return { apiState, dataApi, libraryLoaded, todoLoaded, currentTab, setTab };
 }
-function App() {
+function App(props) {
   const isWeb = useSelector(selectIsWeb);
   console.log('is web: ', isWeb);
   const classes = isWeb? useStylesWeb():useStyles();
@@ -126,11 +126,23 @@ function App() {
     selectProps,
     shallowEqual
   );
+  const { initialToken } = props;
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    if (initialToken) {
+      console.log("set initial token ", initialToken);
+      dataApi.LoginWithToken(initialToken);
+      dispatch({
+        type: SET_API_STATE,
+        apiState: 'initialized',
+      });
+    }
+  },[]);
 
 
   console.log('current tab = ', currentTab);
 
-  const dispatch = useDispatch();
+
   const setTab = (tab) => {
     return dispatch({
       type: SET_TAB,
