@@ -1,3 +1,5 @@
+
+/*
 import {
   app,
   Menu,
@@ -5,11 +7,33 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
+*/
 
+import { getElectron } from './utils/common';
+
+const {
+  app,
+  Menu,
+  shell,
+
+}  = getElectron();
+
+/* WEB-INT */
+/*
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
+*/
+interface DarwinMenuItemConstructorOptions {};
+interface BrowserWindow {
+  webContents: any,
+  setFullScreen: any,
+  isFullScreen: any,
+  close: any,
+};
+interface Menu {};
+interface  MenuItemConstructorOptions {};
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;

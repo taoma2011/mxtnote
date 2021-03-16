@@ -11,11 +11,14 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+// import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { startIpcMain, startIpcRender } from './utils/api';
+import { getElectron } from './utils/common';
+
+const { app , BrowserWindow, shell } = getElectron();
 
 export default class AppUpdater {
   constructor() {
@@ -25,7 +28,7 @@ export default class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: any = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -60,9 +63,13 @@ const createWindow = async () => {
     await installExtensions();
   }
 
+  /* WEB-INT */
+  /*
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../assets');
+  */
+ const RESOURCES_PATH = "";
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
