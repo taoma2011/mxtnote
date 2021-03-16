@@ -89,7 +89,7 @@ import {
 */
 
 import { getDataApi } from '../utils/tsapi';
-
+import { isWebApp, isUseLocalDataApi } from '../utils/env';
 import {
   findFileById,
   replaceFileById,
@@ -169,18 +169,8 @@ function exportStateToFile(state, f) {
   */
 }
 
-let useLocalDataApi = false;
-export function setUseLocalDataApi(b) {
-  useLocalDataApi = b;
-}
-
-let isWeb = false;
-export function setWebApp(b) {
-  isWeb = b;
-}
-
 export function getInitialState() {
-  const dataApi = getDataApi(useLocalDataApi);
+  const dataApi = getDataApi(isUseLocalDataApi());
   const apiState = dataApi.Initialize();
 
   return {
@@ -194,7 +184,7 @@ export function getInitialState() {
     openResetConfirmDialog: false,
     apiState,
     dataApi,
-    isWeb,
+    isWeb: isWebApp(),
   };
 }
 

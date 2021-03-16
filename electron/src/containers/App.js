@@ -49,11 +49,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: `#663399`,
   },
   drawerPaper: {
-    marginTop: '70px', // XXX
     width: drawerWidth,
   },
   content: {
-    marginTop: 30,
+    // marginTop: 30,
     flexGrow: 1,
     padding: theme.spacing(3),
   },
@@ -104,6 +103,10 @@ function App() {
 
   const isWeb = useSelector(selectIsWeb);
   console.log('is web: ', isWeb);
+
+  if (isWeb) {
+    classes.drawerPaper.marginTop = '70px';
+  }
 
   console.log('current tab = ', currentTab);
 
