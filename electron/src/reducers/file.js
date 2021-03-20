@@ -103,7 +103,8 @@ import {
   scaleRect,
   isNewNote,
   generateId,
-  // getElectron,
+  getElectron,
+  getFs,
 } from '../utils/common';
 
 function saveLastPageNumber(dataApi, state) {
@@ -145,8 +146,8 @@ function setEditingNid(state, editingNid) {
 
 function exportStateToFile(state, f) {
   // eslint-disable-next-line global-require
-  /* TODO
-  const { remote } = require('electron');
+
+  const { remote } = getElectron();
   const fs = remote.require('fs');
   console.log('before write file');
 
@@ -166,7 +167,6 @@ function exportStateToFile(state, f) {
   } catch (e) {
     console.log('Failed to save the file: ', e);
   }
-  */
 }
 
 export function getInitialState() {
@@ -830,16 +830,14 @@ export default function file(state, action) {
       return state;
     }
     case EXPORT_NOTE: {
-      /* TODO
       console.log('export notes');
       // eslint-disable-next-line global-require
-      const { remote } = require('electron');
+      const { remote } = getElectron();
       const f = remote.dialog.showSaveDialogSync();
 
       if (f) {
         exportStateToFile(state, f);
       }
-      */
       return state;
     }
     case BACKUP_DB: {

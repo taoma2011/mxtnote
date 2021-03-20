@@ -17,8 +17,9 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { startIpcMain, startIpcRender } from './utils/api';
 import { getElectron } from './utils/common';
+import { setUseLocalDataApi } from './utils/env';
 
-const { app , BrowserWindow, shell } = getElectron();
+const { app, BrowserWindow, shell } = getElectron();
 
 export default class AppUpdater {
   constructor() {
@@ -69,7 +70,7 @@ const createWindow = async () => {
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../assets');
   */
- const RESOURCES_PATH = "";
+  const RESOURCES_PATH = '';
 
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);

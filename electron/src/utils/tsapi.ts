@@ -40,7 +40,7 @@ export const NeoDbDataApi: DataApi = {
   IsLocal: () => true,
   Initialize: () => 'initialized',
   Login: () => {},
-  LoginWithToken: ()=>{},
+  LoginWithToken: () => {},
   GetAllActiveDocuments,
   OpenDocument: OpenPdfFile,
   GetDocumentPage: GetPdfPage,
@@ -93,6 +93,7 @@ export const XtNoteServerDataApi: DataApi = {
 };
 
 export function getDataApi(isLocal: boolean): DataApi {
+  console.log('get data api, local = ', isLocal);
   if (isLocal) return NeoDbDataApi;
   return XtNoteServerDataApi;
 }

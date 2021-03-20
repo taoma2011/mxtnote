@@ -1,5 +1,6 @@
 let useLocalDataApi = false;
 export function setUseLocalDataApi(b) {
+  console.log('set use local data api to ', b);
   useLocalDataApi = b;
 }
 export function isUseLocalDataApi() {

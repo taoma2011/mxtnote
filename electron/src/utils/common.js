@@ -143,7 +143,6 @@ export function scaleRect(rect, decimalScale0) {
   };
 }
 
-
 export function getElectron() {
   /* WEB-INT */
   if (isWebApp()) {
@@ -151,7 +150,15 @@ export function getElectron() {
   }
   // this is so that it works for next.js
   return eval("require('electron')");
+}
 
+export function getFs() {
+  /* WEB-INT */
+  if (isWebApp()) {
+    return null;
+  }
+  // this is so that it works for next.js
+  return eval("require('fs')");
 }
 
 export function generateId() {

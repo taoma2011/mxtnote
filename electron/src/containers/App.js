@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect, useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,12 +13,19 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
 import FilePage from './FilePage';
 import NotePage from '../components/NotePage';
 import LoadLibrary from '../components/LoadLibrary2';
 import LoadTodo from './LoadTodo';
 import LibraryPage from './LibraryPage';
 import TodoPage from './TodoPage';
+import SettingsDialog from '../components/SettingsDialog';
+
 import {
   SET_TAB,
   NOTE_TAB,
@@ -32,6 +39,7 @@ import { AutoLogin } from '../components/AutoLogin';
 import { SetUserPass } from '../utils/db';
 import { CreateCache } from '../utils/cache';
 import { selectIsWeb } from '../components/selector';
+import { isUseLocalDataApi } from '../utils/env';
 
 /* this should be moved to the component directory */
 const drawerWidth = 240;
@@ -120,28 +128,28 @@ function selectProps(state) {
 function App(props) {
   const isWeb = useSelector(selectIsWeb);
   console.log('is web: ', isWeb);
-  const classes = isWeb? useStylesWeb():useStyles();
+  const classes = isWeb ? useStylesWeb() : useStyles();
 
   const { apiState, dataApi, todoLoaded, currentTab } = useSelector(
     selectProps,
     shallowEqual
   );
+
+  // this is used in the web version, we could already login from other place and have a token
   const { initialToken } = props;
   const dispatch = useDispatch();
-  useEffect(()=>{
+  useEffect(() => {
     if (initialToken) {
-      console.log("set initial token ", initialToken);
+      console.log('set initial token ', initialToken);
       dataApi.LoginWithToken(initialToken);
       dispatch({
         type: SET_API_STATE,
         apiState: 'initialized',
       });
     }
-  },[]);
-
+  }, []);
 
   console.log('current tab = ', currentTab);
-
 
   const setTab = (tab) => {
     return dispatch({
@@ -185,6 +193,10 @@ function App(props) {
 
   const openLoginDialog = apiState === 'login-needed';
   const [loginFailed, setLoginFailed] = React.useState(false);
+
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
+
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
 
   const handleLogin = async (user, pass) => {
     // eslint-disable-next-line react/prop-types
@@ -233,6 +245,15 @@ function App(props) {
       ) : (
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+              onClick={(e) => setMenuAnchorEl(e.currentTarget)}
+            >
+              <MenuIcon />
+            </IconButton>
             <Typography
               style={{ flex: 1 }}
               variant="h6"
@@ -241,12 +262,31 @@ function App(props) {
               MxtNote
             </Typography>
 
+            <Typography>
+              {isUseLocalDataApi() ? '(offline mode)' : '(online mode)'}
+            </Typography>
+
             <Tabs
               value={currentTab}
               onChange={handleChange}
               aria-label="simple tabs example"
             />
           </Toolbar>
+          <Menu
+            id="simple-menu"
+            anchorEl={menuAnchorEl}
+            keepMounted
+            open={Boolean(menuAnchorEl)}
+            onClose={() => setMenuAnchorEl(null)}
+          >
+            <MenuItem onClick={() => setSettingsDialogOpen(true)}>
+              Settings
+            </MenuItem>
+          </Menu>
+          <SettingsDialog
+            open={settingsDialogOpen}
+            onClose={() => setSettingsDialogOpen(false)}
+          />
         </AppBar>
       )}
       <Drawer
