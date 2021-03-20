@@ -62,7 +62,6 @@ export const NotePage = () => {
 
   return (
     <div style={{ height: '100%' }}>
-      <BackupDb />
       <NoteControl />
       <Paper height="100%" style={{ height: '100%' }}>
         <AutoSizer>

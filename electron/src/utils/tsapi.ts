@@ -3,6 +3,7 @@ import {
   AddDocument,
   UpdateDocument,
   DeleteDocument,
+  LocalDeleteDocument,
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,
@@ -46,7 +47,8 @@ export const NeoDbDataApi: DataApi = {
   GetDocumentPage: GetPdfPage,
   AddDocument,
   UpdateDocument,
-  DeleteDocumentByFileId: DeleteDocument,
+  DeleteDocumentByFileId: (fileId: string) =>
+    LocalDeleteDocument(NeoDbDataApi.cache)(fileId),
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,

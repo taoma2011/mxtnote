@@ -113,6 +113,17 @@ export const UpdateDocument = (id, doc) => {
   docDb.update({ _id: id }, doc, { upsert: true });
 };
 
+export const LocalDeleteDocument = (cache) => async (fileId) => {
+  try {
+    await docDbP.remove({ id: fileId }, { multi: true });
+  } catch (e) {
+    console.log('delete file exception: ', e);
+    return;
+  }
+  console.log('delete locally, refresh cache');
+  await cache.FillFileCache();
+};
+
 export const DeleteDocument = (fileId) => {
   docDb.remove({ _id: fileId }, { multi: true });
 };

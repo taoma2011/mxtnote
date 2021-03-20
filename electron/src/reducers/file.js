@@ -144,23 +144,17 @@ function setEditingNid(state, editingNid) {
   };
 }
 
-function exportStateToFile(state, f) {
+function exportStateToFile(dataApi, state, f) {
   // eslint-disable-next-line global-require
 
   const { remote } = getElectron();
   const fs = remote.require('fs');
   console.log('before write file');
 
-  // probaby add an option to save image files too
-  const saveNotes = Object.values(state.notes).map((n) => ({
-    ...n,
-    image: null,
-    imageFile: null,
-  }));
   const saveObjects = {
-    files: state.files,
-    notes: saveNotes,
-    todos: state.todos,
+    files: dataApi.GetCachedDocuments(),
+    notes: dataApi.GetCachedNotes(),
+    todos: dataApi.GetCachedTodos(),
   };
   try {
     fs.writeFileSync(f, JSON.stringify(saveObjects, null, 2), 'utf-8');
@@ -836,13 +830,13 @@ export default function file(state, action) {
       const f = remote.dialog.showSaveDialogSync();
 
       if (f) {
-        exportStateToFile(state, f);
+        exportStateToFile(dataApi, state, f);
       }
       return state;
     }
     case BACKUP_DB: {
       console.log('backup db');
-      exportStateToFile(state, 'db_backup.json');
+      exportStateToFile(dataApi, state, 'db_backup.json');
       return state;
     }
     case OPEN_RESET_CONFIRM_DIALOG: {

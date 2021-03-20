@@ -25,6 +25,7 @@ import LoadTodo from './LoadTodo';
 import LibraryPage from './LibraryPage';
 import TodoPage from './TodoPage';
 import SettingsDialog from '../components/SettingsDialog';
+import BackupDb from './BackupDb';
 
 import {
   SET_TAB,
@@ -259,7 +260,7 @@ function App(props) {
               variant="h6"
               className={classes.title}
             >
-              MxtNote
+              MXTNote
             </Typography>
 
             <Typography>
@@ -343,6 +344,7 @@ function App(props) {
             <TodoPage />
           </TabPanel>
         </div>
+        {isUseLocalDataApi() && <BackupDb />}
       </main>
     </div>
   );
