@@ -10,7 +10,7 @@ import { scaleRect } from '../utils/common';
 
 import { selectApi } from './selector';
 
-export const PageWrapper = (props) => {
+export const PageWrapper = React.memo((props) => {
   const [page, setPage] = React.useState(null);
 
   const { dataApi, apiState } = useSelector(selectApi);
@@ -92,7 +92,7 @@ export const PageWrapper = (props) => {
   }
 
   return <p>loading page</p>;
-};
+});
 
 PageWrapper.propTypes = {
   pageNum: PropTypes.number.isRequired,

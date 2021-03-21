@@ -71,11 +71,13 @@ export interface DataApi {
   DeleteTodo(id: string): void;
   UpdateNote(id: string, note: Note): Promise<boolean>;
   DeleteNote(id: string): Promise<boolean>;
+
+  DeleteSettings(): void;
+
   GetAllDocumentsPromise(): Promise<Document>;
   GetAllActiveNotes(): Promise<any>;
   GetAllTodos(): Promise<Todo[]>;
   GetNoteByUuid(id: string): Promise<Note>;
-  // UpdateNotePromise(id: string, note: Note): Promise<Note>;
 
   GetCachedDocuments?(): Document[];
   GetCachedNotes?(): Note[];

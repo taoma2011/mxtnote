@@ -15,6 +15,7 @@ import {
   GetAllNotesPromise,
   GetAllTodosPromise,
   GetNoteByUuid,
+  DeleteSettings,
   UpdateNotePromise,
 } from './db';
 
@@ -55,10 +56,16 @@ export const NeoDbDataApi: DataApi = {
   DeleteAllTodos,
   UpdateTodo,
   DeleteTodo,
+
+  // is this still needed?
   LoadNoteImage,
+
   UpdateNote: (noteId: string, note: Note) =>
     LocalUpdateNote(NeoDbDataApi.cache)(noteId, note),
   DeleteNote: (noteId: string) => LocalDeleteNote(NeoDbDataApi.cache)(noteId),
+
+  DeleteSettings,
+
   GetAllDocumentsPromise,
   GetAllActiveNotes: GetAllNotesPromise,
   GetAllTodos: GetAllTodosPromise,
@@ -77,7 +84,9 @@ export const XtNoteServerDataApi: DataApi = {
   GetDocumentPage: ServerGetPage,
   AddDocument: (file: any) =>
     ServerAddDocument(XtNoteServerDataApi.cache)(file),
-  UpdateDocument,
+  UpdateDocument: () => {
+    console.log('not supported');
+  },
   DeleteDocumentByFileId: (fileId: string) =>
     ServerDeleteDocument(XtNoteServerDataApi.cache)(fileId),
   DeleteAllDocuments,
@@ -89,6 +98,8 @@ export const XtNoteServerDataApi: DataApi = {
   UpdateNote: (id: string, note: Note) =>
     ServerUpdateNote(XtNoteServerDataApi.cache)(id, note),
   DeleteNote: (id: string) => ServerDeleteNote(XtNoteServerDataApi.cache)(id),
+
+  DeleteSettings: () => {},
   GetAllDocumentsPromise,
   GetAllActiveNotes: () => ServerGetAllNotes(XtNoteServerDataApi.cache),
   GetAllTodos: ServerGetAllTodos,

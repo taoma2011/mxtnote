@@ -110,6 +110,9 @@ export const AddDocument = async (doc) => {
 };
 
 export const UpdateDocument = (id, doc) => {
+  if (id) {
+    doc.id = id;
+  }
   docDb.update({ _id: id }, doc, { upsert: true });
 };
 

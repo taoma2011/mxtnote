@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useRef, useEffect } from 'react';
-import { useSelector, shallowEqual } from 'react-redux';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import { FixedSizeList as List } from 'react-window';
@@ -15,7 +15,12 @@ import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
 import { selectSearchText } from '../features/search/searchSlice';
-import { selectNotes, selectCurrentFile } from './selector';
+import {
+  selectNotes,
+  selectCurrentFile,
+  selectFilePageProps,
+} from './selector';
+import { updatePageScroll } from '../actions/file';
 
 export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
@@ -32,8 +37,9 @@ export const FilePage = (props) => {
     settingsLoaded,
     pageWidth,
     pageHeight,
-    updatePageScroll,
-  } = props;
+  } = useSelector(selectFilePageProps, shallowEqual);
+  const dispatch = useDispatch();
+  console.log('page height = ', pageHeight);
 
   const notes = useSelector(selectNotes, shallowEqual);
   const { currentFile } = useSelector(selectCurrentFile, shallowEqual);
@@ -72,7 +78,7 @@ export const FilePage = (props) => {
       const newPageNum = Math.floor((scrollOffset + 1) / pageHeight) + 1;
       if (newPageNum !== pageNum) {
         console.log('update page scroll: ', newPageNum);
-        updatePageScroll(newPageNum);
+        dispatch(updatePageScroll(newPageNum));
       }
     }
   };

@@ -18,7 +18,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
-import FilePage from './FilePage';
+import FilePage from '../components/FilePage';
 import NotePage from '../components/NotePage';
 import LoadLibrary from '../components/LoadLibrary2';
 import LoadTodo from './LoadTodo';

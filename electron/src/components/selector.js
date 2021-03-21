@@ -140,3 +140,42 @@ export const selectSelectRect = (state) => {
 };
 
 export const selectIsWeb = (state) => state.file.isWeb;
+
+export const selectFilePageProps = (state) => {
+  const { file, search } = state;
+  const {
+    scale,
+    pageNum,
+    numPages,
+    fileId,
+    doc,
+    docLoading,
+    noteLoaded,
+    pageWidth,
+    pageHeight,
+  } = file || {};
+  const { searchResults } = search || {};
+
+  let status = 'loading';
+  let message;
+  if (!doc) {
+    message = 'loading document';
+  } else {
+    status = 'ready';
+  }
+
+  return {
+    status,
+    message,
+    doc,
+    docLoading,
+    pageNum,
+    numPages,
+    fileId,
+    scale,
+    searchResults,
+    noteLoaded,
+    pageWidth,
+    pageHeight,
+  };
+};

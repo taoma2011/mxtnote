@@ -5,6 +5,7 @@ import { sizing } from '@material-ui/system';
 import { FilePage } from '../components/FilePage';
 import * as FileActions from '../actions/file';
 
+// will be obsolete
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
   const { file, search } = state;
