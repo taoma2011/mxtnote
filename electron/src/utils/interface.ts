@@ -70,7 +70,7 @@ export interface DataApi {
   UpdateTodo(id: string, todo: Todo): void;
   DeleteTodo(id: string): void;
   UpdateNote(id: string, note: Note): Promise<boolean>;
-  DeleteNote(id: string): void;
+  DeleteNote(id: string): Promise<boolean>;
   GetAllDocumentsPromise(): Promise<Document>;
   GetAllActiveNotes(): Promise<any>;
   GetAllTodos(): Promise<Todo[]>;

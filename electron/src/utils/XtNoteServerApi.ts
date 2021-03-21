@@ -15,10 +15,9 @@ const getBaseUrl = () => {
 
 let token: any;
 
-
 export const ServerInitialize = (initialToken: string) => {
   // check if we have saved token
-  console.log("initial token is ", initialToken);
+  console.log('initial token is ', initialToken);
   if (initialToken) {
     token = initialToken;
     return 'initialized';
@@ -26,8 +25,7 @@ export const ServerInitialize = (initialToken: string) => {
   return 'login-needed';
 };
 
-
-export const ServerLoginWithToken =  (t: string) => {
+export const ServerLoginWithToken = (t: string) => {
   // should verify the token
   token = t;
 };
@@ -312,6 +310,31 @@ export const ServerUpdateNote = (cache: any) => async (
     console.log('get all notes error ', e);
   }
   return false;
+};
+
+export const ServerDeleteNote = (cache: any) => async (
+  id: string
+): Promise<boolean> => {
+  if (!token) {
+    return false;
+  }
+
+  console.log('deleting  note ', id);
+
+  try {
+    const res = await axios.delete(`${getBaseUrl()}/notes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+  } catch (e) {
+    console.log('delete note error ', e);
+    return false;
+  }
+  cache.FillNoteCache();
+  return true;
 };
 
 export const ServerGetAllTodos = async (): Promise<Todo[]> => {

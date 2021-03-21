@@ -181,6 +181,17 @@ export const UpdateNotePromise = (id, note) =>
     });
   });
 
+export const LocalUpdateNote = (cache) => async (id, note) => {
+  try {
+    await UpdateNotePromise(id, note);
+  } catch (e) {
+    console.log('update note exception ', e);
+    return false;
+  }
+  await cache.FillNoteCache();
+  return true;
+};
+
 export const UpdateNote = (id, note, cb) => {
   // eslint-disable-next-line no-underscore-dangle
   const dbNote = {
@@ -205,6 +216,18 @@ export const UpdateNote = (id, note, cb) => {
 export const DeleteNote = (noteId) => {
   //noteDb.remove({ _id: noteId }, { multi: true });
   noteDb.update({ _id: noteId }, { deleted: true });
+};
+
+export const LocalDeleteNote = (cache) => async (noteId) => {
+  try {
+    await noteDbP.remove({ _id: noteId });
+  } catch (e) {
+    console.log('delete note exception: ', e);
+    return false;
+  }
+  console.log('delete locally, refresh cache');
+  await cache.FillNoteCache();
+  return true;
 };
 
 export const GetAllActiveNotes = (handleNote) => {

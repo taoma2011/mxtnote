@@ -736,28 +736,15 @@ export default function file(state, action) {
       };
     }
     case START_DELETE_NOTE: {
-      const deletingNote = findNoteById(state.notes, action.noteId);
-      const newNotes = replaceNoteById(state.notes, action.noteId, {
-        ...deletingNote,
-        deleting: true,
-      });
       return {
         ...state,
         deletingNid: action.noteId,
-        notes: newNotes,
       };
     }
     case CANCEL_DELETE_NOTE: {
-      const deletingNote = findNoteById(state.notes, action.noteId);
-      console.log('handle cancel delete file, ', deletingNote);
-      const newNotes = replaceNoteById(state.notes, action.noteId, {
-        ...deletingNote,
-        deleting: false,
-      });
-      console.log('new notes ', newNotes);
       return {
         ...state,
-        notes: newNotes,
+        deletingNid: null,
       };
     }
     case DELETE_NOTE: {
