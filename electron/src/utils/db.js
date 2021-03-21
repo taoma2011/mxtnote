@@ -109,11 +109,46 @@ export const AddDocument = async (doc) => {
   return newDoc._id;
 };
 
+export const LocalAddDocument = (cache) => async (doc) => {
+  let newDoc;
+  // local version don't need to save content
+  delete doc.content;
+  try {
+    newDoc = await docDbP.insert(doc);
+
+    // set the public id field to be the same as _id
+    // eslint-disable-next-line no-underscore-dangle
+    newDoc.id = newDoc._id;
+
+    await docDbP.update({ _id: newDoc.id }, newDoc);
+  } catch (e) {
+    console.log('insert error: ', e);
+    return '';
+  }
+  cache.FillFileCache();
+  // eslint-disable-next-line no-underscore-dangle
+  return newDoc._id;
+};
+
 export const UpdateDocument = (id, doc) => {
   if (id) {
     doc.id = id;
   }
   docDb.update({ _id: id }, doc, { upsert: true });
+};
+
+export const LocalUpdateDocument = (cache) => async (id, doc) => {
+  if (id) {
+    doc.id = id;
+  }
+  try {
+    docDbP.update({ _id: id }, doc, { upsert: true });
+  } catch (e) {
+    console.log('update document error: ', e);
+    return false;
+  }
+  cache.FillFileCache();
+  return true;
 };
 
 export const LocalDeleteDocument = (cache) => async (fileId) => {

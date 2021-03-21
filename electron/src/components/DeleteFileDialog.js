@@ -7,34 +7,32 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { selectApi } from './selector';
-import { DELETE_FILE } from '../actions/file';
+import { selectApi, selectDeletingFile } from './selector';
+import { UPDATE_UI } from '../actions/file';
 
 export default function DeleteFileDialog(props) {
-  const { fileId, onClose } = props;
+  const { onClose } = props;
   const { dataApi } = useSelector(selectApi);
   const dispatch = useDispatch();
 
-  console.log('deleting file id is ', fileId);
-  if (!fileId) {
-    return null;
-  }
-  const file = dataApi.GetDocumentById(fileId);
-  const { description } = file;
+  const { deletingFileId, deletingFile } = useSelector(selectDeletingFile);
+
+  console.log('deleting file id is ', deletingFileId);
+
+  const { description } = deletingFile || {};
 
   const deleteFile = async () => {
-    await dataApi.DeleteDocumentByFileId(fileId);
+    await dataApi.DeleteDocumentByFileId(deletingFileId);
 
     onClose();
     dispatch({
-      type: DELETE_FILE,
-      fileId,
+      type: UPDATE_UI,
     });
   };
 
   return (
     <Dialog
-      open={fileId !== null}
+      open={Boolean(deletingFileId)}
       onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"

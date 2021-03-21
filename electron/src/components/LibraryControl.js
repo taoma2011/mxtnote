@@ -13,6 +13,7 @@ import { ElectronFileInputButton } from './ElectronFileInputButton';
 import { WebFileInputButton } from './WebFileInputButton';
 import { selectApi } from './selector';
 import { ADD_FILE } from '../actions/file';
+import { isWebApp } from '../utils/env';
 
 export default function LibraryControl(props) {
   const [open, setOpen] = React.useState(false);
@@ -91,7 +92,14 @@ export default function LibraryControl(props) {
           />
         </DialogContent>
         <DialogActions>
-          <WebFileInputButton label="Select" onFileSelected={handleSelect} />
+          {isWebApp() ? (
+            <WebFileInputButton label="Select" onFileSelected={handleSelect} />
+          ) : (
+            <ElectronFileInputButton
+              label="Select"
+              onFileSelected={handleSelect}
+            />
+          )}
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>

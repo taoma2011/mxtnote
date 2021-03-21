@@ -620,36 +620,15 @@ export default function file(state, action) {
     }
 
     case START_EDIT_LIBRARY: {
-      const editingFile = findFileById(state.files, action.fileId);
-      const newFiles = replaceFileById(state.files, action.fileId, {
-        ...editingFile,
-        editing: true,
-      });
       return {
         ...state,
-        files: newFiles,
+        editingFileId: action.fileId,
       };
     }
     case END_EDIT_LIBRARY: {
-      const editingFile = findFileById(state.files, action.fileId);
-      const newFiles = replaceFileById(state.files, action.fileId, {
-        ...editingFile,
-        editing: false,
-      });
       return {
         ...state,
-        files: newFiles,
-      };
-    }
-    case DOCUMENT_DESCRIPTION_CHANGED: {
-      const editingFile = findFileById(state.files, action.fileId);
-      const newFiles = replaceFileById(state.files, action.fileId, {
-        ...editingFile,
-        description: action.description,
-      });
-      return {
-        ...state,
-        files: newFiles,
+        editingFileId: null,
       };
     }
 
@@ -712,27 +691,15 @@ export default function file(state, action) {
       };
     }
     case START_DELETE_FILE: {
-      const deletingFile = findFileById(state.files, action.fileId);
-      const newFiles = replaceFileById(state.files, action.fileId, {
-        ...deletingFile,
-        deleting: true,
-      });
       return {
         ...state,
-        files: newFiles,
+        deletingFileId: action.fileId,
       };
     }
     case CANCEL_DELETE_FILE: {
-      const deletingFile = findFileById(state.files, action.fileId);
-      console.log('handle cancel delete file, ', deletingFile);
-      const newFiles = replaceFileById(state.files, action.fileId, {
-        ...deletingFile,
-        deleting: false,
-      });
-      console.log('new files ', newFiles);
       return {
         ...state,
-        files: newFiles,
+        deletingFileId: null,
       };
     }
     case START_DELETE_NOTE: {
@@ -907,7 +874,6 @@ export default function file(state, action) {
       }
       return newState;
     }
-
     default:
       return state;
   }

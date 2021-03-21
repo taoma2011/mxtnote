@@ -1,8 +1,7 @@
 import {
   GetAllActiveDocuments,
-  AddDocument,
-  UpdateDocument,
-  DeleteDocument,
+  LocalAddDocument,
+  LocalUpdateDocument,
   LocalDeleteDocument,
   DeleteAllDocuments,
   DeleteAllNotes,
@@ -47,8 +46,9 @@ export const NeoDbDataApi: DataApi = {
   GetAllActiveDocuments,
   OpenDocument: OpenPdfFile,
   GetDocumentPage: GetPdfPage,
-  AddDocument,
-  UpdateDocument,
+  AddDocument: (doc: Document) => LocalAddDocument(NeoDbDataApi.cache)(doc),
+  UpdateDocument: (id: string, doc: Document) =>
+    LocalUpdateDocument(NeoDbDataApi.cache)(id, doc),
   DeleteDocumentByFileId: (fileId: string) =>
     LocalDeleteDocument(NeoDbDataApi.cache)(fileId),
   DeleteAllDocuments,
@@ -84,8 +84,9 @@ export const XtNoteServerDataApi: DataApi = {
   GetDocumentPage: ServerGetPage,
   AddDocument: (file: any) =>
     ServerAddDocument(XtNoteServerDataApi.cache)(file),
-  UpdateDocument: () => {
+  UpdateDocument: async () => {
     console.log('not supported');
+    return false;
   },
   DeleteDocumentByFileId: (fileId: string) =>
     ServerDeleteDocument(XtNoteServerDataApi.cache)(fileId),

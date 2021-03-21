@@ -115,6 +115,34 @@ export const selectNoteById = (noteId) => (state) => {
   return dataApi.GetNoteById(noteId);
 };
 
+export const selectEditingFile = (state) => {
+  const { editingFileId, apiState, dataApi } = state.file;
+  if (apiState !== 'ok') {
+    return {
+      editingFileId,
+      editingFile: null,
+    };
+  }
+  return {
+    editingFileId,
+    editingFile: dataApi.GetDocumentById(editingFileId),
+  };
+};
+
+export const selectDeletingFile = (state) => {
+  const { deletingFileId, apiState, dataApi } = state.file;
+  if (apiState !== 'ok') {
+    return {
+      deletingFileId,
+      deletingFile: null,
+    };
+  }
+  return {
+    deletingFileId,
+    deletingFile: dataApi.GetDocumentById(deletingFileId),
+  };
+};
+
 export const selectNoteUiState = (noteId) => (state) => {
   const { editingNid } = state.file;
   return {

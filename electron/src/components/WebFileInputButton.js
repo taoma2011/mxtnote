@@ -27,8 +27,10 @@ export const WebFileInputButton = (props) => {
         type="file"
         onChange={(e) => {
           console.log('input change ', fileInput);
-          const file = fileInput.current.files[0];
-          onFileSelected(file.name, file);
+          if (fileInput.current.files && fileInput.current.files.length > 0) {
+            const file = fileInput.current.files[0];
+            onFileSelected(file.name, file);
+          }
         }}
       />
       <label htmlFor="contained-button-file">

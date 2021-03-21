@@ -61,7 +61,7 @@ export interface DataApi {
   OpenDocument(doc: Document): Promise<RuntimeDocument>;
   GetDocumentPage(docHandle: any, pageNum: number): Promise<any>;
   AddDocument(doc: Document): Promise<string>;
-  UpdateDocument(id: string, doc: Document): void;
+  UpdateDocument(id: string, doc: Document): Promise<boolean>;
   DeleteDocumentByFileId(fileId: string): void;
   DeleteAllDocuments(): void;
   DeleteAllNotes(): void;

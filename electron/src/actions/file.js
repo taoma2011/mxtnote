@@ -85,6 +85,8 @@ export const SYNC_PROGRESS = 'SYNC_PROGRESS';
 export const SYNC_DONE = 'SYNC_DONE';
 export const SET_API_STATE = 'SET_API_STATE';
 
+export const UPDATE_UI = 'UPDATE_UI';
+
 export const updatePageScroll = (p) => {
   return {
     type: PAGE_SCROLL_NOTIFY,
