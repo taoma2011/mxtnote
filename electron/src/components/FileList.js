@@ -13,6 +13,7 @@ import { selectFiles, selectEditingFile, selectDeletingFile } from './selector';
 import EditLibraryDialog from './EditLibraryDialog';
 import DeleteFileDialog from './DeleteFileDialog';
 import { getFileId } from '../utils/common';
+import { GetFileSettings } from '../utils/db';
 
 import {
   OPEN_GIVEN_FILE,
@@ -28,12 +29,15 @@ export default function FileList() {
   const { editingFileId } = useSelector(selectEditingFile);
   const { deletingFileId } = useSelector(selectDeletingFile);
   const dispatch = useDispatch();
-  const gotoFile = (file, fileId) =>
+  const gotoFile = async (file, fileId) => {
+    const settings = await GetFileSettings(fileId);
     dispatch({
       type: OPEN_GIVEN_FILE,
       file,
       fileId,
+      settings,
     });
+  };
 
   const handleClickFile = (index) => {
     const file = files[index];

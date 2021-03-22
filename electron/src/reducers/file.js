@@ -65,7 +65,7 @@ import {
 
 import { updateNote } from '../actions/ActionCreators';
 
-import { SetScale, GetSettings } from '../utils/db';
+import { SetFileScale, SetFileLastPage } from '../utils/db';
 /*
 import {
   AddDocument,
@@ -108,26 +108,7 @@ import {
 } from '../utils/common';
 
 function saveLastPageNumber(dataApi, state) {
-  const { files } = state;
-  if (!files) {
-    return state;
-  }
-  const f = findFileById(files, state.fileId);
-  if (!f) {
-    return state;
-  }
-  const updatedFile = {
-    ...f,
-    lastPageNumber: state.pageNum,
-  };
-  dataApi.UpdateDocument(state.fileId, updatedFile);
-
-  const updatedFiles = [...files];
-  replaceFileById(updatedFiles, state.fileId, updatedFile);
-  return {
-    ...state,
-    files: updatedFiles,
-  };
+  SetFileLastPage(state.fileId, state.currentPageNum);
 }
 
 // return new state to indicate whether we are editing a note
@@ -200,17 +181,18 @@ export default function file(state, action) {
           currentTab: 0,
         };
       }
-      // see if there is a saved page number
-      const { files } = state;
-      // const f = findFileById(files, action.fileId);
-      const pageNum = 1;
 
-      // need to save it locally
-      /*
-      if (f && f.lastPageNumber) {
-        pageNum = f.lastPageNumber;
+      let pageNum = 1;
+      let { scale } = state;
+      if (action.settings) {
+        const { lastPage, lastScale } = action.settings;
+        if (lastPage) {
+          pageNum = lastPage;
+        }
+        if (lastScale) {
+          scale = lastScale;
+        }
       }
-      */
 
       return {
         ...state,
@@ -218,6 +200,7 @@ export default function file(state, action) {
         currentFile: action.file,
         fileId: action.fileId,
         pageNum,
+        scale,
         currentPageNum: pageNum,
         currentTab: 0,
       };
@@ -269,11 +252,12 @@ export default function file(state, action) {
       return saveLastPageNumber(dataApi, newState);
     }
     case PAGE_SCROLL_NOTIFY: {
-      // TODO: update the file last page
-      return {
+      const newState = {
         ...state,
         currentPageNum: action.page,
       };
+      saveLastPageNumber(dataApi, newState);
+      return newState;
     }
     case PAGE_LOADED: {
       return {
@@ -610,7 +594,7 @@ export default function file(state, action) {
     }
     case SCALE_CHANGED: {
       console.log('setting scale to ', action.scale);
-      SetScale(action.scale);
+      SetFileScale(state.fileId, action.scale);
 
       return {
         ...state,

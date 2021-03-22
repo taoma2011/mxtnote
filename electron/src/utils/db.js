@@ -9,6 +9,7 @@ let settingsDb;
 let docDbP;
 let noteDbP;
 let todoDbP;
+let settingsDbP;
 
 export const InitDb = () => {
   // eslint-disable-next-line global-require
@@ -21,6 +22,7 @@ export const InitDb = () => {
   noteDbP = DatastorePromises.create('note.db');
   todoDb = new Datastore({ filename: 'todo.db', autoload: true });
   settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
+  settingsDbP = DatastorePromises.create('settings.db');
 };
 
 export const TestInitDb = () => {
@@ -73,6 +75,33 @@ export const SetScale = (s) => {
   settingsDb.update(
     { scope: 'global' },
     { scope: 'global', scale: s },
+    { upsert: true },
+    (err) => {
+      console.log('set scale error ', err);
+    }
+  );
+};
+
+export const GetFileSettings = async (fileId) => {
+  settingsDbP.find({ scope: fileId });
+};
+
+export const SetFileScale = (fileId, s) => {
+  console.log('begin set scale ', s);
+  settingsDb.update(
+    { scope: fileId },
+    { $set: { lastScale: s } },
+    { upsert: true },
+    (err) => {
+      console.log('set scale error ', err);
+    }
+  );
+};
+
+export const SetFileLastPage = (fileId, p) => {
+  settingsDb.update(
+    { scope: fileId },
+    { $set: { lastPage: p } },
     { upsert: true },
     (err) => {
       console.log('set scale error ', err);
