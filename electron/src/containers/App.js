@@ -87,7 +87,7 @@ const useStylesWeb = makeStyles((theme) => ({
   content: {
     // marginTop: 30,
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(1),
   },
   toolbar: theme.mixins.toolbar,
 }));
