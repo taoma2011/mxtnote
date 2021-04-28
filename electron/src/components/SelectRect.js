@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import ResizableRect from 'react-resizable-rotatable-draggable';
 import NoteEditorControl from '../containers/NoteEditorControl';
 import { selectSelectRect } from './selector';
 import * as ActionCreators from '../actions/ActionCreators';
+import { updateEditingNoteRect } from '../features/backend/backendSlice';
 
 export default function SelectRect() {
   /*
@@ -22,6 +23,19 @@ export default function SelectRect() {
   const { top, left, width, height, angle } = scaledRect;
   const { setRectState } = ActionCreators;
 
+  const [updatePending, setUpdatePending] = useState(false);
+
+  const delayedUpdate = () => {
+    if (updatePending) {
+      return;
+    }
+    setUpdatePending(true);
+    setTimeout(() => {
+      setUpdatePending(false);
+      dispatch(updateEditingNoteRect());
+    }, 1000);
+  };
+
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unused-vars
   const handleResize = (style, isShiftKey, type) => {
@@ -36,6 +50,7 @@ export default function SelectRect() {
         angle,
       })
     );
+    delayedUpdate();
   };
 
   const handleRotate = (a) => {
@@ -44,6 +59,7 @@ export default function SelectRect() {
         angle: a,
       })
     );
+    delayedUpdate();
   };
 
   const handleDrag = (deltaX, deltaY) => {
@@ -55,6 +71,7 @@ export default function SelectRect() {
         height,
       })
     );
+    delayedUpdate();
   };
 
   const noteEditorStyle = {

@@ -9,6 +9,7 @@ import {
   UpdateTodo,
   DeleteTodo,
   LocalUpdateNote,
+  LocalCreateNote,
   LocalDeleteNote,
   GetAllDocumentsPromise,
   GetAllNotesPromise,
@@ -32,6 +33,7 @@ import {
   ServerLoadNoteImage,
   ServerGetAllTodos,
   ServerUpdateNote,
+  ServerCreateNote,
   ServerDeleteNote,
   ServerAddDocument,
   ServerDeleteDocument,
@@ -60,6 +62,7 @@ export const NeoDbDataApi: DataApi = {
   // is this still needed?
   LoadNoteImage,
 
+  CreateNote: (note: Note) => LocalCreateNote(NeoDbDataApi.cache)(note),
   UpdateNote: (noteId: string, note: Note) =>
     LocalUpdateNote(NeoDbDataApi.cache)(noteId, note),
   DeleteNote: (noteId: string) => LocalDeleteNote(NeoDbDataApi.cache)(noteId),
@@ -96,6 +99,7 @@ export const XtNoteServerDataApi: DataApi = {
   UpdateTodo,
   DeleteTodo,
   LoadNoteImage: ServerLoadNoteImage,
+  CreateNote: (note: Note) => ServerCreateNote(XtNoteServerDataApi.cache)(note),
   UpdateNote: (id: string, note: Note) =>
     ServerUpdateNote(XtNoteServerDataApi.cache)(id, note),
   DeleteNote: (id: string) => ServerDeleteNote(XtNoteServerDataApi.cache)(id),

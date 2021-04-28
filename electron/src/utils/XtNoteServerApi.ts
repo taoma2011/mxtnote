@@ -285,6 +285,33 @@ export const ServerGetAllNotes = async (cache: any): Promise<Note[]> => {
   return [];
 };
 
+export const ServerCreateNote = (cache: any) => async (
+  note: Note
+): Promise<string | null> => {
+  if (!token) {
+    return null;
+  }
+
+  console.log('creating ', note);
+  const remoteNote = localNoteToRemoteNote(cache, note);
+
+  try {
+    const res = await axios.post(`${getBaseUrl()}/notes/create`, remoteNote, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+    const newId = res.data.id;
+    cache.SetNoteById(newId, note);
+    return newId;
+  } catch (e) {
+    console.log('get all notes error ', e);
+  }
+  return null;
+};
+
 export const ServerUpdateNote = (cache: any) => async (
   id: string,
   note: Note

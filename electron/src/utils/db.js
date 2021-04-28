@@ -1,5 +1,7 @@
 // import { Datastore } from 'nedb';
 
+import { generateId } from './common';
+
 let docDb;
 let noteDb;
 let todoDb;
@@ -247,6 +249,20 @@ export const UpdateNotePromise = (id, note) =>
       }
     });
   });
+
+export const LocalCreateNote = (cache) => async (note) => {
+  const newId = generateId();
+  try {
+    note.id = newId;
+    await noteDbP.update({ _id: newId }, note, { upsert: true });
+    console.log('added ', note);
+    await cache.FillNoteCache();
+    return newId;
+  } catch (e) {
+    console.log('exception when create note: ', e);
+  }
+  return null;
+};
 
 export const LocalUpdateNote = (cache) => async (id, note) => {
   try {

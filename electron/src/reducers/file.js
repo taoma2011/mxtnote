@@ -286,6 +286,7 @@ export default function file(state, action) {
       // dataApi.UpdateNote(state.editingNid, note);
       return {
         ...state,
+        pendingNid: state.editingNid,
         rect: newRect,
       };
     }
@@ -312,38 +313,13 @@ export default function file(state, action) {
         addingNote: true,
       };
     case ADD_NOTE: {
-      let newNid = generateId();
-      while (state.notes[newNid]) newNid = generateId;
-
-      console.log('adding new note ', newNid);
-
+      // now we come here only when note is added
       const now = new Date();
 
-      const defaultNote = {
-        _id: newNid,
-        fileId: state.fileId,
-        page: state.pageNum,
-        width: 100,
-        height: 100,
-        top: (action.y * 100) / state.scale,
-        left: (action.x * 100) / state.scale,
-        angle: 0,
-        text: 'new note',
-        todoDependency: [],
-        scale: state.scale,
-        image: null,
-        imageFile: null,
-        created: now,
-        lastModified: now,
-      };
-
-      dataApi.UpdateNote(newNid, defaultNote);
+      const { newNid } = action;
       return {
         ...state,
-        notes: {
-          ...state.notes,
-          [newNid]: defaultNote,
-        },
+
         editingNid: newNid,
         showSelection: true,
       };
@@ -450,10 +426,6 @@ export default function file(state, action) {
 
       return {
         ...state,
-        notes: {
-          ...state.notes,
-          [getNoteId(n)]: newNote,
-        },
         editingNid: null,
         showSelection: false,
       };
