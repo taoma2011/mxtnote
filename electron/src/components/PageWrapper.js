@@ -25,12 +25,12 @@ export const PageWrapper = React.memo((props) => {
     pageHeight,
   } = props;
   React.useEffect(() => {
-    console.log(`loading ${pageNum}`);
+    // console.log(`loading ${pageNum}`);
     dataApi
       .GetDocumentPage(pdfDoc, pageNum)
       .then((p) => {
         // pageLoaded(page);
-        console.log(`page ${pageNum} is loaded`);
+        // console.log(`page ${pageNum} is loaded`);
         setPage(p);
         return true;
       })
@@ -38,12 +38,12 @@ export const PageWrapper = React.memo((props) => {
   }, [dataApi, apiState]);
   const items = [];
 
-  console.log('page wrapper get notes: ', fileId);
+  // console.log('page wrapper get notes: ', fileId);
   if (notes) {
     notes.forEach((n) => {
       // eslint-disable-next-line react/prop-types
       if (n.page === pageNum && n.fileId === fileId) {
-        console.log('found note in the page ', pageNum);
+        // console.log('found note in the page ', pageNum);
         items.push(<StaticRect noteId={n.id} key={n.id} />);
       }
     });
@@ -81,7 +81,7 @@ export const PageWrapper = React.memo((props) => {
   }
 
   if (page) {
-    console.log(`page ${pageNum} is ready`);
+    //console.log(`page ${pageNum} is ready`);
     return (
       <>
         <SelectRect />

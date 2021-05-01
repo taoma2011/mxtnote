@@ -175,7 +175,6 @@ export default function NotePanel(props) {
           </Box>
         </CardContent>
       </Card>
-      <DeleteNoteDialog />
     </Box>
   );
 }

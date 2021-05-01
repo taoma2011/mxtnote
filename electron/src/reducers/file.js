@@ -316,10 +316,16 @@ export default function file(state, action) {
       // now we come here only when note is added
       const now = new Date();
 
-      const { newNid } = action;
+      const { newNid, note } = action;
+      const newRect = {
+        top: note.top,
+        left: note.left,
+        width: note.width,
+        height: note.height,
+      };
       return {
         ...state,
-
+        rect: newRect,
         editingNid: newNid,
         showSelection: true,
       };
@@ -413,16 +419,6 @@ export default function file(state, action) {
     }
     case FINALIZE_NOTE: {
       console.log('finialize ', state.editingNid);
-
-      const n = state.notes[state.editingNid];
-      const newNote = {
-        ...n,
-        visible: true,
-        image: null,
-        imageFile: null,
-      };
-      // update db now so that previous imagefile is invalidated
-      dataApi.UpdateNote(getNoteId(newNote), newNote);
 
       return {
         ...state,
@@ -671,7 +667,10 @@ export default function file(state, action) {
       };
     }
     case DELETE_NOTE: {
-      dataApi.DeleteNote(action.noteId);
+      console.log('deleting note ', action.noteId);
+
+      // this is now done in backendSlice
+      //dataApi.DeleteNote(action.noteId);
       return {
         ...state,
         editingNid: null,

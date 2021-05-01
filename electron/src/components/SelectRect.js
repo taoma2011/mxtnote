@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import ResizableRect from 'react-resizable-rotatable-draggable';
 import NoteEditorControl from '../containers/NoteEditorControl';
@@ -25,15 +25,25 @@ export default function SelectRect() {
 
   const [updatePending, setUpdatePending] = useState(false);
 
-  const delayedUpdate = () => {
+  useEffect(() => {
+    let timeout;
     if (updatePending) {
-      return;
+      timeout = setTimeout(() => {
+        console.log('in delayed update');
+        setUpdatePending(false);
+        dispatch(updateEditingNoteRect());
+      }, 1000);
+      return () => {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      };
     }
+    return null;
+  }, [updatePending]);
+
+  const delayedUpdate = () => {
     setUpdatePending(true);
-    setTimeout(() => {
-      setUpdatePending(false);
-      dispatch(updateEditingNoteRect());
-    }, 1000);
   };
 
   const dispatch = useDispatch();

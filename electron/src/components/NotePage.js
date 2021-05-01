@@ -42,7 +42,12 @@ export const NotePage = () => {
   const [deletingNoteId, setDeletingNoteId] = useState(null);
   const noteHeight = (index) => {
     const note = notes[index];
+    console.log('compute note height ', note);
+    if (!note.height || !note.scale) {
+      return 0;
+    }
     const scaledHeight = (note.height || 0) * (note.scale / 100);
+    console.log(`saled height for ${index} is ${scaledHeight}`);
     return scaledHeight + 120;
   };
   const Row = ({ index, style }) => {

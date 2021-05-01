@@ -234,14 +234,19 @@ export const DeleteAllNotes = () => {
   noteDb.remove({}, { multi: true });
 };
 
-export const UpdateNotePromise = (id, note) =>
+export const UpdateNotePromise = async (id, note) => {
+  console.log('update note ', note);
+  await noteDbP.update({ id }, note, { upsert: true });
+};
+
+/*
   new Promise((resolve, reject) => {
     // eslint-disable-next-line no-underscore-dangle
     const dbNote = {
       ...note,
       image: null,
     };
-    noteDb.update({ _id: id }, dbNote, { upsert: true }, function (err, doc) {
+    noteDb.update({ id: id }, dbNote, { upsert: true }, function (err, doc) {
       if (!err) {
         resolve(true);
       } else {
@@ -249,7 +254,7 @@ export const UpdateNotePromise = (id, note) =>
       }
     });
   });
-
+*/
 export const LocalCreateNote = (cache) => async (note) => {
   const newId = generateId();
   try {
@@ -283,7 +288,7 @@ export const UpdateNote = (id, note, cb) => {
   };
   if (id) {
     // eslint-disable-next-line no-underscore-dangle
-    noteDb.update({ _id: id }, dbNote, { upsert: true });
+    noteDb.update({ id: id }, dbNote, { upsert: true });
   } else {
     noteDb.insert(dbNote, function (err, doc) {
       if (cb) {
@@ -298,12 +303,14 @@ export const UpdateNote = (id, note, cb) => {
 
 export const DeleteNote = (noteId) => {
   //noteDb.remove({ _id: noteId }, { multi: true });
-  noteDb.update({ _id: noteId }, { deleted: true });
+  noteDb.update({ id: noteId }, { deleted: true });
 };
 
 export const LocalDeleteNote = (cache) => async (noteId) => {
+  // should set deleted instead of delete?
   try {
-    await noteDbP.remove({ _id: noteId });
+    console.log('local delete ', noteId);
+    await noteDbP.remove({ id: noteId });
   } catch (e) {
     console.log('delete note exception: ', e);
     return false;
@@ -321,17 +328,21 @@ export const GetAllActiveNotes = (handleNote) => {
   });
 };
 
-export const GetAllNotesPromise = () =>
+export const GetAllNotesPromise = async () => {
+  return noteDbP.find({});
+};
+/*
   new Promise((resolve, reject) => {
     noteDb.find({}, (err, note) => {
       if (!err) {
+        console.log(`get ${note.length} notes`);
         resolve(note);
       } else {
         reject(err);
       }
     });
   });
-
+*/
 export const DeleteAllTodos = () => {
   todoDb.remove({}, { multi: true });
 };

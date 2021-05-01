@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { ADD_NOTE } from '../../actions/file';
+import { ADD_NOTE, DELETE_NOTE } from '../../actions/file';
 
 const initialState = {};
 
@@ -22,7 +22,24 @@ export const updateEditingNoteRect = createAsyncThunk(
     n.left = fileState.rect.left;
     n.width = fileState.rect.width;
     n.height = fileState.rect.height;
+    n.image = null;
+    n.imageFile = null;
     dataApi.UpdateNote(fileState.editingNid, n);
+  }
+);
+
+export const deleteNote = createAsyncThunk(
+  'backend/deleteNote',
+  async (data, thunkAPI) => {
+    const { noteId } = data;
+    const fileState = thunkAPI.getState().file;
+    const { dataApi } = fileState;
+
+    await dataApi.DeleteNote(noteId);
+    thunkAPI.dispatch({
+      type: DELETE_NOTE,
+      noteId,
+    });
   }
 );
 
@@ -49,10 +66,13 @@ export const createNote = createAsyncThunk(
       created: now,
       lastModified: now,
     };
+    console.log('create default note ', defaultNote);
     const newNid = await dataApi.CreateNote(defaultNote);
+    console.log('new note id is ', newNid);
     thunkAPI.dispatch({
       type: ADD_NOTE,
       newNid,
+      note: defaultNote,
     });
   }
 );

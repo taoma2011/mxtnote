@@ -13,9 +13,10 @@ export default class PdfPage extends Component {
 
     this.pageWidth = props.pageWidth;
     this.pageHeight = props.pageHeight;
+    /*
     console.log(
       `pdf page got page height ${this.pageHeight} width ${this.pageWidth}`
-    );
+    );*/
   }
 
   componentDidMount() {
@@ -30,19 +31,19 @@ export default class PdfPage extends Component {
     // $FlowFixMe
     const canvas = this.canvas.current;
     const page = this.pdfPage;
-    console.log('render page');
+    // console.log('render page');
     if (!page) {
       return;
     }
     if (this.renderTask) {
       await this.renderTask.promise;
     }
-    console.log('render this page ', page);
-    console.log('canvas is ', canvas);
+    // console.log('render this page ', page);
+    // console.log('canvas is ', canvas);
     // var viewport = page.getViewport({scale: scale});
     // $FlowFixMe
 
-    //const moreScale = 2.0;
+    // const moreScale = 2.0;
     const moreScale = 2.0;
 
     const viewport = page.getViewport({ scale: this.scale * moreScale });

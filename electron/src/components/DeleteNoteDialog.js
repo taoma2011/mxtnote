@@ -9,6 +9,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { selectApi, selectDeletingNote } from './selector';
 import * as ActionCreators from '../actions/ActionCreators';
+import { deleteNote } from '../features/backend/backendSlice';
 
 export default function DeleteNoteDialog(props) {
   const { deletingNoteId } = useSelector(selectDeletingNote);
@@ -38,7 +39,7 @@ export default function DeleteNoteDialog(props) {
           Cancel
         </Button>
         <Button
-          onClick={() => dispatch(ActionCreators.DeleteNote(deletingNoteId))}
+          onClick={() => dispatch(deleteNote({ noteId: deletingNoteId }))}
           color="primary"
           autoFocus
         >
