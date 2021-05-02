@@ -29,6 +29,7 @@ export const FilePage = (props) => {
     status,
     doc,
     pageNum,
+    pageNumIsEffective,
     numPages,
     docLoading,
     noteLoaded,
@@ -38,6 +39,7 @@ export const FilePage = (props) => {
     pageWidth,
     pageHeight,
   } = useSelector(selectFilePageProps, shallowEqual);
+
   const dispatch = useDispatch();
   console.log('page height = ', pageHeight);
 
@@ -88,7 +90,7 @@ export const FilePage = (props) => {
   // so we need to call the scrollToItem api
   const listRef = useRef(null);
   useEffect(() => {
-    if (listRef && listRef.current && pageHeight) {
+    if (listRef && listRef.current && pageHeight && pageNumIsEffective) {
       console.log('scroll in useEffect');
       listRef.current.scrollToItem(pageNum - 1);
     }

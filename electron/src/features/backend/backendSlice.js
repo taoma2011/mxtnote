@@ -51,8 +51,8 @@ export const createNote = createAsyncThunk(
     const { dataApi } = fileState;
     const now = new Date();
     const defaultNote = {
-      fileId: fileState.fileId,
-      page: fileState.pageNum,
+      fileId: fileState.currentFile.id,
+      page: fileState.currentPageNum,
       width: 100,
       height: 100,
       top: (y * 100) / fileState.scale,

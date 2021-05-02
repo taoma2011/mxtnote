@@ -23,6 +23,7 @@ export default function SelectRect() {
   const { top, left, width, height, angle } = scaledRect;
   const { setRectState } = ActionCreators;
 
+  /*
   const [updatePending, setUpdatePending] = useState(false);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function SelectRect() {
   const delayedUpdate = () => {
     setUpdatePending(true);
   };
+  */
 
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unused-vars
@@ -60,7 +62,10 @@ export default function SelectRect() {
         angle,
       })
     );
-    delayedUpdate();
+    // delayedUpdate();
+  };
+  const handleResizeEnd = () => {
+    dispatch(updateEditingNoteRect());
   };
 
   const handleRotate = (a) => {
@@ -69,7 +74,7 @@ export default function SelectRect() {
         angle: a,
       })
     );
-    delayedUpdate();
+    // delayedUpdate();
   };
 
   const handleDrag = (deltaX, deltaY) => {
@@ -81,7 +86,10 @@ export default function SelectRect() {
         height,
       })
     );
-    delayedUpdate();
+    // delayedUpdate();
+  };
+  const handleDragEnd = () => {
+    dispatch(updateEditingNoteRect());
   };
 
   const noteEditorStyle = {
@@ -111,10 +119,10 @@ export default function SelectRect() {
         // onRotateEnd={this.handleRotateEnd}
         // onResizeStart={this.handleResizeStart}
         onResize={handleResize}
-        // onResizeEnd={this.handleUp}
+        onResizeEnd={handleResizeEnd}
         // onDragStart={this.handleDragStart}
         onDrag={handleDrag}
-        // onDragEnd={this.handleDragEnd}
+        onDragEnd={handleDragEnd}
       />
       <div style={noteEditorStyle}>
         <NoteEditorControl />

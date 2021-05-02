@@ -198,6 +198,7 @@ export default function file(state, action) {
         ...state,
         documentLoaded: false,
         currentFile: action.file,
+        // this fileId field is obsolete?
         fileId: action.fileId,
         pageNum,
         scale,
@@ -223,9 +224,11 @@ export default function file(state, action) {
       const newState = {
         ...state,
         pageNum: state.currentPageNum + 1,
+        pageNumIsEffective: true,
         currentPageNum: state.currentPageNum + 1,
       };
-      return saveLastPageNumber(dataApi, newState);
+      saveLastPageNumber(dataApi, newState);
+      return newState;
     }
     case PREV_PAGE: {
       if (!state.pageNum || state.currentPageNum <= 1) {
@@ -234,9 +237,11 @@ export default function file(state, action) {
       const newState = {
         ...state,
         pageNum: state.currentPageNum - 1,
+        pageNumIsEffective: true,
         currentPageNum: state.currentPageNum - 1,
       };
-      return saveLastPageNumber(dataApi, newState);
+      saveLastPageNumber(dataApi, newState);
+      return newState;
     }
     case SET_PAGE_NUMBER: {
       const page = Number(action.page);
@@ -247,13 +252,16 @@ export default function file(state, action) {
       const newState = {
         ...state,
         pageNum: page,
+        pageNumIsEffective: true,
         currentPageNum: page,
       };
-      return saveLastPageNumber(dataApi, newState);
+      saveLastPageNumber(dataApi, newState);
+      return newState;
     }
     case PAGE_SCROLL_NOTIFY: {
       const newState = {
         ...state,
+        pageNumIsEffective: false,
         currentPageNum: action.page,
       };
       saveLastPageNumber(dataApi, newState);
