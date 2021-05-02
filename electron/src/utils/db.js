@@ -156,7 +156,7 @@ export const LocalAddDocument = (cache) => async (doc) => {
     console.log('insert error: ', e);
     return '';
   }
-  cache.FillFileCache();
+  await cache.FillFileCache();
   // eslint-disable-next-line no-underscore-dangle
   return newDoc._id;
 };

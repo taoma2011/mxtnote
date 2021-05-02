@@ -9,6 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { LinearProgress, Alert } from '@material-ui/core';
 import { ElectronFileInputButton } from './ElectronFileInputButton';
 import { WebFileInputButton } from './WebFileInputButton';
 import { selectApi } from './selector';
@@ -17,6 +18,8 @@ import { isWebApp } from '../utils/env';
 
 export default function LibraryControl(props) {
   const [open, setOpen] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState(null);
   const [description, setDescription] = React.useState('');
   const [fileName, setFileName] = React.useState('');
   const [fileContent, setFileContent] = React.useState(null);
@@ -55,8 +58,16 @@ export default function LibraryControl(props) {
   };
 
   const handleAdd = () => {
-    setOpen(false);
-    addFileToLibrary();
+    setUploading(true);
+    addFileToLibrary()
+      .then(() => {
+        setUploading(false);
+        setOpen(false);
+        return true;
+      })
+      .catch((e) => {
+        setUploadError(e.toString());
+      });
   };
 
   return (
@@ -90,6 +101,10 @@ export default function LibraryControl(props) {
             value={fileName}
             fullWidth
           />
+          {uploading && <LinearProgress />}
+          {uploadError && (
+            <Alert severity="error"> Error adding file: {uploadError} </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           {isWebApp() ? (
