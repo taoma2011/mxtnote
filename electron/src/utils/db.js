@@ -85,29 +85,24 @@ export const SetScale = (s) => {
 };
 
 export const GetFileSettings = async (fileId) => {
-  settingsDbP.find({ scope: fileId });
+  const res = await settingsDbP.findOne({ scope: fileId });
+  return res;
 };
 
 export const SetFileScale = (fileId, s) => {
   console.log('begin set scale ', s);
-  settingsDb.update(
+  settingsDbP.update(
     { scope: fileId },
     { $set: { lastScale: s } },
-    { upsert: true },
-    (err) => {
-      console.log('set scale error ', err);
-    }
+    { upsert: true }
   );
 };
 
-export const SetFileLastPage = (fileId, p) => {
-  settingsDb.update(
+export const SetFileLastPage = async (fileId, p) => {
+  settingsDbP.update(
     { scope: fileId },
     { $set: { lastPage: p } },
-    { upsert: true },
-    (err) => {
-      console.log('set scale error ', err);
-    }
+    { upsert: true }
   );
 };
 

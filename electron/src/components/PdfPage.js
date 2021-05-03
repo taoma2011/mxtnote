@@ -60,9 +60,11 @@ export default class PdfPage extends Component {
       Math.abs(pageWidth - this.pageWidth) > 5 ||
       Math.abs(pageHeight - this.pageHeight) > 5
     ) {
+      /*
       console.log(
         `note page size old width = ${this.pageWidth}, new width = ${pageWidth}, old height = ${this.pageHeight}, new height = ${pageHeight}`
       );
+      */
       this.notifyPageSizeReady(pageWidth, pageHeight);
     }
     //canvas.style.height = Math.floor(viewport.height / moreScale);
@@ -82,7 +84,7 @@ export default class PdfPage extends Component {
     // eslint-disable-next-line promise/catch-or-return
     this.renderTask.promise
       .then(() => {
-        console.log('render done');
+        // console.log('render done');
         this.notifyRenderComplete(this.canvas.current);
         this.renderTask = null;
         return true;
@@ -105,7 +107,7 @@ export default class PdfPage extends Component {
     const { pdfPage, scale, addingNote } = this.props;
     this.pdfPage = pdfPage;
     this.scale = scale / 100;
-    console.log('pdf page rendered called');
+    // console.log('pdf page rendered called');
     // eslint-disable-next-line react/prop-types
 
     const style = addingNote ? { cursor: 'crosshair' } : {};

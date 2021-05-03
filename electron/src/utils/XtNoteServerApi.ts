@@ -117,7 +117,7 @@ export const ServerGetPage = async (doc: any, pageNum: number) => {
         },
       }
     );
-    console.log('page pdf return ', res);
+    // console.log('page pdf return ', res);
     const pdfDoc = await OpenPdfData(res.data);
     const pdfPage = await GetPdfPage(pdfDoc, 1);
     xd.pages[pageNum] = pdfPage;

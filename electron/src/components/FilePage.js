@@ -41,7 +41,7 @@ export const FilePage = (props) => {
   } = useSelector(selectFilePageProps, shallowEqual);
 
   const dispatch = useDispatch();
-  console.log('page height = ', pageHeight);
+  // console.log('page height = ', pageHeight);
 
   const notes = useSelector(selectNotes, shallowEqual);
   const { currentFile } = useSelector(selectCurrentFile, shallowEqual);
@@ -52,7 +52,7 @@ export const FilePage = (props) => {
   */
 
   const Row = ({ index, style }) => {
-    console.log(`loading row ${index}`);
+    // console.log(`loading row ${index}`);
     const domKey = `page-panel-${index}`;
 
     return (
@@ -73,7 +73,7 @@ export const FilePage = (props) => {
   };
 
   const displayPageHeight = React.useMemo(() => pageHeight || 80, [pageHeight]);
-  console.log('display page height = ', displayPageHeight);
+  // console.log('display page height = ', displayPageHeight);
 
   const scrollUpdate = ({ scrollOffset }) => {
     if (pageHeight) {
@@ -97,14 +97,14 @@ export const FilePage = (props) => {
   });
   const pages = () => {
     if (status === 'ready') {
-      console.log('doc is ready, displayPageHeight is ', displayPageHeight);
-      console.log('num page is ', numPages);
+      // console.log('doc is ready, displayPageHeight is ', displayPageHeight);
+      // console.log('num page is ', numPages);
 
       let initialScrollOffset = 0;
       // if we have page height, we scroll to the desired page
       if (pageHeight) {
         initialScrollOffset = (pageNum - 1) * pageHeight + 1;
-        console.log('set initial scroll to ', initialScrollOffset);
+        // console.log('set initial scroll to ', initialScrollOffset);
 
         const list = (
           <List

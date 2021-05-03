@@ -108,7 +108,10 @@ import {
 } from '../utils/common';
 
 function saveLastPageNumber(dataApi, state) {
-  SetFileLastPage(state.fileId, state.currentPageNum);
+  console.log(
+    `save file ${state.currentFile.id} to page ${state.currentPageNum}`
+  );
+  SetFileLastPage(state.currentFile.id, state.currentPageNum);
 }
 
 // return new state to indicate whether we are editing a note
@@ -570,7 +573,7 @@ export default function file(state, action) {
     }
     case SCALE_CHANGED: {
       console.log('setting scale to ', action.scale);
-      SetFileScale(state.fileId, action.scale);
+      SetFileScale(state.currentFile.id, action.scale);
 
       return {
         ...state,

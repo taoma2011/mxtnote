@@ -31,6 +31,7 @@ export default function FileList() {
   const dispatch = useDispatch();
   const gotoFile = async (file, fileId) => {
     const settings = await GetFileSettings(fileId);
+    console.log(`file ${fileId} settings is ${settings}`);
     dispatch({
       type: OPEN_GIVEN_FILE,
       file,
@@ -42,7 +43,7 @@ export default function FileList() {
   const handleClickFile = (index) => {
     const file = files[index];
     // eslint-disable-next-line no-underscore-dangle
-    gotoFile(file, file._id);
+    gotoFile(file, file.id);
   };
 
   return (

@@ -27,7 +27,7 @@ export default function NoteEditorDialog(props) {
   const { open, noteId, handleClose } = props;
   const note = useSelector(selectNoteById(noteId));
   const origNoteText = note ? note.text : '';
-  console.log('got note ', note);
+  // console.log('got note ', note);
   const [newNoteText, setNewNoteText] = React.useState('');
   const [noteTextChanged, setNoteTextChanged] = React.useState(false);
   const handleTextChange = (e) => {
@@ -46,7 +46,7 @@ export default function NoteEditorDialog(props) {
     setNoteTextChanged(false);
     handleClose();
   };
-  console.log('noteeditor dialog open=', open);
+  // console.log('noteeditor dialog open=', open);
   return (
     <Dialog
       open={open}
