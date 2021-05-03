@@ -31,7 +31,7 @@ export const LoginDialog = ({
     >
       <DialogTitle id="form-dialog-title">Login</DialogTitle>
       <DialogContent>
-        <DialogContentText>Login to MxtNote server</DialogContentText>
+        <DialogContentText>Login to MXTNote server</DialogContentText>
         <TextField
           autoFocus
           margin="dense"

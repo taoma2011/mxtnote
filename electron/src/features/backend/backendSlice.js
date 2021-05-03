@@ -5,8 +5,10 @@ const initialState = {};
 
 export const updateNote = createAsyncThunk(
   'backend/updateNote',
-  async (data) => {
-    const { dataApi, noteId, note } = data;
+  async (data, thunkAPI) => {
+    const fileState = thunkAPI.getState().file;
+    const { dataApi } = fileState;
+    const { noteId, note } = data;
     const ret = await dataApi.UpdateNote(noteId, note);
     return ret;
   }

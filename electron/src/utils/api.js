@@ -4,9 +4,7 @@ import {
   GetDocumentByUuidPromise,
 } from './db';
 
-import {
-  getElectron
-} from './common';
+import { getElectron } from './common';
 
 // TODO
 // const { machineIdSync } = require('node-machine-id');
@@ -195,7 +193,7 @@ function centerWHToRect(x, y, w, h, pageW, pageH) {
   };
 }
 
-function rectToCenter(left, top, right, bottom, pageW, pageH) {
+export function rectToCenter(left, top, right, bottom, pageW, pageH) {
   console.log(
     `rect to center ${left}, ${top}, ${right}, ${bottom}, ${pageW}, ${pageH}`
   );

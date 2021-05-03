@@ -1,3 +1,5 @@
+import { rectToCenter } from './api';
+
 const version = require('../version/version');
 
 function centerWHToRect(x, y, w, h, pageW, pageH) {
@@ -27,6 +29,7 @@ export const localNoteToRemoteNote = (cache, localNote) => {
   };
   const localNoteTags = localNote.todoDependency;
   const noteTags = [];
+
   if (localNoteTags) {
     for (let k = 0; k < localNoteTags.length; k += 1) {
       const t = localNoteTags[k];
@@ -37,6 +40,7 @@ export const localNoteToRemoteNote = (cache, localNote) => {
       }
     }
   }
+
   const newNote = {
     ...localNote,
     pageX: center.x,

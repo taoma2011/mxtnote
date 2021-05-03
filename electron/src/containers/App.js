@@ -17,6 +17,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { Paper, Button } from '@material-ui/core';
 
 import FilePage from '../components/FilePage';
 import NotePage from '../components/NotePage';
@@ -192,8 +193,10 @@ function App(props) {
     }
   }, [apiState]);
 
-  const openLoginDialog = apiState === 'login-needed';
+  const loginNeeded = apiState === 'login-needed';
+  const [loginCanceled, setLoginCanceled] = React.useState(true);
   const [loginFailed, setLoginFailed] = React.useState(false);
+  const openLoginDialog = loginNeeded && !loginCanceled;
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
 
@@ -212,7 +215,9 @@ function App(props) {
     }
   };
 
-  const handleCloseLoginDialog = () => {};
+  const handleCloseLoginDialog = () => {
+    setLoginCanceled(true);
+  };
 
   // const { app } = getElectron();
 
@@ -220,6 +225,16 @@ function App(props) {
     return (
       <div>
         <AutoLogin />
+        <Paper>
+          <p>Login to MXTNote server is needed to proceed</p>
+          <Button
+            onClick={() => {
+              setLoginCanceled(false);
+            }}
+          >
+            Login
+          </Button>
+        </Paper>
         <LoginDialog
           open={openLoginDialog}
           handleClose={handleCloseLoginDialog}
