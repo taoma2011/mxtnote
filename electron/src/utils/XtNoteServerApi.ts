@@ -3,6 +3,7 @@ import { OpenPdfData, GetPdfPage, getImageFromPdfPage } from './pdfutils';
 import { GetAllActiveDocuments } from './db';
 import { Document, Note, RuntimeDocument, Todo } from './interface';
 import { localNoteToRemoteNote, remoteNoteToLocalNote } from './remoteMapping';
+import { FillNoteCache } from './cache';
 
 const uuid = require('uuid');
 
@@ -306,7 +307,8 @@ export const ServerCreateNote = (cache: any) => async (
 
     console.log('res = ', res);
     const newId = res.data.id;
-    cache.SetNoteById(newId, note);
+    //cache.SetNoteById(newId, note);
+    await cache.FillNoteCache();
     return newId;
   } catch (e) {
     console.log('get all notes error ', e);
@@ -362,7 +364,7 @@ export const ServerDeleteNote = (cache: any) => async (
     console.log('delete note error ', e);
     return false;
   }
-  cache.FillNoteCache();
+  await cache.FillNoteCache();
   return true;
 };
 
