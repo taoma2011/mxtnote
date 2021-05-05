@@ -124,8 +124,8 @@ export const CacheLoadNoteImage = async (noteId: string) => {
   }
   const pdfFile = await bApi.OpenDocument(f);
   const pdfPage = await bApi.GetDocumentPage(pdfFile, n.page);
-  console.log('getting note image: ', n);
+  // console.log('getting note image: ', n);
   const image = await getImageFromPdfPage(n, pdfPage);
-  console.log('done');
+  // console.log('done');
   return image;
 };

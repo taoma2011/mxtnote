@@ -14,6 +14,7 @@ const getBaseUrl = () => {
 };
 
 let token: any;
+let userId: any;
 
 export const ServerInitialize = (initialToken: string) => {
   // check if we have saved token
@@ -38,6 +39,7 @@ export const ServerLogin = async (user: string, pass: string) => {
     });
     console.log('login get ', res);
     token = res.data.token;
+    userId = res.data.id;
     // await afterLogin();
     return true;
   } catch (e) {
@@ -294,7 +296,7 @@ export const ServerCreateNote = (cache: any) => async (
 
   console.log('creating ', note);
   const remoteNote = localNoteToRemoteNote(cache, note);
-
+  remoteNote.userId = userId;
   try {
     const res = await axios.post(`${getBaseUrl()}/notes/create`, remoteNote, {
       headers: {

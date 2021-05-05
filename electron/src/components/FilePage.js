@@ -15,6 +15,8 @@ import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
 import { selectSearchText } from '../features/search/searchSlice';
+import { compareDate } from '../utils/common';
+
 import {
   selectNotes,
   selectCurrentFile,
@@ -44,6 +46,7 @@ export const FilePage = (props) => {
   // console.log('page height = ', pageHeight);
 
   const notes = useSelector(selectNotes, shallowEqual);
+
   const { currentFile } = useSelector(selectCurrentFile, shallowEqual);
   /*
   const pageDivStyle = {

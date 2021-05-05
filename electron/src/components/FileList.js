@@ -12,7 +12,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { selectFiles, selectEditingFile, selectDeletingFile } from './selector';
 import EditLibraryDialog from './EditLibraryDialog';
 import DeleteFileDialog from './DeleteFileDialog';
-import { getFileId } from '../utils/common';
+import { getFileId, compareDate } from '../utils/common';
 import { GetFileSettings } from '../utils/db';
 
 import {
@@ -26,6 +26,9 @@ import {
 export default function FileList() {
   // eslint-disable-next-line react/prop-types
   const files = useSelector(selectFiles);
+  files.sort((a, b) => {
+    return compareDate(a.createdDate, b.createdDate);
+  });
   const { editingFileId } = useSelector(selectEditingFile);
   const { deletingFileId } = useSelector(selectDeletingFile);
   const dispatch = useDispatch();

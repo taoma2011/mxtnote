@@ -76,7 +76,7 @@ export function loadImageFromPdf(pdfFile, note, cb) {
 
           scale: note.scale / 100,
         });
-        console.log('viewport is ', viewport);
+        // console.log('viewport is ', viewport);
         // eslint-disable-next-line compat/compat
         const canvas = new OffscreenCanvas(viewport.width, viewport.height);
 
@@ -185,4 +185,13 @@ export function toggleTodoDependency(dataApi, noteId, todoId) {
   const newNote = { ...note };
   newNote.todoDependency = newDependency;
   return newNote;
+}
+
+export function compareDate(a, b) {
+  // console.log(`compare ${a} with ${b}`);
+  const da = Date.parse(a);
+  const db = Date.parse(b);
+  const result = db - da;
+  // console.log(`result is ${result}`);
+  return result;
 }

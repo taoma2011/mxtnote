@@ -57,8 +57,19 @@ export const selectFilteredNotes = (state) => {
     : noteArray;
 
   const noteArraySorted = noteArrayFiltered.sort(function (n1, n2) {
-    const t1 = n1.lastModified ? Date.parse(n1.lastModified) : 0;
-    const t2 = n2.lastModified ? Date.parse(n2.lastModified) : 0;
+    const t1 = n1.lastModifiedTime ? Date.parse(n1.lastModifiedTime) : 0;
+    const t2 = n2.lastModifiedTime ? Date.parse(n2.lastModifiedTime) : 0;
+    if (t1 === 0) {
+      console.log('n1 = ', n1);
+      if (t2 === 0) {
+        return 0;
+      }
+      return -1;
+    }
+    if (t2 === 0) {
+      console.log('n2 = ', n2);
+      return 1;
+    }
     return t2 - t1;
   });
 

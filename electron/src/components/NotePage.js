@@ -14,7 +14,7 @@ import DeleteNoteDialog from './DeleteNoteDialog';
 import SyncProgressDialog from '../containers/SyncProgressDialog';
 import BackupDb from '../containers/BackupDb';
 import { selectFilteredNotes } from './selector';
-import { getNoteId } from '../utils/common';
+import { getNoteId, compareDate } from '../utils/common';
 
 const checkEqual = (prevProp, nextProp) => {
   if (prevProp.notes == null) {
@@ -42,12 +42,12 @@ export const NotePage = () => {
   const [deletingNoteId, setDeletingNoteId] = useState(null);
   const noteHeight = (index) => {
     const note = notes[index];
-    console.log('compute note height ', note);
+    // console.log('compute note height ', note);
     if (!note.height || !note.scale) {
       return 0;
     }
     const scaledHeight = (note.height || 0) * (note.scale / 100);
-    console.log(`saled height for ${index} is ${scaledHeight}`);
+    // console.log(`saled height for ${index} is ${scaledHeight}`);
     return scaledHeight + 120;
   };
   const Row = ({ index, style }) => {

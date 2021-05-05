@@ -31,7 +31,7 @@ export const OpenPdfData = async (d) => {
 
 export const getImageFromPdfPage = async (note, pdfPage) => {
   const scaledRect = scaleRect(note, note.scale / 100);
-  console.log('scaled rect is ', scaledRect);
+  // console.log('scaled rect is ', scaledRect);
 
   const viewport = pdfPage.getViewport({
     // offsetX: scaledRect.left,
@@ -39,7 +39,7 @@ export const getImageFromPdfPage = async (note, pdfPage) => {
 
     scale: note.scale / 100,
   });
-  console.log('viewport is ', viewport);
+  // console.log('viewport is ', viewport);
   // eslint-disable-next-line compat/compat
   const canvas = new OffscreenCanvas(viewport.width, viewport.height);
 
@@ -51,7 +51,7 @@ export const getImageFromPdfPage = async (note, pdfPage) => {
 
   await pdfPage.render(renderContext).promise;
 
-  console.log('extract image with ', scaledRect);
+  // console.log('extract image with ', scaledRect);
   const image = ctx.getImageData(
     scaledRect.left,
     scaledRect.top,
