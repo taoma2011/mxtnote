@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Checkbox from '@material-ui/core/Checkbox';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import List from '@material-ui/core/List';
@@ -11,32 +12,49 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import EditTodoDialog from '../containers/EditTodoDialog';
-import DeleteTodoDialog from '../containers/DeleteTodoDialog';
+import EditTodoDialog from './EditTodoDialog';
+import DeleteTodoDialog from './DeleteTodoDialog';
 import { getTodoId } from '../utils/common';
+import { selectTodos } from './selector';
+import {
+  GOTO_TODO,
+  START_DELETE_TODO,
+  START_EDIT_TODO,
+  TOGGLE_TODO_DONE,
+} from '../actions/file';
 
 export default function TodoList(props) {
   // eslint-disable-next-line react/prop-types
-  const {
-    todos,
-    hasCheckbox,
-    initiallyChecked,
-    hasEditDelete,
-    // gotoTodo,
-    editTodo,
-    deleteTodo,
-    toggleTodoDone
-  } = props;
+  const { hasCheckbox, initiallyChecked, hasEditDelete } = props;
 
+  const todos = useSelector(selectTodos);
+  const dispatch = useDispatch();
+  const action = {
+    editTodo: (todoId) =>
+      dispatch({
+        type: START_EDIT_TODO,
+        todoId,
+      }),
+    deleteTodo: (todoId) =>
+      dispatch({
+        type: START_DELETE_TODO,
+        todoId,
+      }),
+    toggleTodoDone: (todoId) =>
+      dispatch({
+        type: TOGGLE_TODO_DONE,
+        todoId,
+      }),
+  };
   const handleClickTodo = () => {
     // const todo = todos[index];
     // eslint-disable-next-line no-underscore-dangle
     // gotoTodo(todo._id);
   };
 
-  const handleDeleteTodo = index => {
+  const handleDeleteTodo = (index) => {
     const todo = todos[index];
-    deleteTodo(todo._id);
+    action.deleteTodo(todo._id);
   };
 
   let checked = initiallyChecked;
@@ -45,7 +63,7 @@ export default function TodoList(props) {
     checkedByIndex.push(false);
   }
 
-  const handleChecked = index => {
+  const handleChecked = (index) => {
     const newChecked = [];
     checkedByIndex[index] = !checkedByIndex[index];
     for (let i = 0; i < todos.length; i += 1) {
@@ -56,63 +74,73 @@ export default function TodoList(props) {
     checked = newChecked;
   };
 
+  const [editingTodoId, setEditingTodoId] = useState(null);
+  const [deletingTodoId, setDeletingTodoId] = useState(null);
   return (
-    <List>
-      {todos.map((todo, index) => {
-        const key = `todo-li-${index}`;
-        const checkboxLabel = `checkbox-list-label-${index}`;
-        return (
-          <ListItem
-            key={key}
-            dense
-            button
-            onClick={() => handleClickTodo(index)}
-          >
-            {hasCheckbox && (
-              <ListItemIcon>
-                <Checkbox
-                  edge="start"
-                  checked={checked.indexOf(index) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  onClick={() => handleChecked(index)}
-                  inputProps={{ 'aria-labelledby': checkboxLabel }}
-                />
-              </ListItemIcon>
-            )}
-            <ListItemText primary={todo.description} />
-            <EditTodoDialog context={getTodoId(todo)} />
-            <DeleteTodoDialog context={getTodoId(todo)} />
+    <>
+      <List>
+        {todos.map((todo, index) => {
+          const key = `todo-li-${index}`;
+          const checkboxLabel = `checkbox-list-label-${index}`;
+          return (
+            <ListItem
+              key={key}
+              dense
+              button
+              onClick={() => handleClickTodo(index)}
+            >
+              {hasCheckbox && (
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={checked.indexOf(index) !== -1}
+                    tabIndex={-1}
+                    disableRipple
+                    onClick={() => handleChecked(index)}
+                    inputProps={{ 'aria-labelledby': checkboxLabel }}
+                  />
+                </ListItemIcon>
+              )}
+              <ListItemText primary={todo.description} />
 
-            {hasEditDelete && (
-              <ListItemSecondaryAction>
-                <ToggleButton
-                  value="check"
-                  size="small"
-                  onChange={() => toggleTodoDone(getTodoId(todo))}
-                  selected={todo.done}
-                >
-                  Done
-                </ToggleButton>
-                <IconButton
-                  edge="end"
-                  aria-label="edit"
-                  onClick={() => editTodo(getTodoId(todo))}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={() => handleDeleteTodo(index)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            )}
-          </ListItem>
-        );
-      })}
-    </List>
+              {hasEditDelete && (
+                <ListItemSecondaryAction>
+                  <ToggleButton
+                    value="check"
+                    size="small"
+                    onChange={() => action.toggleTodoDone(getTodoId(todo))}
+                    selected={todo.done}
+                  >
+                    Done
+                  </ToggleButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="edit"
+                    onClick={() => action.editTodo(getTodoId(todo))}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => action.handleDeleteTodo(index)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              )}
+            </ListItem>
+          );
+        })}
+      </List>
+      <EditTodoDialog
+        todoId={editingTodoId}
+        onClose={() => setEditingTodoId(null)}
+      />
+      <DeleteTodoDialog
+        todoId={deletingTodoId}
+        onClose={() => setDeletingTodoId(null)}
+      />
+    </>
   );
 }

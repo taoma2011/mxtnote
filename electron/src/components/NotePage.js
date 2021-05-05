@@ -1,22 +1,22 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-import Paper from "@material-ui/core/Paper";
-import NotePanel from "../containers/NotePanel";
-import LoadNote from "../containers/LoadNote";
-import NoteControl from "../containers/NoteControl";
-import NoteEditorDialog from "../containers/NoteEditorDialog";
-import ResetConfirmDialog from "../containers/ResetConfirmDialog";
-import ResolveConflictDialog from "../containers/ResolveConflictDialog";
-import SyncProgressDialog from "../containers/SyncProgressDialog";
-import BackupDb from "../containers/BackupDb";
-
-import { getNoteId } from "../utils/common";
-
-import { VariableSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Paper from '@material-ui/core/Paper';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { VariableSizeList as List } from 'react-window';
+import NotePanel from './NotePanel';
+import LoadNote from './LoadNote';
+import NoteControl from './NoteControl';
+import NoteEditorDialog from '../containers/NoteEditorDialog';
+import ResetConfirmDialog from '../containers/ResetConfirmDialog';
+import ResolveConflictDialog from '../containers/ResolveConflictDialog';
+import DeleteNoteDialog from './DeleteNoteDialog';
+import SyncProgressDialog from '../containers/SyncProgressDialog';
+import BackupDb from '../containers/BackupDb';
+import { selectFilteredNotes } from './selector';
+import { getNoteId, compareDate } from '../utils/common';
 
 const checkEqual = (prevProp, nextProp) => {
-  if (prevProp.noteLoaded != nextProp.noteLoaded) return false;
   if (prevProp.notes == null) {
     if (nextProp.notes != null) return false;
     return true;
@@ -24,32 +24,30 @@ const checkEqual = (prevProp, nextProp) => {
   if (nextProp.notes == null) {
     return false;
   }
-  if (prevProp.notes.length != nextProp.notes.length) return false;
-  for (let i = 0; i < prevProp.notes.length; i++) {
+  if (prevProp.notes.length !== nextProp.notes.length) return false;
+  for (let i = 0; i < prevProp.notes.length; i += 1) {
     const pn = prevProp.notes[i];
     const nn = nextProp.notes[i];
-    if (pn._id != nn._id) return false;
-    if (pn.height != nn.height) return false;
-    if (pn.scale != nn.scale) return false;
+    if (pn.id !== nn.id) return false;
+    if (pn.height !== nn.height) return false;
+    if (pn.scale !== nn.scale) return false;
   }
   return true;
 };
-export const NotePage = React.memo(function NotePage(props) {
-  //const items = [];
+
+export const NotePage = () => {
   // eslint-disable-next-line react/prop-types
-  const { notes, noteLoaded } = props;
-  //console.log("note page: all notes ", notes);
-  /*
-    if (notes) {
-      notes.forEach((note) => {
-        const domKey = `notepanel-${getNoteId(note)}`;
-        items.push(<NotePanel nid={getNoteId(note)} key={domKey} />);
-      });
-    }
-    */
+  const { notes } = useSelector(selectFilteredNotes, checkEqual);
+
+  const [deletingNoteId, setDeletingNoteId] = useState(null);
   const noteHeight = (index) => {
     const note = notes[index];
+    // console.log('compute note height ', note);
+    if (!note.height || !note.scale) {
+      return 0;
+    }
     const scaledHeight = (note.height || 0) * (note.scale / 100);
+    // console.log(`saled height for ${index} is ${scaledHeight}`);
     return scaledHeight + 120;
   };
   const Row = ({ index, style }) => {
@@ -58,47 +56,19 @@ export const NotePage = React.memo(function NotePage(props) {
 
     return (
       <div style={style}>
-        <NotePanel nid={getNoteId(note)} key={domKey} />
+        <NotePanel
+          noteId={getNoteId(note)}
+          key={domKey}
+          onDelete={(noteId) => setDeletingNoteId(noteId)}
+        />
       </div>
     );
   };
-  /*
-    return (
-      <div style={{ background: "blue", height: "100%" }}>
-        {!noteLoaded && <LoadNote />}
-        <BackupDb />
-        <Paper height="100%" style={{ height: "100%" }}>
-          <div style={{ display: "flex", height: "100%" }}>
-            <NoteControl />
 
-            <div style={{ flex: "1 1 auto" }}>
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    height={height}
-                    itemCount={notes.length}
-                    itemSize={35}
-                    width={width}
-                  >
-                    {Row}
-                  </List>
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-          <NoteEditorDialog />
-          <ResetConfirmDialog />
-          <ResolveConflictDialog />
-        </Paper>
-      </div>
-    );
-    */
   return (
-    <div style={{ height: "100%" }}>
-      {!noteLoaded && <LoadNote />}
-      <BackupDb />
+    <div style={{ height: '100%' }}>
       <NoteControl />
-      <Paper height="100%" style={{ height: "100%" }}>
+      <Paper height="100%" style={{ height: '100%' }}>
         <AutoSizer>
           {({ height, width }) => (
             <List
@@ -111,12 +81,17 @@ export const NotePage = React.memo(function NotePage(props) {
             </List>
           )}
         </AutoSizer>
+        <DeleteNoteDialog
+          noteId={deletingNoteId}
+          onClose={() => setDeletingNoteId(null)}
+        />
         <NoteEditorDialog />
         <ResetConfirmDialog />
         <SyncProgressDialog />
         <ResolveConflictDialog />
       </Paper>
-      )}
     </div>
   );
-}, checkEqual);
+};
+
+export default NotePage;

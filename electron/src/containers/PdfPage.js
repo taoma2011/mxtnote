@@ -1,6 +1,7 @@
-import { connect } from "react-redux";
-import PdfPage from "../components/PdfPage";
-import { RENDER_COMPLETE, ADD_NOTE, PAGE_SIZE_READY } from "../actions/file";
+import { connect } from 'react-redux';
+import PdfPage from '../components/PdfPage';
+import { RENDER_COMPLETE, ADD_NOTE, PAGE_SIZE_READY } from '../actions/file';
+import { createNote } from '../features/backend/backendSlice';
 
 // eslint-disable-next-line no-unused-vars
 function mapStateToProps(state) {
@@ -20,12 +21,12 @@ function mapDispatchToProps(dispatch) {
     notifyPageSizeReady: (pageWidth, pageHeight) =>
       dispatch({ type: PAGE_SIZE_READY, pageWidth, pageHeight }),
     addNoteAt: (e) =>
-      dispatch({
-        type: ADD_NOTE,
-        // not sure why we need to -100?
-        x: e.nativeEvent.offsetX,
-        y: e.nativeEvent.offsetY,
-      }),
+      dispatch(
+        createNote({
+          x: e.nativeEvent.offsetX,
+          y: e.nativeEvent.offsetY,
+        })
+      ),
   };
 }
 

@@ -1,14 +1,16 @@
 // @flow
-import { combineReducers } from "redux";
-import { connectRouter } from "connected-react-router";
-import file from "./file";
-import search from "../features/search/searchSlice";
+import { combineReducers } from 'redux';
+import { connectRouter } from 'connected-react-router';
+import file from './file';
+import search from '../features/search/searchSlice';
+import backend from '../features/backend/backendSlice';
 
 export default function createRootReducer(history) {
   return combineReducers({
-    router: connectRouter(history),
+    // router: connectRouter(history),
     file,
     search,
+    backend,
   });
 }
 

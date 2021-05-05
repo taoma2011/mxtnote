@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useRef, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import { FixedSizeList as List } from 'react-window';
@@ -8,13 +8,21 @@ import SplitPane from 'react-split-pane';
 import FileControl from '../containers/FileControl';
 import { SearchControl } from './SearchControl';
 import { SearchResult } from './SearchResult';
-import DeleteNoteDialog from '../containers/DeleteNoteDialog';
+import DeleteNoteDialog from './DeleteNoteDialog';
 import { PageWrapper } from './PageWrapper';
-import LoadNote from '../containers/LoadNote';
-import LoadFile from '../containers/LoadFile';
+import LoadNote from './LoadNote';
+import LoadFile from './LoadFile';
 import LoadSettings from '../containers/LoadSettings';
 import BackupDb from '../containers/BackupDb';
 import { selectSearchText } from '../features/search/searchSlice';
+import { compareDate } from '../utils/common';
+
+import {
+  selectNotes,
+  selectCurrentFile,
+  selectFilePageProps,
+} from './selector';
+import { updatePageScroll } from '../actions/file';
 
 export const FilePage = (props) => {
   // eslint-disable-next-line react/prop-types
@@ -23,19 +31,23 @@ export const FilePage = (props) => {
     status,
     doc,
     pageNum,
+    pageNumIsEffective,
     numPages,
-    fileId,
     docLoading,
     noteLoaded,
-    notes,
     scale,
     searchResults,
     settingsLoaded,
     pageWidth,
     pageHeight,
-    updatePageScroll,
-  } = props;
+  } = useSelector(selectFilePageProps, shallowEqual);
 
+  const dispatch = useDispatch();
+  // console.log('page height = ', pageHeight);
+
+  const notes = useSelector(selectNotes, shallowEqual);
+
+  const { currentFile } = useSelector(selectCurrentFile, shallowEqual);
   /*
   const pageDivStyle = {
     position: "relative",
@@ -43,7 +55,7 @@ export const FilePage = (props) => {
   */
 
   const Row = ({ index, style }) => {
-    console.log(`loading row ${index}`);
+    // console.log(`loading row ${index}`);
     const domKey = `page-panel-${index}`;
 
     return (
@@ -55,7 +67,7 @@ export const FilePage = (props) => {
           searchResults={searchResults}
           pdfDoc={doc}
           key={domKey}
-          fileId={fileId}
+          fileId={currentFile.id}
           pageWidth={pageWidth}
           pageHeight={pageHeight}
         />
@@ -64,14 +76,14 @@ export const FilePage = (props) => {
   };
 
   const displayPageHeight = React.useMemo(() => pageHeight || 80, [pageHeight]);
-  console.log('display page height = ', displayPageHeight);
+  // console.log('display page height = ', displayPageHeight);
 
   const scrollUpdate = ({ scrollOffset }) => {
     if (pageHeight) {
       const newPageNum = Math.floor((scrollOffset + 1) / pageHeight) + 1;
       if (newPageNum !== pageNum) {
         console.log('update page scroll: ', newPageNum);
-        updatePageScroll(newPageNum);
+        dispatch(updatePageScroll(newPageNum));
       }
     }
   };
@@ -81,21 +93,21 @@ export const FilePage = (props) => {
   // so we need to call the scrollToItem api
   const listRef = useRef(null);
   useEffect(() => {
-    if (listRef && listRef.current && pageHeight) {
+    if (listRef && listRef.current && pageHeight && pageNumIsEffective) {
       console.log('scroll in useEffect');
       listRef.current.scrollToItem(pageNum - 1);
     }
   });
   const pages = () => {
     if (status === 'ready') {
-      console.log('doc is ready, displayPageHeight is ', displayPageHeight);
-      console.log('num page is ', numPages);
+      // console.log('doc is ready, displayPageHeight is ', displayPageHeight);
+      // console.log('num page is ', numPages);
 
       let initialScrollOffset = 0;
       // if we have page height, we scroll to the desired page
       if (pageHeight) {
         initialScrollOffset = (pageNum - 1) * pageHeight + 1;
-        console.log('set initial scroll to ', initialScrollOffset);
+        // console.log('set initial scroll to ', initialScrollOffset);
 
         const list = (
           <List
@@ -119,7 +131,7 @@ export const FilePage = (props) => {
           notes={notes}
           pdfDoc={doc}
           key="test-page"
-          fileId={fileId}
+          fileId={currentFile.id}
           pageWidth={0}
           pageHeight={0}
         />
@@ -153,10 +165,8 @@ export const FilePage = (props) => {
       </div>
       <div style={{ height: viewPortHeight }}>
         <Paper height="100%" style={{ height: '100%' }}>
-          {!noteLoaded && <LoadNote />}
           {!settingsLoaded && <LoadSettings />}
-          {docLoading && <LoadFile />}
-          <BackupDb />
+          <LoadFile />
           <DeleteNoteDialog />
           {searchText ? (
             <SplitPane

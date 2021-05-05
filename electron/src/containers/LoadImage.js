@@ -1,13 +1,13 @@
-import { connect } from "react-redux";
-import LoadImage from "../components/LoadImage";
-import { IMAGE_DATA_READY, IMAGE_FILE_READY } from "../actions/file";
-import { findFileById } from "../utils/common";
+import { connect } from 'react-redux';
+import LoadImage from '../components/LoadImage';
+import { IMAGE_DATA_READY, IMAGE_FILE_READY } from '../actions/file';
+import { findFileById } from '../utils/common';
 
 function mapStateToProps(state, ownProp) {
   const { file } = state;
   const nid = ownProp.context;
   if (!nid) {
-    console.log("load image no nid");
+    console.log('load image no nid');
     return {};
   }
 
@@ -25,6 +25,9 @@ function mapStateToProps(state, ownProp) {
     imageFile: n.imageFile,
   };
 }
+
+// try to clean up this, dont need to send back event IMAGE_DATA_READY, IMAGE_FILE_READY,
+// directly use api to load image and set the image buffer
 
 function mapDispatchToProps(dispatch) {
   return {

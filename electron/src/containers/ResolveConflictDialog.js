@@ -1,8 +1,9 @@
-import { connect } from "react-redux";
-import { IMPORT_NOTE_FROM_REMOTE, RESOLVE_DONE } from "../actions/file";
+import { connect } from 'react-redux';
 // import { isNewNote } from '../utils/common';
-import ResolveConflictDialog from "../components/ResolveConflictDialog";
-import { doSync, mergeAndExport } from "../reducers/file";
+import ResolveConflictDialog from '../components/ResolveConflictDialog';
+// import { doSync, mergeAndExport } from '../utils/remote';
+import { RESOLVE_DONE } from '../actions/file';
+
 function mapStateToProps(state) {
   const { file } = state;
   const {
@@ -11,6 +12,7 @@ function mapStateToProps(state) {
     resolveConflictRemote,
     remoteDb,
     currentIndex,
+    dataApi,
   } = file;
 
   return {
@@ -19,30 +21,32 @@ function mapStateToProps(state) {
     resolveConflictRemote: resolveConflictRemote || {},
     remoteDb,
     currentIndex,
+    dataApi,
   };
 }
 
 function continueMergeThunk(remoteDb, currIndex, resolveResult) {
-  return function(dispatch) {
+  return function (dispatch) {
     return mergeAndExport(remoteDb, currIndex, resolveResult).then((result) => {
       dispatch(result);
+      return true;
     });
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    handleCancel: (remoteDb, currentIndex) => {
+    handleCancel: (dataApi, remoteDb, currentIndex) => {
       dispatch({ type: RESOLVE_DONE });
-      dispatch(continueMergeThunk(remoteDb, currentIndex, "cancel"));
+      dispatch(continueMergeThunk(dataApi, remoteDb, currentIndex, 'cancel'));
     },
-    chooseLocal: (remoteDb, currentIndex) => {
+    chooseLocal: (dataApi, remoteDb, currentIndex) => {
       dispatch({ type: RESOLVE_DONE });
-      dispatch(continueMergeThunk(remoteDb, currentIndex, "local"));
+      dispatch(continueMergeThunk(dataApi, remoteDb, currentIndex, 'local'));
     },
-    chooseRemote: (remoteDb, currentIndex) => {
+    chooseRemote: (dataApi, remoteDb, currentIndex) => {
       dispatch({ type: RESOLVE_DONE });
-      dispatch(continueMergeThunk(remoteDb, currentIndex, "remote"));
+      dispatch(continueMergeThunk(dataApi, remoteDb, currentIndex, 'remote'));
     },
   };
 }

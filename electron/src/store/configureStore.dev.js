@@ -8,9 +8,10 @@ import * as counterActions from '../actions/counter';
 
 // import { DeleteAllNotes } from '../utils/db';
 
-const history = createHashHistory();
+// TODO
+// const history = createHashHistory();
 
-const rootReducer = createRootReducer(history);
+const rootReducer = createRootReducer();
 
 const configureStore = (initialState) => {
   console.log('XXX initialState is ', initialState);
@@ -29,7 +30,7 @@ const configureStore = (initialState) => {
   // Logging Middleware
   const logger = createLogger({
     level: 'info',
-    collapsed: true
+    collapsed: true,
   });
 
   // Skip redux logs in console during the tests
@@ -38,22 +39,26 @@ const configureStore = (initialState) => {
   }
 
   // Router Middleware
-  const router = routerMiddleware(history);
+  const router = routerMiddleware();
   middleware.push(router);
 
   // Redux DevTools Configuration
   const actionCreators = {
     ...counterActions,
-    ...routerActions
+    ...routerActions,
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */
+  /* TODO */
+  /*
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
         // Options: http://extension.remotedev.io/docs/API/Arguments.html
-        actionCreators
+        actionCreators,
       })
     : compose;
+    */
+  const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
 
   // Apply Middleware & Compose Enhancers
@@ -74,4 +79,4 @@ const configureStore = (initialState) => {
   return store;
 };
 
-export default { configureStore, history };
+export default { configureStore };

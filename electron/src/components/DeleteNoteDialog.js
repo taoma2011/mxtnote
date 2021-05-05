@@ -1,18 +1,27 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { selectApi, selectDeletingNote } from './selector';
+import * as ActionCreators from '../actions/ActionCreators';
+import { deleteNote } from '../features/backend/backendSlice';
 
 export default function DeleteNoteDialog(props) {
-  const { deleting, noteId, handleClose, deleteNote } = props;
+  const { deletingNoteId } = useSelector(selectDeletingNote);
+  const { dataApi } = useSelector(selectApi);
+  const dispatch = useDispatch();
+
+  // const note = dataApi.GetNoteById(deletingNoteId);
+
   return (
     <Dialog
-      open={deleting}
-      onClose={handleClose}
+      open={!!deletingNoteId}
+      onClose={() => dispatch(ActionCreators.CloseDeleteNoteDialog())}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -23,10 +32,17 @@ export default function DeleteNoteDialog(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose(noteId)} color="primary">
+        <Button
+          onClick={() => dispatch(ActionCreators.CloseDeleteNoteDialog())}
+          color="primary"
+        >
           Cancel
         </Button>
-        <Button onClick={() => deleteNote(noteId)} color="primary" autoFocus>
+        <Button
+          onClick={() => dispatch(deleteNote({ noteId: deletingNoteId }))}
+          color="primary"
+          autoFocus
+        >
           Ok
         </Button>
       </DialogActions>

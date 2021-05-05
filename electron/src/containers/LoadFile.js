@@ -7,17 +7,17 @@ function mapStateToProps(state) {
   console.log('in load file container');
   const file = state.file || {};
   return {
-    pdfFile: file.fileName
+    pdfFile: file.fileName,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    documentLoaded: pdfDoc =>
+    documentLoaded: (pdfDoc) =>
       dispatch({
         type: FILE_LOADED,
-        doc: pdfDoc
-      })
+        doc: pdfDoc,
+      }),
   };
 }
 

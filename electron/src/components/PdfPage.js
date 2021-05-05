@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 export default class PdfPage extends Component {
   constructor(props) {
@@ -10,8 +10,13 @@ export default class PdfPage extends Component {
     this.notifyPageSizeReady = props.notifyPageSizeReady;
     this.addNoteAt = props.addNoteAt;
     this.handleClick = this.handleClick.bind(this);
+
     this.pageWidth = props.pageWidth;
     this.pageHeight = props.pageHeight;
+    /*
+    console.log(
+      `pdf page got page height ${this.pageHeight} width ${this.pageWidth}`
+    );*/
   }
 
   componentDidMount() {
@@ -26,19 +31,19 @@ export default class PdfPage extends Component {
     // $FlowFixMe
     const canvas = this.canvas.current;
     const page = this.pdfPage;
-    console.log("render page");
+    // console.log('render page');
     if (!page) {
       return;
     }
     if (this.renderTask) {
       await this.renderTask.promise;
     }
-    console.log("render this page ", page);
-    console.log("canvas is ", canvas);
+    // console.log('render this page ', page);
+    // console.log('canvas is ', canvas);
     // var viewport = page.getViewport({scale: scale});
     // $FlowFixMe
 
-    //const moreScale = 2.0;
+    // const moreScale = 2.0;
     const moreScale = 2.0;
 
     const viewport = page.getViewport({ scale: this.scale * moreScale });
@@ -49,15 +54,23 @@ export default class PdfPage extends Component {
     const pageHeight = Math.floor(viewport.height / moreScale);
     const pageWidth = Math.floor(viewport.width / moreScale);
 
-    canvas.style.height = pageHeight + "px";
-    canvas.style.width = pageWidth + "px";
-    if (pageWidth != this.pageWidth || pageHeight != this.pageHeight) {
+    canvas.style.height = pageHeight + 'px';
+    canvas.style.width = pageWidth + 'px';
+    if (
+      Math.abs(pageWidth - this.pageWidth) > 5 ||
+      Math.abs(pageHeight - this.pageHeight) > 5
+    ) {
+      /*
+      console.log(
+        `note page size old width = ${this.pageWidth}, new width = ${pageWidth}, old height = ${this.pageHeight}, new height = ${pageHeight}`
+      );
+      */
       this.notifyPageSizeReady(pageWidth, pageHeight);
     }
     //canvas.style.height = Math.floor(viewport.height / moreScale);
     //canvas.style.width = Math.floor(viewport.width / moreScale);
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     // Render PDF page into canvas context
     const renderContext = {
       canvasContext: ctx,
@@ -71,13 +84,13 @@ export default class PdfPage extends Component {
     // eslint-disable-next-line promise/catch-or-return
     this.renderTask.promise
       .then(() => {
-        console.log("render done");
+        // console.log('render done');
         this.notifyRenderComplete(this.canvas.current);
         this.renderTask = null;
         return true;
       })
       .catch((err) => {
-        console.log("error in render ", err);
+        console.log('error in render ', err);
       });
   }
 
@@ -94,10 +107,10 @@ export default class PdfPage extends Component {
     const { pdfPage, scale, addingNote } = this.props;
     this.pdfPage = pdfPage;
     this.scale = scale / 100;
-    console.log("pdf page rendered called");
+    // console.log('pdf page rendered called');
     // eslint-disable-next-line react/prop-types
 
-    const style = addingNote ? { cursor: "crosshair" } : {};
+    const style = addingNote ? { cursor: 'crosshair' } : {};
     return (
       <canvas ref={this.canvas} style={style} onClick={this.handleClick} />
     );

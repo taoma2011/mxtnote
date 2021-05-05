@@ -1,15 +1,19 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import PdfPage from '../containers/PdfPage';
-import SelectRect from '../containers/SelectRect';
-import StaticRect from '../containers/StaticRect';
+import SelectRect from './SelectRect';
+import StaticRect from './StaticRect';
 import { SearchMatchRect } from './SearchMatchRect';
 import { scaleRect } from '../utils/common';
 
-export const PageWrapper = (props) => {
+import { selectApi } from './selector';
+
+export const PageWrapper = React.memo((props) => {
   const [page, setPage] = React.useState(null);
 
+  const { dataApi, apiState } = useSelector(selectApi);
   const {
     pdfDoc,
     pageNum,
@@ -21,25 +25,26 @@ export const PageWrapper = (props) => {
     pageHeight,
   } = props;
   React.useEffect(() => {
-    console.log(`loading ${pageNum}`);
-    pdfDoc
-      // eslint-disable-next-line react/prop-types
-      .getPage(pageNum)
+    // console.log(`loading ${pageNum}`);
+    dataApi
+      .GetDocumentPage(pdfDoc, pageNum)
       .then((p) => {
         // pageLoaded(page);
-        console.log(`page ${pageNum} is loaded`);
+        // console.log(`page ${pageNum} is loaded`);
         setPage(p);
         return true;
       })
       .catch(() => null);
-  });
+  }, [dataApi, apiState]);
   const items = [];
+
+  // console.log('page wrapper get notes: ', fileId);
   if (notes) {
-    Object.keys(notes).forEach((key) => {
-      const n = notes[key];
+    notes.forEach((n) => {
       // eslint-disable-next-line react/prop-types
       if (n.page === pageNum && n.fileId === fileId) {
-        items.push(<StaticRect nid={key} key={key} />);
+        // console.log('found note in the page ', pageNum);
+        items.push(<StaticRect noteId={n.id} key={n.id} />);
       }
     });
   }
@@ -76,7 +81,7 @@ export const PageWrapper = (props) => {
   }
 
   if (page) {
-    console.log(`page ${pageNum} is ready`);
+    //console.log(`page ${pageNum} is ready`);
     return (
       <>
         <SelectRect />
@@ -87,7 +92,7 @@ export const PageWrapper = (props) => {
   }
 
   return <p>loading page</p>;
-};
+});
 
 PageWrapper.propTypes = {
   pageNum: PropTypes.number.isRequired,
