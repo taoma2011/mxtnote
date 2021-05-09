@@ -30,7 +30,7 @@ export const SearchResult = () => {
     let remainText = text;
     let i = remainText.toLocaleLowerCase().indexOf(lcSearchText);
     while (i !== -1) {
-      console.log('i = ', i);
+      // console.log('i = ', i);
       const beforeMatch = text.substring(0, i);
       children.push(<span>{beforeMatch}</span>);
       children.push(

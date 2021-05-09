@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 export const SearchMatchRect = (props) => {
   // eslint-disable-next-line react/prop-types
   const { top, left, width, height } = props;
-  console.log('search match render called ', left, top, width, height);
+  // console.log('search match render called ', left, top, width, height);
 
   const style = {
     zIndex: 0,

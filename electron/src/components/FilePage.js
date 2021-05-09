@@ -93,6 +93,7 @@ export const FilePage = (props) => {
   // so we need to call the scrollToItem api
   const listRef = useRef(null);
   useEffect(() => {
+    console.log('file page update, pageNumIsEffective: ', pageNumIsEffective);
     if (listRef && listRef.current && pageHeight && pageNumIsEffective) {
       console.log('scroll in useEffect');
       listRef.current.scrollToItem(pageNum - 1);

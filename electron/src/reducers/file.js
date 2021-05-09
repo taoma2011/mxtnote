@@ -252,6 +252,7 @@ export default function file(state, action) {
         console.log('invalid page ', page, state.pageNum);
         return state;
       }
+      console.log('set page to ', page);
       const newState = {
         ...state,
         pageNum: page,

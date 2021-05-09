@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 /* eslint-disable promise/catch-or-return */
-import * as pdfjs from 'pdfjs-dist';
+// import * as pdfjs from 'pdfjs-dist';
 
 import { isWebApp } from './env';
 
@@ -49,61 +49,6 @@ export function replaceTodoById(todos, id, newTodo) {
       return newTodo;
     }
     return todo;
-  });
-}
-
-export function loadPdfFile(pdfFile, cb) {
-  pdfjs.getDocument(pdfFile).promise.then((pdfDoc) => {
-    if (pdfDoc) {
-      cb(pdfDoc);
-    }
-  });
-}
-
-// this is moved to LoadNoteImage, delete later
-export function loadImageFromPdf(pdfFile, note, cb) {
-  // eslint-disable-next-line promise/catch-or-return
-  console.log('load pdf ', pdfFile);
-  pdfjs.getDocument(pdfFile).promise.then((pdfDoc) => {
-    if (pdfDoc) {
-      pdfDoc.getPage(note.page).then((page) => {
-        const scaledRect = scaleRect(note, note.scale / 100);
-        console.log('scaled rect is ', scaledRect);
-
-        const viewport = page.getViewport({
-          // offsetX: scaledRect.left,
-          // offsetY: scaledRect.top,
-
-          scale: note.scale / 100,
-        });
-        // console.log('viewport is ', viewport);
-        // eslint-disable-next-line compat/compat
-        const canvas = new OffscreenCanvas(viewport.width, viewport.height);
-
-        const ctx = canvas.getContext('2d');
-        const renderContext = {
-          canvasContext: ctx,
-          viewport,
-        };
-
-        page.render(renderContext).promise.then(() => {
-          console.log('offline render complete');
-          if (cb) {
-            console.log('extract image with ', scaledRect);
-            const image = ctx.getImageData(
-              scaledRect.left,
-              scaledRect.top,
-              scaledRect.width,
-              scaledRect.height
-            );
-            cb(image.data.buffer);
-          }
-          return true;
-        });
-        return true;
-      });
-    }
-    return true;
   });
 }
 
@@ -194,4 +139,10 @@ export function compareDate(a, b) {
   const result = db - da;
   // console.log(`result is ${result}`);
   return result;
+}
+
+export function getDataApiFromThunk(thunkAPI) {
+  const fileState = thunkAPI.getState().file;
+  const { dataApi } = fileState;
+  return dataApi;
 }

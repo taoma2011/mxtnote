@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getDataApiFromThunk } from '../../utils/common';
 
 const initialState = {
   searchText: '',
@@ -70,8 +71,9 @@ function getIndicesOf(searchStr, str) {
   return indices;
 }
 
-async function searchPage(doc, pn, searchText, dispatch) {
-  const pageHandle = await doc.getPage(pn);
+async function searchPage(dataApi, doc, pn, searchText, dispatch) {
+  // const pageHandle = await doc.getPage(pn);
+  const pageHandle = await dataApi.GetDocumentPage(doc, pn);
   // add page promise
   const text = await pageHandle.getTextContent();
 
@@ -136,7 +138,9 @@ async function searchPage(doc, pn, searchText, dispatch) {
 
 export const searchTextInDoc = createAsyncThunk(
   'search/searchTextInDoc',
-  ({ searchText, doc }, { dispatch }) => {
+  ({ searchText, doc }, thunkAPI) => {
+    const { dispatch } = thunkAPI;
+    const dataApi = getDataApiFromThunk(thunkAPI);
     console.log('in searchText thunk, text = ', searchText);
     console.log('doc = ', doc);
     dispatch(searchSlice.actions.setSearchText(searchText));
@@ -144,7 +148,7 @@ export const searchTextInDoc = createAsyncThunk(
     const searchPromises = []; // collecting all page promises
     for (let j = 1; j <= maxPages; j += 1) {
       (function (pn) {
-        searchPromises.push(searchPage(doc, pn, searchText, dispatch));
+        searchPromises.push(searchPage(dataApi, doc, pn, searchText, dispatch));
       })(j);
     }
     return Promise.all(searchPromises);

@@ -210,6 +210,7 @@ export const selectFilePageProps = (state) => {
     doc,
     docLoading,
     pageNum,
+    pageNumIsEffective,
     numPages,
     fileId,
     scale,

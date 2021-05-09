@@ -50,7 +50,6 @@ export interface CacheApi {
   FillFileCache(): void;
 }
 
-// TODO: implement 17 apis imported by reducers/file.js
 export interface DataApi {
   cache: CacheApi | null;
   Initialize(data: any): string;

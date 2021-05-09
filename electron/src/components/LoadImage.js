@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 import React, { useEffect } from 'react';
-import { loadImageFromPdf } from '../utils/common';
+import { loadImageFromPdf } from '../utils/pdfutils';
 
 export default function LoadImage(props) {
   // eslint-disable-next-line react/prop-types
