@@ -1,11 +1,12 @@
-import { connect } from "react-redux";
-import LoadSettings from "../components/LoadSettings";
-import { GetSettings } from "../utils/db";
-import { SCALE_CHANGED } from "../actions/file";
+import { connect } from 'react-redux';
+import LoadSettings from '../components/LoadSettings';
+import { GetSettings } from '../utils/db';
+import { SCALE_CHANGED } from '../actions/file';
 
+// this is obsolete
 function asyncLoadSettings() {
   return (dispatch) => {
-    console.log("111");
+    console.log('111');
     return GetSettings().then((settings) => {
       //console.log("got settings ", settings);
       if ((settings || {}).scale) {

@@ -23,7 +23,7 @@ export const InitDb = () => {
   noteDb = new Datastore({ filename: 'note.db', autoload: true });
   noteDbP = DatastorePromises.create('note.db');
   todoDb = new Datastore({ filename: 'todo.db', autoload: true });
-  settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
+  //settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
   settingsDbP = DatastorePromises.create('settings.db');
 };
 
@@ -57,6 +57,7 @@ export const GetNoteByUuid = (uuid) => {
 };
 
 export const GetSettings = () => {
+  /*
   return new Promise(function (resolve, reject) {
     settingsDb.find({ scope: 'global' }, function (err, doc) {
       if (err) {
@@ -66,21 +67,20 @@ export const GetSettings = () => {
       }
     });
   });
+  */
+  return settingsDbP.findOne({ scope: 'global' });
 };
 
 export const DeleteSettings = () => {
-  settingsDb.remove({}, { multi: true });
+  settingsDbP.remove({}, { multi: true });
 };
 
 export const SetScale = (s) => {
   console.log('begin set scale ', s);
-  settingsDb.update(
+  settingsDbP.update(
     { scope: 'global' },
     { scope: 'global', scale: s },
-    { upsert: true },
-    (err) => {
-      console.log('set scale error ', err);
-    }
+    { upsert: true }
   );
 };
 
@@ -106,14 +106,11 @@ export const SetFileLastPage = async (fileId, p) => {
   );
 };
 
-export const SetUserPass = (user, password) => {
-  settingsDb.update(
+export const SetUserPass = async (user, password) => {
+  settingsDbP.update(
     { scope: 'global' },
     { scope: 'global', user: user, password: password },
-    { upsert: true },
-    (err) => {
-      console.log('set user pass error ', err);
-    }
+    { upsert: true }
   );
 };
 

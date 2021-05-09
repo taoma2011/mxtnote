@@ -29,15 +29,16 @@ export const OpenPdfData = async (d) => {
   return pdfDoc;
 };
 
-export const getImageFromPdfPage = async (note, pdfPage) => {
-  const scaledRect = scaleRect(note, note.scale / 100);
+export const getImageFromPdfPage = async (note, pdfPage, scale) => {
+  const finalScale = (note.scale / 100) * scale;
+  const scaledRect = scaleRect(note, finalScale);
   // console.log('scaled rect is ', scaledRect);
 
   const viewport = pdfPage.getViewport({
     // offsetX: scaledRect.left,
     // offsetY: scaledRect.top,
 
-    scale: note.scale / 100,
+    scale: finalScale,
   });
   // console.log('viewport is ', viewport);
   // eslint-disable-next-line compat/compat

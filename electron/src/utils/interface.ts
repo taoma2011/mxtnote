@@ -65,7 +65,7 @@ export interface DataApi {
   DeleteAllDocuments(): void;
   DeleteAllNotes(): void;
   DeleteAllTodos(): void;
-  LoadNoteImage(noteId: string): Promise<any>;
+  LoadNoteImage(noteId: string, scale: number): Promise<any>;
   // need create todo?
   UpdateTodo(id: string, todo: Todo): void;
   DeleteTodo(id: string): void;

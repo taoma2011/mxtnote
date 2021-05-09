@@ -28,6 +28,7 @@ import TodoPage from './TodoPage';
 import SettingsDialog from '../components/SettingsDialog';
 import BackupDb from './BackupDb';
 
+import { initializeNoteSettings } from '../features/note/noteSlice';
 import {
   SET_TAB,
   NOTE_TAB,
@@ -148,6 +149,9 @@ function App(props) {
         type: SET_API_STATE,
         apiState: 'initialized',
       });
+
+      // initialize note settings
+      dispatch(initializeNoteSettings());
     }
   }, []);
 
@@ -207,7 +211,7 @@ function App(props) {
     const ok = await dataApi.Login(user, pass);
     if (ok) {
       console.log('saving user pass');
-      SetUserPass(user, pass);
+      await SetUserPass(user, pass);
       dispatch({
         type: SET_API_STATE,
         apiState: 'initialized',

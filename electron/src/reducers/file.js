@@ -582,7 +582,6 @@ export default function file(state, action) {
         settingsLoaded: true,
       };
     }
-
     case START_EDIT_LIBRARY: {
       return {
         ...state,

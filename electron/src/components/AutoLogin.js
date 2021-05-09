@@ -17,6 +17,7 @@ export const AutoLogin = () => {
     if (apiState === 'login-needed') {
       GetSettings()
         .then((settings) => {
+          console.log('settings is ', settings);
           if (settings && settings.user && settings.password) {
             console.log(
               `auto login with ${settings.user}, ${settings.password}`

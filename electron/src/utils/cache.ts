@@ -113,7 +113,7 @@ export const CreateCache = async (backendApi: any): Promise<DataApi> => {
   return cache;
 };
 
-export const CacheLoadNoteImage = async (noteId: string) => {
+export const CacheLoadNoteImage = async (noteId: string, scale: number) => {
   const n = getNoteById(noteId);
   if (!n) {
     return null;
@@ -125,7 +125,7 @@ export const CacheLoadNoteImage = async (noteId: string) => {
   const pdfFile = await bApi.OpenDocument(f);
   const pdfPage = await bApi.GetDocumentPage(pdfFile, n.page);
   // console.log('getting note image: ', n);
-  const image = await getImageFromPdfPage(n, pdfPage);
+  const image = await getImageFromPdfPage(n, pdfPage, scale);
   // console.log('done');
   return image;
 };

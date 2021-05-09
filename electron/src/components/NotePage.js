@@ -13,7 +13,7 @@ import ResolveConflictDialog from '../containers/ResolveConflictDialog';
 import DeleteNoteDialog from './DeleteNoteDialog';
 import SyncProgressDialog from '../containers/SyncProgressDialog';
 import BackupDb from '../containers/BackupDb';
-import { selectFilteredNotes } from './selector';
+import { selectFilteredNotes, selectNoteImageScale } from './selector';
 import { getNoteId, compareDate } from '../utils/common';
 
 const checkEqual = (prevProp, nextProp) => {
@@ -40,13 +40,15 @@ export const NotePage = () => {
   const { notes } = useSelector(selectFilteredNotes, checkEqual);
 
   const [deletingNoteId, setDeletingNoteId] = useState(null);
+  const noteImageScale = useSelector(selectNoteImageScale) || 100;
+  const userScale = noteImageScale / 100;
   const noteHeight = (index) => {
     const note = notes[index];
     // console.log('compute note height ', note);
     if (!note.height || !note.scale) {
       return 0;
     }
-    const scaledHeight = (note.height || 0) * (note.scale / 100);
+    const scaledHeight = (note.height || 0) * (note.scale / 100) * userScale;
     // console.log(`saled height for ${index} is ${scaledHeight}`);
     return scaledHeight + 120;
   };

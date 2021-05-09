@@ -8,6 +8,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import Slider from '@material-ui/core/Slider';
 import { getTodoId } from '../utils/common';
 
 import { callLogin } from '../utils/api';
@@ -15,7 +16,7 @@ import { GetSettings, SetUserPass } from '../utils/db';
 import { ElectronFileInputButton } from './ElectronFileInputButton';
 import { LoginDialog } from './LoginDialog';
 import { syncRemoteThunk } from '../utils/remote';
-
+import { setImageScale } from '../features/note/noteSlice';
 import {
   SET_NOTE_TODO_FILTER,
   IMPORT_NOTE_FROM_REMOTE,
@@ -28,6 +29,7 @@ import {
   selectApi,
   selectNoteTodoFilter,
   selectIsWeb,
+  selectNoteImageScale,
 } from './selector';
 
 export default function NoteControl(props) {
@@ -42,6 +44,7 @@ export default function NoteControl(props) {
   const todos = useSelector(selectTodos);
   const { dataApi } = useSelector(selectApi);
   const isWeb = useSelector(selectIsWeb);
+  const noteImageScale = useSelector(selectNoteImageScale);
   const dispatch = useDispatch();
   const filterChanged = (e) =>
     dispatch({ type: SET_NOTE_TODO_FILTER, todoId: e.target.value });
@@ -72,7 +75,6 @@ export default function NoteControl(props) {
   const doLogin = async () => {
     const settings = await GetSettings();
     if (settings && settings.user && settings.password) {
-
       await callLogin(settings.user, settings.password);
       return true;
     }
@@ -80,7 +82,6 @@ export default function NoteControl(props) {
   };
 
   const doImportNoteFromRemote = async () => {
-
     const ok = await doLogin();
     if (!ok) {
       setAfterLogin('import-note');
@@ -91,25 +92,22 @@ export default function NoteControl(props) {
       console.log('auto login ok');
       importNoteFromRemote(dataApi);
     }
-
   };
 
   const loginWithNewUserPass = async (user, pass) => {
-
     const ok = await callLogin(user, pass);
     if (ok) {
       setLoginFailed(false);
       setOpenLoginDialog(false);
 
       console.log('saving user pass');
-      SetUserPass(user, pass);
+      await SetUserPass(user, pass);
       if (afterLogin === 'import-note') {
         importNoteFromRemote(dataApi);
       }
     } else {
       setLoginFailed(true);
     }
-
   };
 
   const handleClose = () => {
@@ -118,6 +116,10 @@ export default function NoteControl(props) {
 
   const fileSelected = (name, content) => {
     dispatch({ type: IMPORT_NOTE, content });
+  };
+
+  const handleNoteImageScaleChange = (event, value) => {
+    dispatch(setImageScale(value));
   };
 
   return (
@@ -136,34 +138,47 @@ export default function NoteControl(props) {
         </FormControl>
       </Grid>
 
-     { isWeb ||
-     <>
-      <Grid item>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={doImportNoteFromRemote}
-        >
-          Sync With Remote
-        </Button>
-      </Grid>
+      {isWeb || (
+        <>
+          <Grid item>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={doImportNoteFromRemote}
+            >
+              Sync With Remote
+            </Button>
+          </Grid>
 
-      <Grid item>
-        <ElectronFileInputButton label="Import" onFileSelected={fileSelected} />
-      </Grid>
-      <Grid item>
-        <Button variant="contained" color="primary" onClick={exportNote}>
-          Export
-        </Button>
-      </Grid>
+          <Grid item>
+            <ElectronFileInputButton
+              label="Import"
+              onFileSelected={fileSelected}
+            />
+          </Grid>
+          <Grid item>
+            <Button variant="contained" color="primary" onClick={exportNote}>
+              Export
+            </Button>
+          </Grid>
 
-      <Grid item>
-        <Button variant="contained" color="primary" onClick={resetDb}>
-          Reset Db
-        </Button>
+          <Grid item>
+            <Button variant="contained" color="primary" onClick={resetDb}>
+              Reset Db
+            </Button>
+          </Grid>
+        </>
+      )}
+      <Grid item xs={1}>
+        <Slider
+          min={50}
+          max={300}
+          value={noteImageScale}
+          onChange={handleNoteImageScaleChange}
+          aria-labelledby="continuous-slider"
+          valueLabelDisplay="auto"
+        />
       </Grid>
-      </>
-}
       <LoginDialog
         open={openLoginDialog}
         loginFailed={loginFailed}

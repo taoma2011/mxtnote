@@ -178,6 +178,8 @@ export const selectSelectRect = (state) => {
   return { showSelection, scaledRect };
 };
 
+export const selectNoteImageScale = (state) => state.note.imageScale;
+
 export const selectIsWeb = (state) => state.file.isWeb;
 
 export const selectFilePageProps = (state) => {

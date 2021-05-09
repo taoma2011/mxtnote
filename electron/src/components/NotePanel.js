@@ -14,7 +14,7 @@ import Popover from '@material-ui/core/Popover';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import { selectApi } from './selector';
+import { selectApi, selectNoteImageScale } from './selector';
 
 import LoadImage from '../containers/LoadImage';
 import DeleteNoteDialog from './DeleteNoteDialog';
@@ -33,7 +33,10 @@ export default function NotePanel(props) {
   const canvasRef = React.createRef();
 
   const { dataApi, apiState } = useSelector(selectApi);
+  const noteImageScale = useSelector(selectNoteImageScale) || 100;
+  const userScale = noteImageScale / 100;
 
+  console.log('noteImageScale = ', noteImageScale);
   const [image, setImage] = React.useState(null);
   const [note, setNote] = React.useState(null);
 
@@ -59,7 +62,7 @@ export default function NotePanel(props) {
       setNote(dataApi.GetNoteById(noteId));
 
       dataApi
-        .LoadNoteImage(noteId)
+        .LoadNoteImage(noteId, userScale)
         .then((im) => {
           setImage(im);
           return true;
@@ -74,8 +77,8 @@ export default function NotePanel(props) {
     if (!note) {
       return;
     }
-    const scaledWidth = (note.width || 0) * (note.scale / 100);
-    const scaledHeight = (note.height || 0) * (note.scale / 100);
+    const scaledWidth = (note.width || 0) * (note.scale / 100) * userScale;
+    const scaledHeight = (note.height || 0) * (note.scale / 100) * userScale;
 
     if (canvasRef.current && image && scaledWidth && scaledHeight) {
       canvasRef.current.width = scaledWidth;
@@ -91,7 +94,7 @@ export default function NotePanel(props) {
         console.log(err);
       }
     }
-  }, [image, note]);
+  }, [image, note, noteImageScale]);
 
   if (!note) return null;
   const style = {
