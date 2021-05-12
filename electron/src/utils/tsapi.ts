@@ -11,12 +11,14 @@ import {
   LocalUpdateNote,
   LocalCreateNote,
   LocalDeleteNote,
+  LocalCreateTodo,
+  LocalUpdateTodo,
+  LocalDeleteTodo,
   GetAllDocumentsPromise,
   GetAllNotesPromise,
-  GetAllTodosPromise,
+  GetAllTodos,
   GetNoteByUuid,
   DeleteSettings,
-  UpdateNotePromise,
 } from './db';
 
 import { OpenPdfFile, GetPdfPage, LoadNoteImage } from './pdfutils';
@@ -56,8 +58,6 @@ export const NeoDbDataApi: DataApi = {
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,
-  UpdateTodo,
-  DeleteTodo,
 
   // is this still needed?
   LoadNoteImage,
@@ -67,11 +67,16 @@ export const NeoDbDataApi: DataApi = {
     LocalUpdateNote(NeoDbDataApi.cache)(noteId, note),
   DeleteNote: (noteId: string) => LocalDeleteNote(NeoDbDataApi.cache)(noteId),
 
+  CreateTodo: (todo: Todo) => LocalCreateTodo(NeoDbDataApi.cache)(todo),
+  UpdateTodo: (id: string, todo: Todo) =>
+    LocalUpdateTodo(NeoDbDataApi.cache)(id, todo),
+  DeleteTodo: (noteId: string) => LocalDeleteNote(NeoDbDataApi.cache)(noteId),
+
   DeleteSettings,
 
   GetAllDocumentsPromise,
   GetAllActiveNotes: GetAllNotesPromise,
-  GetAllTodos: GetAllTodosPromise,
+  GetAllTodos,
   GetNoteByUuid,
   // UpdateNotePromise,
 };

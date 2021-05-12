@@ -2,23 +2,24 @@ import { connect } from 'react-redux';
 import { ADD_TODO } from '../actions/file';
 import TodoControl from '../components/TodoControl';
 
+// this is obsolete
 function mapStateToProps(state) {
   const { file } = state;
   const { todos } = file || {};
 
   return {
-    todos
+    todos,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    addTodo: description => {
+    addTodo: (description) => {
       return dispatch({
         type: ADD_TODO,
-        description
+        description,
       });
-    }
+    },
   };
 }
 

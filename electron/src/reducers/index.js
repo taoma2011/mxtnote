@@ -5,6 +5,7 @@ import file from './file';
 import search from '../features/search/searchSlice';
 import backend from '../features/backend/backendSlice';
 import note from '../features/note/noteSlice';
+import todo from '../features/todo/todoSlice';
 
 export default function createRootReducer(history) {
   return combineReducers({
@@ -13,6 +14,7 @@ export default function createRootReducer(history) {
     search,
     backend,
     note,
+    todo,
   });
 }
 

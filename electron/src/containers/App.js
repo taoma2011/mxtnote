@@ -295,6 +295,8 @@ function App(props) {
           <Menu
             id="simple-menu"
             anchorEl={menuAnchorEl}
+            getContentAnchorEl={null}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             keepMounted
             open={Boolean(menuAnchorEl)}
             onClose={() => setMenuAnchorEl(null)}

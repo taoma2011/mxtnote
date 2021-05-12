@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
@@ -8,11 +8,16 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { selectTodos } from './selector';
+import { addTodo } from '../features/todo/todoSlice';
+
 // import TodoDependency from '../containers/TodoDependency';
 
 export default function TodoControl(props) {
   // eslint-disable-next-line react/prop-types
-  const { addTodo, todos } = props;
+  // const { addTodo, todos } = props;
+  const todos = useSelector(selectTodos);
+  const dispatch = useDispatch();
 
   const [open, setOpen] = React.useState(false);
   const [description, setDescription] = React.useState('');
@@ -25,13 +30,13 @@ export default function TodoControl(props) {
     setOpen(false);
   };
 
-  const handleDescriptionChange = e => {
+  const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
   const handleAdd = () => {
     setOpen(false);
-    addTodo(description);
+    dispatch(addTodo({ description }));
   };
 
   /*

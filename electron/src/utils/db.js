@@ -22,7 +22,8 @@ export const InitDb = () => {
   docDbP = DatastorePromises.create('doc.db');
   noteDb = new Datastore({ filename: 'note.db', autoload: true });
   noteDbP = DatastorePromises.create('note.db');
-  todoDb = new Datastore({ filename: 'todo.db', autoload: true });
+  //todoDb = new Datastore({ filename: 'todo.db', autoload: true });
+  todoDbP = DatastorePromises.create('todo.db');
   //settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
   settingsDbP = DatastorePromises.create('settings.db');
 };
@@ -247,6 +248,21 @@ export const UpdateNotePromise = async (id, note) => {
     });
   });
 */
+
+export const LocalCreateTodo = (cache) => async (todo) => {
+  const newId = generateId();
+  try {
+    todo.id = newId;
+    await todoDbP.update({ _id: newId }, todo, { upsert: true });
+    console.log('added ', todo);
+    await cache.FillTodoCache();
+    return newId;
+  } catch (e) {
+    console.log('exception when create todo: ', e);
+  }
+  return null;
+};
+
 export const LocalCreateNote = (cache) => async (note) => {
   const newId = generateId();
   try {
@@ -336,19 +352,14 @@ export const GetAllNotesPromise = async () => {
   });
 */
 export const DeleteAllTodos = () => {
-  todoDb.remove({}, { multi: true });
+  todoDbP.remove({}, { multi: true });
 };
 
-export const UpdateTodo = (id, todo) => {
-  // eslint-disable-next-line no-underscore-dangle
-  if (id) {
-    // eslint-disable-next-line no-underscore-dangle
-    todoDb.update({ _id: id }, todo, { upsert: true });
-  } else {
-    todoDb.insert(todo);
-  }
+export const LocalUpdateTodo = (cache) => async (id, todo) => {
+  await todoDbP.update({ id }, todo, { upsert: true });
 };
 
+/*
 export const NewTodo = (todo) =>
   new Promise((resolve, reject) => {
     todoDb.insert(todo, function (err, doc) {
@@ -359,17 +370,14 @@ export const NewTodo = (todo) =>
       }
     });
   });
+*/
 
-export const DeleteTodo = (todoId) => {
-  todoDb.remove({ _id: todoId }, { multi: true });
+export const LocalDeleteTodo = (cache) => async (todoId) => {
+  todoDbP.remove({ _id: todoId }, { multi: true });
 };
 
-export const GetAllTodos = (handleTodo) => {
-  todoDb.find({}, (err, todo) => {
-    if (!err) {
-      handleTodo(todo);
-    }
-  });
+export const GetAllTodos = () => {
+  return todoDbP.find({});
 };
 
 export const GetAllTodosPromise = () =>

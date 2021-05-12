@@ -3,6 +3,7 @@ import { ADD_NOTE, DELETE_NOTE } from '../../actions/file';
 
 const initialState = {};
 
+// some of these should go to the note slice
 export const updateNote = createAsyncThunk(
   'backend/updateNote',
   async (data, thunkAPI) => {
