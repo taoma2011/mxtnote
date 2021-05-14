@@ -36,7 +36,13 @@ export default function TodoControl(props) {
 
   const handleAdd = () => {
     setOpen(false);
-    dispatch(addTodo({ description }));
+    dispatch(
+      addTodo({
+        todo: {
+          description,
+        },
+      })
+    );
   };
 
   /*

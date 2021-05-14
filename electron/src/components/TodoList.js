@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import Checkbox from '@material-ui/core/Checkbox';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import List from '@material-ui/core/List';
@@ -27,7 +27,7 @@ export default function TodoList(props) {
   // eslint-disable-next-line react/prop-types
   const { hasCheckbox, initiallyChecked, hasEditDelete } = props;
 
-  const todos = useSelector(selectTodos);
+  const todos = useSelector(selectTodos, shallowEqual);
   const dispatch = useDispatch();
   const action = {
     editTodo: (todoId) =>
@@ -74,8 +74,8 @@ export default function TodoList(props) {
     checked = newChecked;
   };
 
-  const [editingTodoId, setEditingTodoId] = useState(null);
-  const [deletingTodoId, setDeletingTodoId] = useState(null);
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [deletingTodo, setDeletingTodo] = useState(null);
   return (
     <>
       <List>
@@ -103,43 +103,30 @@ export default function TodoList(props) {
               )}
               <ListItemText primary={todo.description} />
 
-              {hasEditDelete && (
-                <ListItemSecondaryAction>
-                  <ToggleButton
-                    value="check"
-                    size="small"
-                    onChange={() => action.toggleTodoDone(getTodoId(todo))}
-                    selected={todo.done}
-                  >
-                    Done
-                  </ToggleButton>
-                  <IconButton
-                    edge="end"
-                    aria-label="edit"
-                    onClick={() => action.editTodo(getTodoId(todo))}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={() => action.handleDeleteTodo(index)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              )}
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  aria-label="edit"
+                  onClick={() => setEditingTodo(todo)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={() => setDeletingTodo(todo)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           );
         })}
       </List>
-      <EditTodoDialog
-        todoId={editingTodoId}
-        onClose={() => setEditingTodoId(null)}
-      />
+      <EditTodoDialog todo={editingTodo} onClose={() => setEditingTodo(null)} />
       <DeleteTodoDialog
-        todoId={deletingTodoId}
-        onClose={() => setDeletingTodoId(null)}
+        todo={deletingTodo}
+        onClose={() => setDeletingTodo(null)}
       />
     </>
   );

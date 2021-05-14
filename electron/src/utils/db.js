@@ -253,7 +253,7 @@ export const LocalCreateTodo = (cache) => async (todo) => {
   const newId = generateId();
   try {
     todo.id = newId;
-    await todoDbP.update({ _id: newId }, todo, { upsert: true });
+    await todoDbP.insert(todo);
     console.log('added ', todo);
     await cache.FillTodoCache();
     return newId;
@@ -356,7 +356,10 @@ export const DeleteAllTodos = () => {
 };
 
 export const LocalUpdateTodo = (cache) => async (id, todo) => {
-  await todoDbP.update({ id }, todo, { upsert: true });
+  await todoDbP.update({ id }, todo);
+
+  await cache.FillTodoCache();
+  return true;
 };
 
 /*
@@ -373,7 +376,9 @@ export const NewTodo = (todo) =>
 */
 
 export const LocalDeleteTodo = (cache) => async (todoId) => {
-  todoDbP.remove({ _id: todoId }, { multi: true });
+  console.log('deleting todo ', todoId);
+  await todoDbP.remove({ id: todoId }, { multi: true });
+  await cache.FillTodoCache();
 };
 
 export const GetAllTodos = () => {

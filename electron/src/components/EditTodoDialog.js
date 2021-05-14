@@ -8,29 +8,31 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import { selectApi } from './selector';
+import { selectTodoById } from './selector';
+import { editTodo } from '../features/todo/todoSlice';
 import { TODO_DESCRIPTION_CHANGED } from '../actions/file';
 
 export default function EditTodoDialog(props) {
-  const { todoId, onClose } = props;
-  const { apiState, dataApi } = useSelector(selectApi);
+  const { todo, onClose } = props;
   const dispatch = useDispatch();
-  const todo = apiState === 'ok' ? dataApi.GetTodoById(todoId) : {};
   const { description } = todo || {};
-
   const [text, setText] = useState(description);
   const onCommit = () => {
-    dispatch({
-      type: TODO_DESCRIPTION_CHANGED,
-      todoId,
+    const newTodo = {
+      ...todo,
       description: text,
-    });
+    };
+    dispatch(
+      editTodo({
+        todo: newTodo,
+      })
+    );
     onClose();
   };
 
   return (
     <Dialog
-      open={todoId !== null}
+      open={todo !== null}
       onClose={onClose}
       aria-labelledby="form-dialog-title"
     >

@@ -70,7 +70,7 @@ export const NeoDbDataApi: DataApi = {
   CreateTodo: (todo: Todo) => LocalCreateTodo(NeoDbDataApi.cache)(todo),
   UpdateTodo: (id: string, todo: Todo) =>
     LocalUpdateTodo(NeoDbDataApi.cache)(id, todo),
-  DeleteTodo: (noteId: string) => LocalDeleteNote(NeoDbDataApi.cache)(noteId),
+  DeleteTodo: (noteId: string) => LocalDeleteTodo(NeoDbDataApi.cache)(noteId),
 
   DeleteSettings,
 

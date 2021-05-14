@@ -8,24 +8,27 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { selectApi } from './selector';
+import { deleteTodo } from '../features/todo/todoSlice';
 import { DELETE_TODO } from '../actions/file';
 
 export default function DeleteTodoDialog(props) {
-  const { todoId, onClose } = props;
-  const { apiState, dataApi } = useSelector(selectApi);
+  const { todo, onClose } = props;
+
   const dispatch = useDispatch();
-  const todo = apiState === 'ok' ? dataApi.GetTodoById(todoId) : {};
+
   const { description } = todo || {};
-  const deleteTodo = () => {
-    return dispatch({
-      type: DELETE_TODO,
-      todoId,
-    });
+  const doDeleteTodo = () => {
+    dispatch(
+      deleteTodo({
+        todo,
+      })
+    );
+    onClose();
   };
 
   return (
     <Dialog
-      open={todoId !== null}
+      open={todo !== null}
       onClose={onClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
@@ -40,7 +43,7 @@ export default function DeleteTodoDialog(props) {
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={deleteTodo} color="primary" autoFocus>
+        <Button onClick={doDeleteTodo} color="primary" autoFocus>
           Ok
         </Button>
       </DialogActions>

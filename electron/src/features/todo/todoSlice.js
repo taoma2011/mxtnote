@@ -30,4 +30,22 @@ export const addTodo = createAsyncThunk('todo/add', async (data, thunkAPI) => {
   thunkAPI.dispatch(todoSlice.actions.todoAdded(newTodoId));
 });
 
+export const editTodo = createAsyncThunk(
+  'todo/edit',
+  async (data, thunkAPI) => {
+    const { todo } = data;
+    const dataApi = getDataApiFromThunk(thunkAPI);
+    await dataApi.UpdateTodo(todo.id, todo);
+  }
+);
+
+export const deleteTodo = createAsyncThunk(
+  'todo/delete',
+  async (data, thunkAPI) => {
+    const { todo } = data;
+    const dataApi = getDataApiFromThunk(thunkAPI);
+    await dataApi.DeleteTodo(todo.id);
+  }
+);
+
 export const { todoAdded } = todoSlice.actions;

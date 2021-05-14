@@ -126,6 +126,15 @@ export const selectNoteById = (noteId) => (state) => {
   return dataApi.GetNoteById(noteId);
 };
 
+export const selectTodoById = (todoId) => (state) => {
+  const { dataApi, apiState } = state.file;
+  if (apiState !== 'ok') {
+    return null;
+  }
+
+  return dataApi.GetTodoById(todoId);
+};
+
 export const selectEditingFile = (state) => {
   const { editingFileId, apiState, dataApi } = state.file;
   if (apiState !== 'ok') {
