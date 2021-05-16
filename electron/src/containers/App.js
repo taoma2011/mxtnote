@@ -142,10 +142,6 @@ function App(props) {
   const { initialToken } = props;
   const dispatch = useDispatch();
   useEffect(() => {
-    if (isWeb) {
-      console.log('init db for web');
-      InitDb();
-    }
     if (initialToken) {
       console.log('set initial token ', initialToken);
       dataApi.LoginWithToken(initialToken);

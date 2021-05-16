@@ -13,7 +13,12 @@ let noteDbP;
 let todoDbP;
 let settingsDbP;
 
+let dbInited;
+
 export const InitDb = () => {
+  if (dbInited) {
+    return;
+  }
   // eslint-disable-next-line global-require
   const Datastore = require('nedb');
   // eslint-disable-next-line global-require
@@ -26,6 +31,8 @@ export const InitDb = () => {
   todoDbP = DatastorePromises.create('todo.db');
   //settingsDb = new Datastore({ filename: 'settings.db', autoload: true });
   settingsDbP = DatastorePromises.create('settings.db');
+  console.log('nedb initied');
+  dbInited = true;
 };
 
 export const TestInitDb = () => {
@@ -69,6 +76,7 @@ export const GetSettings = () => {
     });
   });
   */
+  InitDb();
   return settingsDbP.findOne({ scope: 'global' });
 };
 
