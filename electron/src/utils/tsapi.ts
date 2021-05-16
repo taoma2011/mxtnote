@@ -37,6 +37,9 @@ import {
   ServerUpdateNote,
   ServerCreateNote,
   ServerDeleteNote,
+  ServerCreateTodo,
+  ServerUpdateTodo,
+  ServerDeleteTodo,
   ServerAddDocument,
   ServerDeleteDocument,
 } from './XtNoteServerApi';
@@ -101,8 +104,10 @@ export const XtNoteServerDataApi: DataApi = {
   DeleteAllDocuments,
   DeleteAllNotes,
   DeleteAllTodos,
-  UpdateTodo,
-  DeleteTodo,
+  CreateTodo: (todo: Todo) => ServerCreateTodo(XtNoteServerDataApi.cache)(todo),
+  UpdateTodo: (id: string, todo: Todo) =>
+    ServerUpdateTodo(XtNoteServerDataApi.cache)(id, todo),
+  DeleteTodo: (id: string) => ServerDeleteTodo(XtNoteServerDataApi.cache)(id),
   LoadNoteImage: ServerLoadNoteImage,
   CreateNote: (note: Note) => ServerCreateNote(XtNoteServerDataApi.cache)(note),
   UpdateNote: (id: string, note: Note) =>

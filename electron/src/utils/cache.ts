@@ -61,7 +61,25 @@ const getTodoById = (id: string): Todo | null => {
 const setNoteById = (id: string, note: Note): void => {
   for (let i = 0; i < noteCache.length; i += 1) {
     if (noteCache[i].id === id) {
-      noteCache.splice(i, 1, note);
+      const a = noteCache
+        .slice(0, i)
+        .concat(note)
+        .concat(noteCache.slice(i + 1));
+      noteCache = a;
+      return;
+    }
+  }
+};
+
+const setTodoById = (id: string, todo: Todo): void => {
+  for (let i = 0; i < todoCache.length; i += 1) {
+    if (todoCache[i].id === id) {
+      const a = todoCache
+        .slice(0, i)
+        .concat(todo)
+        .concat(todoCache.slice(i + 1));
+      todoCache = a;
+      console.log('new todocache is ', todoCache);
       return;
     }
   }
@@ -95,6 +113,7 @@ export const CreateCache = async (backendApi: any): Promise<DataApi> => {
     GetTodoByDescription: getTodoByDescription,
     GetTodoById: getTodoById,
     SetNoteById: setNoteById,
+    SetTodoById: setTodoById,
 
     FillFileCache,
     FillNoteCache,

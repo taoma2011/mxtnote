@@ -29,50 +29,6 @@ export default function TodoList(props) {
 
   const todos = useSelector(selectTodos, shallowEqual);
   const dispatch = useDispatch();
-  const action = {
-    editTodo: (todoId) =>
-      dispatch({
-        type: START_EDIT_TODO,
-        todoId,
-      }),
-    deleteTodo: (todoId) =>
-      dispatch({
-        type: START_DELETE_TODO,
-        todoId,
-      }),
-    toggleTodoDone: (todoId) =>
-      dispatch({
-        type: TOGGLE_TODO_DONE,
-        todoId,
-      }),
-  };
-  const handleClickTodo = () => {
-    // const todo = todos[index];
-    // eslint-disable-next-line no-underscore-dangle
-    // gotoTodo(todo._id);
-  };
-
-  const handleDeleteTodo = (index) => {
-    const todo = todos[index];
-    action.deleteTodo(todo._id);
-  };
-
-  let checked = initiallyChecked;
-  const checkedByIndex = [];
-  for (let i = 0; i < todos.length; i += 1) {
-    checkedByIndex.push(false);
-  }
-
-  const handleChecked = (index) => {
-    const newChecked = [];
-    checkedByIndex[index] = !checkedByIndex[index];
-    for (let i = 0; i < todos.length; i += 1) {
-      if (checkedByIndex[i]) {
-        newChecked.push(i);
-      }
-    }
-    checked = newChecked;
-  };
 
   const [editingTodo, setEditingTodo] = useState(null);
   const [deletingTodo, setDeletingTodo] = useState(null);
@@ -83,24 +39,7 @@ export default function TodoList(props) {
           const key = `todo-li-${index}`;
           const checkboxLabel = `checkbox-list-label-${index}`;
           return (
-            <ListItem
-              key={key}
-              dense
-              button
-              onClick={() => handleClickTodo(index)}
-            >
-              {hasCheckbox && (
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(index) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    onClick={() => handleChecked(index)}
-                    inputProps={{ 'aria-labelledby': checkboxLabel }}
-                  />
-                </ListItemIcon>
-              )}
+            <ListItem key={key} dense button>
               <ListItemText primary={todo.description} />
 
               <ListItemSecondaryAction>

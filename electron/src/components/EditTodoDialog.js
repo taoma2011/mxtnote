@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -14,9 +14,14 @@ import { TODO_DESCRIPTION_CHANGED } from '../actions/file';
 
 export default function EditTodoDialog(props) {
   const { todo, onClose } = props;
+  console.log('editing todo ', todo);
   const dispatch = useDispatch();
   const { description } = todo || {};
-  const [text, setText] = useState(description);
+
+  const [text, setText] = useState('');
+  useEffect(() => {
+    setText(description);
+  }, [description]);
   const onCommit = () => {
     const newTodo = {
       ...todo,
@@ -49,6 +54,9 @@ export default function EditTodoDialog(props) {
         />
       </DialogContent>
       <DialogActions>
+        <Button onClick={onClose} color="primary">
+          Cancel
+        </Button>
         <Button onClick={onCommit} color="primary">
           Ok
         </Button>

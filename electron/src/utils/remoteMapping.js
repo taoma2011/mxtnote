@@ -11,6 +11,12 @@ function centerWHToRect(x, y, w, h, pageW, pageH) {
   };
 }
 
+export const localTodoToRemoteTodo = (localTodo) => {
+  return {
+    name: localTodo.description,
+  };
+};
+
 export const localNoteToRemoteNote = (cache, localNote) => {
   const noteFile = cache.GetDocumentById(localNote.fileId);
 
@@ -54,6 +60,12 @@ export const localNoteToRemoteNote = (cache, localNote) => {
     createdDate: localNote.created ? Date.parse(localNote.created) : null,
   };
   return newNote;
+};
+
+export const remoteTodoToLocalTodo = (remoteTodo) => {
+  return {
+    description: remoteTodo.name,
+  };
 };
 
 export const remoteNoteToLocalNote = (cache, noteFile, oldNote) => {

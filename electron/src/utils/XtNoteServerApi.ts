@@ -2,7 +2,12 @@ import axios from 'axios';
 import { OpenPdfData, GetPdfPage, getImageFromPdfPage } from './pdfutils';
 import { GetAllActiveDocuments } from './db';
 import { Document, Note, RuntimeDocument, Todo } from './interface';
-import { localNoteToRemoteNote, remoteNoteToLocalNote } from './remoteMapping';
+import {
+  localNoteToRemoteNote,
+  localTodoToRemoteTodo,
+  remoteNoteToLocalNote,
+  remoteTodoToLocalTodo,
+} from './remoteMapping';
 import { FillNoteCache } from './cache';
 
 const uuid = require('uuid');
@@ -383,6 +388,7 @@ export const ServerGetAllTodos = async (): Promise<Todo[]> => {
     console.log('todos ', res);
     return res.data.map((t: any) => {
       return {
+        // is it ok to generate id ourselves?
         id: t.id ? t.id : uuid.v4(),
         description: t.name,
       };
@@ -391,4 +397,83 @@ export const ServerGetAllTodos = async (): Promise<Todo[]> => {
     console.log('get all todos error ', e);
   }
   return [];
+};
+
+export const ServerCreateTodo = (cache: any) => async (
+  todo: Todo
+): Promise<string | null> => {
+  if (!token) {
+    return null;
+  }
+
+  console.log('creating ', todo);
+  const remoteTodo = localTodoToRemoteTodo(todo);
+  remoteTodo.userId = userId;
+  try {
+    const res = await axios.post(`${getBaseUrl()}/tags/create`, remoteTodo, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+    const newId = res.data.id;
+
+    await cache.FillTodoCache();
+    return newId;
+  } catch (e) {
+    console.log('get all notes error ', e);
+  }
+  return null;
+};
+
+export const ServerUpdateTodo = (cache: any) => async (
+  id: string,
+  todo: Todo
+): Promise<boolean> => {
+  if (!token) {
+    return false;
+  }
+
+  const remoteTodo = localTodoToRemoteTodo(todo);
+  console.log('updating ', remoteTodo);
+  try {
+    const res = await axios.post(`${getBaseUrl()}/tags/${id}`, remoteTodo, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+    await cache.SetTodoById(todo.id, todo);
+    return true;
+  } catch (e) {
+    console.log('set todo error ', e);
+  }
+  return false;
+};
+
+export const ServerDeleteTodo = (cache: any) => async (
+  id: string
+): Promise<boolean> => {
+  if (!token) {
+    return false;
+  }
+
+  console.log('deleting  note ', id);
+
+  try {
+    const res = await axios.delete(`${getBaseUrl()}/tags/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('res = ', res);
+  } catch (e) {
+    console.log('delete note error ', e);
+    return false;
+  }
+  await cache.FillTodoCache();
+  return true;
 };

@@ -46,7 +46,7 @@ export interface CacheApi {
   GetTodoByDescription(desc: string): Todo | null;
   GetTodoById(id: string): Todo | null;
   SetNoteById(id: string, note: Note): void;
-
+  SetTodoById(id: string, todo: Todo): void;
   FillFileCache(): void;
 }
 
