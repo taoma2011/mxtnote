@@ -39,7 +39,7 @@ import {
 // import { getElectron } from '../utils/common';
 import { LoginDialog } from '../components/LoginDialog';
 import { AutoLogin } from '../components/AutoLogin';
-import { SetUserPass } from '../utils/db';
+import { SetUserPass, InitDb } from '../utils/db';
 import { CreateCache } from '../utils/cache';
 import { selectIsWeb } from '../components/selector';
 import { isUseLocalDataApi } from '../utils/env';
@@ -142,6 +142,10 @@ function App(props) {
   const { initialToken } = props;
   const dispatch = useDispatch();
   useEffect(() => {
+    if (isWeb) {
+      console.log('init db for web');
+      InitDb();
+    }
     if (initialToken) {
       console.log('set initial token ', initialToken);
       dataApi.LoginWithToken(initialToken);
