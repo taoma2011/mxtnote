@@ -1,10 +1,10 @@
-var TreeModel = require("tree-model");
+var TreeModel = require('tree-model');
 var tm = new TreeModel();
-const uuid = require("uuid");
+const uuid = require('uuid');
 
 const isModifiedAfterSync = (v) => {
-  console.log("checking last modified ", v.lastModified);
-  console.log("last sync ", v.lastSynced);
+  console.log('checking last modified ', v.lastModified);
+  console.log('last sync ', v.lastSynced);
   return v.lastModified > v.lastSynced;
 };
 
@@ -19,13 +19,13 @@ const mergeTree = (local, remote) => {
   const localString = JSON.stringify(local.model);
   const remoteString = JSON.stringify(remote.model);
   if (localString === remoteString) {
-    console.log("merge with both child");
+    console.log('merge with both child');
     newTree.addChild(local);
     return newTree.model;
   }
   newTree.addChild(local);
   newTree.addChild(remote);
-  console.log("after merge: ", newTree.model);
+  console.log('after merge: ', newTree.model);
   return newTree.model;
 };
 
@@ -42,13 +42,13 @@ const mergeVersions = (local, remote) => {
   if (remote == null && local == null) return null;
   if (remote == null) {
     return {
-      status: "local",
+      status: 'local',
       tree: local.tree,
     };
   }
   if (local == null) {
     return {
-      status: "remote",
+      status: 'remote',
       tree: remote.tree,
     };
   }
@@ -64,56 +64,56 @@ const mergeVersions = (local, remote) => {
   const remoteTree = remote.tree ? tm.parse(remote.tree) : tm.parse(newNode());
 
   const localRootId = localTree.model.id;
-  const remoteNode = remoteTree.first(function(node) {
+  const remoteNode = remoteTree.first(function (node) {
     return node.model.id === localRootId;
   });
   if (remoteNode != null) {
     if (remoteNode.isRoot()) {
-      console.log("checking local modified time");
+      console.log('checking local modified time');
       if (!isModifiedAfterSync(local)) {
         return {
-          status: "remote",
+          status: 'remote',
           tree: mergeTree(localTree, remoteTree),
         };
       }
-      console.log("checking remote modified time");
+      console.log('checking remote modified time');
       if (!isModifiedAfterSync(remote)) {
         return {
-          status: "local",
+          status: 'local',
           tree: mergeTree(localTree, remoteTree),
         };
       }
     } else {
       if (!isModifiedAfterSync(local)) {
         return {
-          status: "remote",
+          status: 'remote',
           tree: mergeTree(localTree, remoteTree),
         };
       }
     }
     return {
-      status: "conflict",
+      status: 'conflict',
     };
   }
 
   const remoteRootId = remoteTree.model.id;
-  const localNode = local.tree.first(function(node) {
+  const localNode = localTree.first(function (node) {
     return node.model.id === remoteRootId;
   });
   if (localNode != null) {
     if (!isModifiedAfterSync(remote)) {
       return {
-        status: "local",
-        tree: mergeTree(local.tree, remote.tree),
+        status: 'local',
+        tree: mergeTree(localTree, remoteTree),
       };
     }
     return {
-      status: "conflict",
+      status: 'conflict',
     };
   }
 
   return {
-    status: "conflict",
+    status: 'conflict',
   };
 };
 

@@ -710,6 +710,7 @@ export default function file(state, action) {
         noteLoaded: false,
         todos: [],
         todoLoaded: false,
+        syncProgress: 'done',
       };
     }
     case IMPORT_NOTE: {
@@ -767,10 +768,13 @@ export default function file(state, action) {
     }
     case CLOSE_RESET_CONFIRM_DIALOG: {
       if (action.confirmed) {
+        /*
+        this is done in backendSlice now
         dataApi.DeleteAllDocuments();
         dataApi.DeleteAllNotes();
         dataApi.DeleteAllTodos();
         dataApi.DeleteSettings();
+        */
         return {
           ...state,
           notes: {},

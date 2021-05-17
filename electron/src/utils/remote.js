@@ -5,11 +5,13 @@ import {
   callExportRemoteDb,
 } from './api';
 
+import { RESOLVE_CONFLICT, IMPORT_NOTE_FROM_REMOTE } from '../actions/file';
 import { mergeVersions, newNode } from '../version/version';
 
 export function syncRemoteThunk(dataApi) {
   return function (dispatch) {
     return doSync(dataApi).then((result) => {
+      console.log('got sync result ', result);
       dispatch(result);
       return true;
     });
@@ -30,7 +32,7 @@ export async function doSync(dataApi) {
     dataApi.UpdateDocument(f._id, f);
   });
 
-  await mergeAndExport(dataApi, remoteDb, 0, null);
+  return mergeAndExport(dataApi, remoteDb, 0, null);
 }
 
 //
@@ -91,7 +93,7 @@ export async function mergeAndExport(
           if (result === 'local') {
             existingNote.lastSynced = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNote(existingNote._id, existingNote);
             continue;
           } else if (result === 'remote') {
             Object.assign(existingNote, n);
@@ -99,11 +101,11 @@ export async function mergeAndExport(
             existingNote.lastSynced = syncTime;
             existingNote.lastModified = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNote(existingNote._id, existingNote);
             continue;
           } else {
             existingNote.conflict = true;
-            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNote(existingNote._id, existingNote);
             continue;
           }
         } else {
@@ -111,7 +113,7 @@ export async function mergeAndExport(
             // keep local version, create
             existingNote.lastSynced = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNote(existingNote._id, existingNote);
             continue;
           }
           if (res.status === 'remote') {
@@ -120,7 +122,7 @@ export async function mergeAndExport(
             existingNote.lastSynced = syncTime;
             existingNote.lastModified = syncTime;
             existingNote.syncRecord = JSON.stringify(res.tree);
-            await dataApi.UpdateNotePromise(existingNote._id, existingNote);
+            await dataApi.UpdateNote(existingNote._id, existingNote);
             continue;
           }
         }
@@ -131,7 +133,7 @@ export async function mergeAndExport(
     n.lastSynced = syncTime;
     // convert to local field name/format
     n.lastModified = n.lastModifiedTime;
-    await dataApi.UpdateNotePromise(n.id, n);
+    await dataApi.UpdateNote(n.id, n);
   }
   remoteDb.todos.forEach((t) => {
     t._id = t.id;
@@ -142,20 +144,20 @@ export async function mergeAndExport(
   const localFiles = await dataApi.GetAllDocumentsPromise();
 
   // if there is no sync record, create one
-  const localNotes = await dataApi.GetAllNotesPromise();
+  const localNotes = await dataApi.GetAllActiveNotes();
 
   localNotes.forEach(async (n) => {
     if (!n.syncRecord) {
       n.lastSynced = syncTime;
       n.syncRecord = JSON.stringify(newNode());
-      await dataApi.UpdateNotePromise(n._id, n);
+      await dataApi.UpdateNote(n._id, n);
     }
   });
 
   const db = {
     files: localFiles,
     notes: localNotes,
-    todos: await dataApi.GetAllTodosPromise(),
+    todos: await dataApi.GetAllTodos(),
   };
   await callExportRemoteDb(db);
 

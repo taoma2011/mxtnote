@@ -1,7 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { ADD_NOTE, DELETE_NOTE } from '../../actions/file';
+import {
+  ADD_NOTE,
+  DELETE_NOTE,
+  CLOSE_RESET_CONFIRM_DIALOG,
+} from '../../actions/file';
 
 const initialState = {};
+
+export const resetDb = createAsyncThunk(
+  'backend/resetDb',
+  async (data, thunkAPI) => {
+    const fileState = thunkAPI.getState().file;
+    const { dataApi } = fileState;
+    await dataApi.DeleteAllDocuments();
+    await dataApi.DeleteAllNotes();
+    await dataApi.DeleteAllTodos();
+    await dataApi.DeleteSettings();
+    thunkAPI.dispatch({
+      type: CLOSE_RESET_CONFIRM_DIALOG,
+      confirmed: true,
+    });
+  }
+);
 
 // some of these should go to the note slice
 export const updateNote = createAsyncThunk(

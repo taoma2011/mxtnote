@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 // import { isNewNote } from '../utils/common';
 import ResolveConflictDialog from '../components/ResolveConflictDialog';
-// import { doSync, mergeAndExport } from '../utils/remote';
+import { mergeAndExport } from '../utils/remote';
 import { RESOLVE_DONE } from '../actions/file';
 
 function mapStateToProps(state) {
@@ -25,12 +25,14 @@ function mapStateToProps(state) {
   };
 }
 
-function continueMergeThunk(remoteDb, currIndex, resolveResult) {
+function continueMergeThunk(dataApi, remoteDb, currIndex, resolveResult) {
   return function (dispatch) {
-    return mergeAndExport(remoteDb, currIndex, resolveResult).then((result) => {
-      dispatch(result);
-      return true;
-    });
+    return mergeAndExport(dataApi, remoteDb, currIndex, resolveResult).then(
+      (result) => {
+        dispatch(result);
+        return true;
+      }
+    );
   };
 }
 

@@ -384,7 +384,8 @@ export const exportRemoteDb = async (event, db) => {
   const tagMap = {};
   const newTags = [];
 
-  const myId = machineIdSync() + ':mxtnote-electron';
+  const nm = eval("require('node-machine-id')");
+  const myId = nm.machineIdSync() + ':mxtnote-electron';
   for (let i = 0; i < localFiles.length; i += 1) {
     const localFile = localFiles[i];
     event.sender.send(

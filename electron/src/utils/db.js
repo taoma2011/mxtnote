@@ -127,6 +127,22 @@ export const DeleteAllDocuments = () => {
   docDb.remove({}, { multi: true });
 };
 
+export const LocalDeleteAllDocuments = (cache) => async () => {
+  console.log('delete all doc');
+  await docDbP.remove({}, { multi: true });
+  await cache.FillFileCache();
+};
+
+export const LocalDeleteAllNotes = (cache) => async () => {
+  await noteDbP.remove({}, { multi: true });
+  await cache.FillNoteCache();
+};
+
+export const LocalDeleteAllTodos = (cache) => async () => {
+  await todoDbP.remove({}, { multi: true });
+  await cache.FillTodoCache();
+};
+
 export const AddDocument = async (doc) => {
   let newDoc;
   // local version don't need to save content
@@ -209,7 +225,11 @@ export const GetAllDocuments = (handleDoc) => {
 export const GetAllActiveDocuments = () =>
   docDbP.find({ deleted: { $ne: true } });
 
-export const GetAllDocumentsPromise = () =>
+export const GetAllDocumentsPromise = async () => {
+  return docDbP.find({});
+};
+
+/*
   new Promise((resolve, reject) => {
     docDb.find({}, (err, doc) => {
       if (!err) {
@@ -218,7 +238,7 @@ export const GetAllDocumentsPromise = () =>
         reject(err);
       }
     });
-  });
+  }); */
 
 export const GetDocumentByUuidPromise = (fileUuid) =>
   new Promise((resolve, reject) => {

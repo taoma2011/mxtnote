@@ -8,6 +8,9 @@ import {
   DeleteAllTodos,
   //UpdateTodo,
   //DeleteTodo,
+  LocalDeleteAllDocuments,
+  LocalDeleteAllNotes,
+  LocalDeleteAllTodos,
   LocalUpdateNote,
   LocalCreateNote,
   LocalDeleteNote,
@@ -58,9 +61,9 @@ export const NeoDbDataApi: DataApi = {
     LocalUpdateDocument(NeoDbDataApi.cache)(id, doc),
   DeleteDocumentByFileId: (fileId: string) =>
     LocalDeleteDocument(NeoDbDataApi.cache)(fileId),
-  DeleteAllDocuments,
-  DeleteAllNotes,
-  DeleteAllTodos,
+  DeleteAllDocuments: () => LocalDeleteAllDocuments(NeoDbDataApi.cache)(),
+  DeleteAllNotes: () => LocalDeleteAllNotes(NeoDbDataApi.cache)(),
+  DeleteAllTodos: () => LocalDeleteAllTodos(NeoDbDataApi.cache)(),
 
   // is this still needed?
   LoadNoteImage,
@@ -101,9 +104,9 @@ export const XtNoteServerDataApi: DataApi = {
   },
   DeleteDocumentByFileId: (fileId: string) =>
     ServerDeleteDocument(XtNoteServerDataApi.cache)(fileId),
-  DeleteAllDocuments,
-  DeleteAllNotes,
-  DeleteAllTodos,
+  DeleteAllDocuments: async () => {},
+  DeleteAllNotes: async () => {},
+  DeleteAllTodos: async () => {},
   CreateTodo: (todo: Todo) => ServerCreateTodo(XtNoteServerDataApi.cache)(todo),
   UpdateTodo: (id: string, todo: Todo) =>
     ServerUpdateTodo(XtNoteServerDataApi.cache)(id, todo),

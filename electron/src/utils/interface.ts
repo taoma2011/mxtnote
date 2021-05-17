@@ -62,9 +62,9 @@ export interface DataApi {
   AddDocument(doc: Document): Promise<string>;
   UpdateDocument(id: string, doc: Document): Promise<boolean>;
   DeleteDocumentByFileId(fileId: string): void;
-  DeleteAllDocuments(): void;
-  DeleteAllNotes(): void;
-  DeleteAllTodos(): void;
+  DeleteAllDocuments(): Promise<void>;
+  DeleteAllNotes(): Promise<void>;
+  DeleteAllTodos(): Promise<void>;
   LoadNoteImage(noteId: string, scale: number): Promise<any>;
   // need create todo?
   CreateTodo(todo: Todo): Promise<string | null>;
