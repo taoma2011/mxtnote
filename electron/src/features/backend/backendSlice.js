@@ -69,13 +69,13 @@ export const deleteNote = createAsyncThunk(
 export const createNote = createAsyncThunk(
   'backend/createNote',
   async (data, thunkAPI) => {
-    const { x, y } = data;
+    const { x, y, pageNum } = data;
     const fileState = thunkAPI.getState().file;
     const { dataApi } = fileState;
     const now = new Date();
     const defaultNote = {
       fileId: fileState.currentFile.id,
-      page: fileState.currentPageNum,
+      page: pageNum,
       width: 100,
       height: 100,
       top: (y * 100) / fileState.scale,

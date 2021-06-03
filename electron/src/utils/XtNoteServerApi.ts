@@ -284,6 +284,13 @@ export const ServerGetAllNotes = async (cache: any): Promise<Note[]> => {
         if (!f || !f.width) {
           return null;
         }
+        // parse the json date
+        if (remoteNote.creationTime) {
+          remoteNote.creationTime = new Date(remoteNote.creationTime);
+        }
+        if (remoteNote.lastModifiedTime) {
+          remoteNote.lastModifiedTime = new Date(remoteNote.lastModifiedTime);
+        }
         return remoteNoteToLocalNote(cache, f, remoteNote);
       })
       .filter((n: any) => n !== null);

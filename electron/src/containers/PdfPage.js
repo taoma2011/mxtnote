@@ -20,9 +20,10 @@ function mapDispatchToProps(dispatch) {
       dispatch({ type: RENDER_COMPLETE, canvas }),
     notifyPageSizeReady: (pageWidth, pageHeight) =>
       dispatch({ type: PAGE_SIZE_READY, pageWidth, pageHeight }),
-    addNoteAt: (e) =>
+    addNoteAt: (e, pageNum) =>
       dispatch(
         createNote({
+          pageNum,
           x: e.nativeEvent.offsetX,
           y: e.nativeEvent.offsetY,
         })

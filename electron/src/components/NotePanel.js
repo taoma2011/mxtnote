@@ -105,7 +105,7 @@ export default function NotePanel(props) {
   const noteFile = dataApi.GetDocumentById(fileId);
   let noteContext = 'missing context';
   if (noteFile) {
-    noteContext = `${noteFile.description}, page ${note.page}`;
+    noteContext = `${noteFile.description}, page ${note.page}, last modified ${note.lastModified}`;
   }
   const lines = text ? text.split(/\r?\n/) : [];
   // const mathJaxNodes = lines.forEach(l => <MathJax.Text text={l} />);

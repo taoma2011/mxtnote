@@ -57,7 +57,8 @@ export const localNoteToRemoteNote = (cache, localNote) => {
     ...newWH,
     detail: localNote.text,
     tags: noteTags,
-    createdDate: localNote.created ? Date.parse(localNote.created) : null,
+    creationTime: localNote.created,
+    lastModifiedTime: localNote.lastModified,
   };
   return newNote;
 };
@@ -106,10 +107,9 @@ export const remoteNoteToLocalNote = (cache, noteFile, oldNote) => {
     text: oldNote.detail,
     todoDependency: noteTags,
 
-    created: oldNote.createdDate
-      ? Number(Date.parse(oldNote.createdDate))
-      : null,
+    created: oldNote.creationTime,
     visible: true,
+    lastModified: oldNote.lastModifiedTime,
   };
 
   // if the remote note doesn't have sync record, create one,

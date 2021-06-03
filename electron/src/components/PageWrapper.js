@@ -86,7 +86,12 @@ export const PageWrapper = React.memo((props) => {
       <>
         <SelectRect />
         {items}
-        <PdfPage pdfPage={page} pageWidth={pageWidth} pageHeight={pageHeight} />
+        <PdfPage
+          pdfPage={page}
+          pageNum={pageNum}
+          pageWidth={pageWidth}
+          pageHeight={pageHeight}
+        />
       </>
     );
   }

@@ -28,8 +28,8 @@ export interface Note {
   image: any;
   imageFile: string;
   todoDependency: string[];
-  created: string;
-  lastModified: string;
+  created: Date;
+  lastModified: Date;
   lastSynced: string;
   syncRecord: string;
   id: string;

@@ -10,7 +10,7 @@ export default class PdfPage extends Component {
     this.notifyPageSizeReady = props.notifyPageSizeReady;
     this.addNoteAt = props.addNoteAt;
     this.handleClick = this.handleClick.bind(this);
-
+    this.pageNum = props.pageNum;
     this.pageWidth = props.pageWidth;
     this.pageHeight = props.pageHeight;
     /*
@@ -98,7 +98,7 @@ export default class PdfPage extends Component {
     // console.log('e = ', e.offsetX, e.offsetY);
     // eslint-disable-next-line react/destructuring-assignment
     if (this.props.addingNote) {
-      this.addNoteAt(e);
+      this.addNoteAt(e, this.pageNum);
     }
   }
 
